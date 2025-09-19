@@ -4,45 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Runway Slots - Welcome</title>
+  <meta name="color-scheme" content="light only">
   <link rel="stylesheet" href="styles/welco.css">
 </head>
 <body>
-  <!-- Name capture-->
-  <div class="overlay" id="nameOverlay" aria-modal="true" role="dialog">
-    <div class="modal">
-      <h2>Enter your name</h2>
-      <p>We’ll personalize your greeting.</p>
-      <div class="field">
-        <input id="nameInput" type="text" placeholder="e.g., ArtemisByte" maxlength="50" autocomplete="name" />
-        <button id="saveNameBtn">Continue</button>
+  <div class="overlay" id="nameOverlay" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="dialog" role="document">
+      <div class="titlebar">
+        <div id="dlgTitle" class="title">User Personalization</div>
+        <div class="controls">
+          <button class="ctrl-btn" id="closeDialog" aria-label="Close name dialog"><span class="ctrl-x">×</span></button>
+        </div>
       </div>
-      <div id="nameError" class="error"></div>
+      <div class="dialog-body">
+        <div>Let me personalise your greeting.</div>
+        <div class="row">
+          <label for="nameInput">Your name:</label>
+          <input id="nameInput" class="input" type="text" maxlength="50" autocomplete="name" placeholder="e.g., ArtemisByte" />
+        </div>
+        <div class="row" style="justify-content:flex-end; gap:6px;">
+          <button class="btn" id="saveNameBtn">OK</button>
+          <button class="btn" id="cancelNameBtn">Cancel</button>
+        </div>
+        <div id="nameError" class="error" role="alert"></div>
+      </div>
     </div>
   </div>
 
-  <!-- Main content -->
-  <div class="wrapper" id="wrapper" aria-live="polite">
-    <h1 id="greeting">Welcome</h1>
-
-    <div class="container">
-      <!-- Row 1 -->
-      <div class="box" style="--delay:.05s; grid-column: 1; grid-row: 1;" onclick="location.href='multiflight.html'">SCR Generator</div>
-      <div class="box" style="--delay:.12s; grid-column: 3; grid-row: 1;" onclick="location.href='gcrformat.html'">GCR Generator</div>
-
-      <!-- Row 2 (middle) -->
-      <div class="box" style="--delay:.19s; grid-column: 2; grid-row: 2;" onclick="location.href='airport-search.html'">Airport Database</div>
-
-      <!-- Row 3 -->
-      <div class="box" style="--delay:.26s; grid-column: 1; grid-row: 3;" onclick="location.href='turnaround.html'">Turnaround Generator</div>
-      <div class="box" style="--delay:.33s; grid-column: 3; grid-row: 3;" onclick="location.href='scrbackup.html'">SCR-Backup</div>
+  <div class="window" id="wrapper" aria-live="polite">
+    <div class="titlebar">
+      <div class="title">Welcome to ArtemisByte's Runway Slot Generator/div>
+      <div class="controls">
+        <div class="ctrl-btn" title="Minimize"></div>
+        <div class="ctrl-btn" title="Maximize"></div>
+        <div class="ctrl-btn" title="Close"></div>
+      </div>
     </div>
+    <div class="window-body">
 
-    <div class="footer-actions">
-      <a id="changeName">Click Here to Change Name</a>
+      <div class="group" aria-labelledby="grpGreeting">
+        <div id="grpGreeting" class="label">Information</div>
+        <div class="greeting" id="greeting">Welcome</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Navigation</div>
+        <div class="grid" role="list">
+          <a role="listitem" class="w95-button" href="multiflight.html">SCR Generator</a>
+          <a role="listitem" class="w95-button" href="gcrformat.html">GCR Generator</a>
+          <a role="listitem" class="w95-button center" href="airport-search.html">Airport Database</a>
+          <a role="listitem" class="w95-button" href="turnaround.html">Turnaround Generator</a>
+          <a role="listitem" class="w95-button" href="scrbackup.html">SCR-BACKUP</a>
+          <span role="listitem" class="w95-button" style="pointer-events:none; opacity:.6;">—</span>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span id="changeName" class="link">Click here to change name</span>
+      </div>
+
     </div>
   </div>
+
+  <footer>Created By: ArtemisByte/KunchackoBoben 2024</footer>
+  <footer>Disclaimer:
+
+Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use. You assume all responsibility.</footer>
 
   <script src="scripts/welco.js"></script>
-    
 </body>
 </html>
