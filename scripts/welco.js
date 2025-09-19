@@ -61,10 +61,13 @@
       document.getElementById("nameError").textContent = "";
     });
 
-    // Init
-    (function init(){
-      let name = "";
-      try { name = localStorage.getItem(LS_KEY) || ""; } catch(e){}
-      setGreeting(name);
-      if (!name) showOverlay(true);
-    })();
+ (function init(){
+  let name = "";
+  try { name = localStorage.getItem(LS_KEY) || ""; } catch(e){}
+  setGreeting(name);
+  if (!name) {
+    showOverlay(true);
+  } else {
+    showOverlay(false); 
+  }
+})();
