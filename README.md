@@ -65,7 +65,7 @@ Have feedback or feature requests? I'd love to hear from you! 📨
 
 
 
-CREATED BY ArtemisByte/KunchackoBoben 2024
+CREATED BY ArtemisByte/KunchackoBoben 2024 
 
 
 
