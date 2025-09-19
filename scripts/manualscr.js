@@ -153,6 +153,28 @@ function formatDateDDMMM(isoDate) {
 }
 
 /******************************************
+ IATA SEASON CODE (Syy / Wyy)
+******************************************/
+function getIataSeasonCode(date = new Date()) {
+  const y = date.getFullYear();
+
+  const lastSunday = (year, monthIndex /* 0=Jan..11=Dec */) => {
+    const d = new Date(year, monthIndex + 1, 0, 12); // 12:00 on last day of month
+    const dow = d.getDay(); // 0=Sun..6=Sat
+    d.setDate(d.getDate() - dow); // back to Sunday
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const summerStart = lastSunday(y, 2); // last Sunday of March
+  const winterStart = lastSunday(y, 9); // last Sunday of October
+
+  if (date >= winterStart) return "W" + String(y).slice(-2);
+  if (date >= summerStart) return "S" + String(y).slice(-2);
+  return "W" + String(y - 1).slice(-2);
+}
+
+/******************************************
  1) SHOW SCR for NEW/CANCEL
 ******************************************/
 function showSCR(buttonEl) {
@@ -182,6 +204,7 @@ function showSCR(buttonEl) {
 
   const formattedDate = formatDateDDMMM(dateVal);
   const dayValue = getDayValue(dateObj);
+  const seasonCode = getIataSeasonCode(dateObj); // NEW
 
   let indicator = 'N';
   let actionText = 'NEW SLOT';
@@ -191,7 +214,7 @@ function showSCR(buttonEl) {
   }
 
   let scrMessage = `SCR  
-S25  
+${seasonCode}  
 ${formattedDate}  
 ${airportCode}  
 `;
@@ -289,6 +312,7 @@ function showChangeSCR(buttonEl) {
   const new_ddmmm = formatDateDDMMM(new_date);
   const old_dayVal = getDayValue(new Date(old_date));
   const new_dayVal = getDayValue(new Date(new_date));
+  const seasonCode = getIataSeasonCode(new Date(old_date)); // NEW (header season based on old_date)
 
   const old_indicator = (old_slotType === 'Arrival') ? `C${old_flightNo}` : `C ${old_flightNo}`;
   const new_indicator = (new_slotType === 'Arrival') ? `R${new_flightNo}` : `R ${new_flightNo}`;
@@ -297,7 +321,7 @@ function showChangeSCR(buttonEl) {
   let new_stationTime = (new_slotType === 'Arrival') ? `${new_do}${new_time}` : `${new_time}${new_do}`;
 
   let scrMessage = `SCR
-S25
+${seasonCode}
 ${old_ddmmm}
 ${old_airport}
 ${old_indicator} ${old_ddmmm}${old_ddmmm} ${old_dayVal} 000${old_acType} ${old_stationTime} ${old_stc}  
