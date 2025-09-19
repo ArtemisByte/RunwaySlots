@@ -30,6 +30,8 @@ Plus, enjoy additional tools to streamline your workflow. 🚀
 
 🆕 New functionalities coming soon! Stay tuned! 🚀
 
+🆕 New Web Address Coming Soon 
+
 
 
 
@@ -72,6 +74,7 @@ CREATED BY ArtemisByte/KunchackoBoben 2024
 COPYRIGHT INFORMATION:
 
 MIT License
+-----------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,6 +87,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 DISCLAIMER:
+---------------
 
 THE SOFTWARE/WEBSITE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
