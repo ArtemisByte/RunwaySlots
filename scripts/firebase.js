@@ -11,3 +11,5 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 console.log("Firebase initialized:", firebase.apps[0]);
+
+//THIS FIREBASE API KEY WILL BE DISCONTINUED/INVALID//
