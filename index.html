@@ -43,6 +43,22 @@
         <div class="greeting" id="greeting">Welcome</div>
       </div>
 
+       <div class="info-bar">
+    <div class="left-tools">
+      <div id="utcTopClock" class="utc-clock" aria-live="polite">UTC: --:--:-- • --MON----</div>
+    </div>
+    <div class="right-tools">
+      <label class="auto-refresh" title="Automatically reload this page every 15 minutes">
+        <input type="checkbox" id="autoRefreshToggle" checked>
+        <span>Auto-refresh (15 min)</span>
+      </label>
+      <div id="fbStatus" class="status-indicator" title="Firebase Realtime Database status">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="text">DB Not Connected</span>
+      </div>
+    </div>
+  </div>
+
       <div class="group">
         <div class="label">Navigation</div>
         <div class="grid" role="list">
@@ -64,9 +80,11 @@
 
   <footer>Created By: ArtemisByte/KunchackoBoben 2024</footer>
   <footer>Disclaimer:
-
 Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use. You assume all responsibility.</footer>
 
-  <script src="scripts/welco.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script> 
+<script src="scripts/firebase.js"></script>  
+<script src="scripts/welco.js"></script>
 </body>
 </html>
