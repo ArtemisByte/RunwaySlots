@@ -51,8 +51,7 @@
     function getSelectedServiceType() { return document.getElementById("dropdownMenu").value; }
     function getSlotType() { const v = document.getElementById("slotType").value; if (v === "NEW") return "NEW SLOT"; if (v === "CANCEL") return "CANCEL SLOT"; if (v === "CHANGE") return "CHANGE SCR"; return ""; }
     function getAircraftReg() { const sST = getSelectedServiceType(); const rIV = document.getElementById("regInput").value.trim().toUpperCase(); if (sST === "D") { if (rIV && rIV !== "L45" && rIV !== "CL5") return rIV; if (document.getElementById("learjetCheckbox").checked) return "L45"; if (document.getElementById("bombardierCheckbox").checked) return "CL5"; document.getElementById("learjetCheckbox").checked = true; return "L45"; } return rIV || "[UNKNOWN_REG]"; }
-    function getFinalCombinedCode(scrLineServiceType, aircraftTypeInput) { const sT = scrLineServiceType.toUpperCase(); const aTI = aircraftTypeInput ? aircraftTypeInput.toUpperCase() : null; if (sT === 'J') { if (aTI === '73H') return '18973H'; if (aTI === '7M8') return '1977M8'; return '18973H'; } else if (sT === 'P') { if (aTI === '73H') return '00073H'; if (aTI === '7M8') return '0007M8'; return '00073H'; } else if (sT === 'D') { const pfx = document.getElementById("bombardierCheckbox").checked ? "009" : "008"; const oC = document.getElementById("bombardierCheckbox").checked ? "CL5" : "L45"; return pfx + oC; } else { const pfx = '000'; let oC = '73H'; if (aTI === '73H') oC = '73H'; else if (aTI === '7M8') oC = '7M8'; return pfx + oC; } }
-
+    function getFinalCombinedCode(scrLineServiceType, aircraftTypeInput) { const sT = scrLineServiceType.toUpperCase(); const aTI = aircraftTypeInput ? aircraftTypeInput.toUpperCase() : null; if (sT === 'J') { if (aTI === '73H') return '18973H'; if (aTI === '7MJ') return '2287MJ'; if (aTI === '320') return '180320'; if (aTI === '7M8') return '1977M8'; return '18973H'; } else if (sT === 'P') { if (aTI === '73H') return '00073H'; if (aTI === '7M8') return '0007M8';  if (aTI === '320') return '000320'; if (aTI === '7MJ') return '0007MJ'; return '00073H'; } else if (sT === 'D') { const pfx = document.getElementById("bombardierCheckbox").checked ? "009" : "008"; const oC = document.getElementById("bombardierCheckbox").checked ? "CL5" : "L45"; return pfx + oC; } else { const pfx = '000'; let oC = '73H'; if (aTI === '73H') oC = '73H'; else if (aTI === '7M8') oC = '7M8'; else if (aTI === '320') oC ='320'; else if (aTI === '7MJ') oC ='7MJ'; return pfx + oC; } }
     function showError(m) { const eD = document.getElementById("errorMessage"); eD.innerHTML = m; eD.style.display = "block"; }
     function showSuccess(m) { const sD = document.getElementById("successMessage"); sD.textContent = m; sD.style.display = "block"; setTimeout(() => { sD.style.display = "none"; }, 5000); }
     function clearFeedback() { document.getElementById("errorMessage").style.display = "none"; document.getElementById("successMessage").style.display = "none"; }
@@ -107,9 +106,7 @@
         if (parsedEntries.length > 0) { showSuccess(`Formatted ${parsedEntries.length} leg(s) into ${Object.keys(airportGroups).length} editable message(s). ${errors ? 'Errors found.' : ''}`); }
     }
 
-    // --- UI Element Creation Functions (Adapted for OLD UI) ---
-
-    /** Creates OLD UI scr-group for NEW/CANCEL */
+       /** Creates UI scr-group for NEW/CANCEL */
     function createScrGroupElement(outputList, airportCode, scrOutput) {
         const scrGroup = document.createElement("div"); scrGroup.className = "scr-group"; scrGroup.dataset.airportCode = airportCode; scrGroup.dataset.scrOutput = scrOutput;
         const hD = document.createElement("div"); hD.className = "heading"; hD.textContent = `SCR [${airportCode}]`; scrGroup.appendChild(hD);
@@ -159,7 +156,7 @@
         buttonContainer.appendChild(updateSendBtn); scrGroup.appendChild(buttonContainer); outputList.appendChild(scrGroup); return scrGroup;
     }
 
-    /** Helper to create OLD UI editable R-Line row */
+    /** create OLD UI editable R-Line row */
      function createEditableRLineRow(rowData) {
         const rowDiv = document.createElement("div"); rowDiv.className = "modified-scr-row"; rowDiv.dataset.rowId = rowData.id;
         const createField = (lTxt, iT, cN, val, dis = false, opts = null) => { const lbl = document.createElement("label"); lbl.textContent = lTxt + ": "; let inp; if(iT === 'select'){ inp = document.createElement("select"); inp.className = cN; (opts||[]).forEach(o => { const op = document.createElement("option"); op.value=o; op.textContent=o; if(o===val) op.selected=true; inp.appendChild(op); }); } else { inp = document.createElement("input"); inp.type = iT; inp.className = cN; inp.value = val; } inp.disabled = dis; if(iT==='text' && (cN==='r-airport'||cN==='r-combined-code')) inp.style.textTransform='uppercase'; lbl.appendChild(inp); return {label:lbl, input:inp}; }; // Return object containing label and input
