@@ -63,7 +63,7 @@ Constantly working to improve RunwaySlots! Here’s what’s coming soon:
 
 Have feedback or feature requests? I'd love to hear from you! 📨
 
-📧 Contact at: https://forms.gle/nXCQzWxCcH5B1uZd6
+📧 Contact at: https://forms.gle/zt6oX3dATB5PCt9S8
 
 
 
