@@ -1,1 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SIR Generator</title>
+  <style>
+    
+    body { margin: 0; padding: 0; background-color: #008080; font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif; color: black; }
+    a { color: black; text-decoration: none; }
+    a:hover { color: #0000cd; }
+    nav { background-color: #c0c0c0; border-bottom: 2px solid #7d7d7d; padding: 2px 4px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; flex-wrap: wrap; }
+    nav a { padding: 2px 6px; border: 2px outset #fff; font-size: 12px; text-transform: uppercase; color: black; text-decoration: none; white-space: nowrap; }
+    nav a:hover { border: 2px inset #7d7d7d; }
+    .container { width: 800px; max-width: 95%; margin: 40px auto; border: 2px solid #7d7d7d; background-color: #fff; box-shadow: 2px 2px 0 #fff; }
+    .title-bar { background: linear-gradient(to right, #000080, #0000cd); color: white; padding: 2px 6px; font-size: 14px; font-weight: bold; border-bottom: 2px solid #7d7d7d; }
+    .window-content { padding: 8px; }
+    h1 { font-size: 1px; height: 1px; width: 1px; position: absolute; overflow: hidden; }
+
+    label { display: block; margin-bottom: 4px; font-size: 10px; font-weight: bold; }
+    textarea, input[type="text"], input[type="date"], select {
+      box-sizing: border-box; width: 98%; padding: 4px; margin-bottom: 8px;
+      border: 2px inset #7d7d7d; font-size: 12px; font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif; background-color: white;
+    }
+    button { padding: 4px 8px; margin: 4px 4px 4px 0; background-color: #c0c0c0; border: 2px outset #fff; font-size: 12px; text-transform: uppercase; font-weight: bold; cursor: pointer; }
+    button:hover { border: 2px inset #7d7d7d; }
+    select { padding: 4px 8px; margin: 4px 4px 4px 0; border: 2px inset #7d7d7d; font-size: 12px; text-transform: uppercase; cursor: pointer; background-color: white; }
+
+    .error, .success { text-align: center; padding: 4px; margin-bottom: 8px; font-size: 12px; display: none; border: 1px solid black; }
+    .error { background-color: #ff4c4c; color: white; }
+    .success { background-color: #4caf50; color: white; }
+
+    .scr-group { border: 2px solid #7d7d7d; padding: 4px; margin-bottom: 8px; background-color: #fff; }
+    .heading { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #000080; text-transform: uppercase; }
+    .send-button-container { display: flex; justify-content: flex-end; gap: 4px; }
+
+    .output-container {
+      margin-top: 10px; padding: 8px; border: 2px dashed #7d7d7d; background-color: #f0f0f0;
+      font-size: 12px; font-family: monospace; color: #000080; white-space: pre-wrap; word-wrap: break-word;
+      max-height: 400px; overflow-y: auto; position: relative;
+    }
+
+    footer { font-size: 12px; color: black; text-align: center; margin-top: 12px; padding-bottom: 20px; }
+    @media (max-width: 850px) { .container { width: 95%; } }
+  </style>
+</head>
+<body>
+  
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="multiflight.html">Multi Flight</a></li>
+      <li><a href="airport-search.html">Airport Database</a></li>
+      <li><a href="gcrformat.html">GCR Format</a></li>
+      <li><a href="turnaround.html">Turnaround Format</a></li>
+      <li><a href="quicklinks.html">Quick Links</a></li>
+      <li><a href="scrbackup.html">SCR Backup</a></li>
+      <li><a href="updates.html">SYSTEM UPDATES</a></li>
+      <li><a href="sir.html" aria-current="page">SIR</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="title-bar">Slot Information Request (SIR)</div>
+    <div class="window-content">
+      <h1>Slot Information Request (SIR)</h1>
+      
+      <div id="errorMessage" class="error" role="alert"></div>
+      <div id="successMessage" class="success" role="status"></div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:220px;">
+          <label for="sirAirport">Airport Code</label>
+          <input id="sirAirport" type="text" placeholder="e.g., DUB" style="text-transform:uppercase" />
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <label for="sirDate">Header Date (Line 3)</label>
+          <input id="sirDate" type="date" />
+        </div>
+        <div style="min-width:160px;">
+          <label for="carrier">Carrier</label>
+          <input id="carrier" type="text" value="FR" style="text-transform:uppercase" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:260px;">
+          <label for="sirType">Request Type</label>
+          <select id="sirType">
+            <option value="whole_season">Whole season (full list)</option>
+            <option value="turnaround">Specific period – Turnaround format</option>
+            <option value="unlinked">Unlinked (home-base, ARR+DEP)</option>
+            <option value="arrivals_only">Arrivals only (range)</option>
+            <option value="departures_only">Departures only (range)</option>
+            <option value="specific_arrival">Specific arrival – single date</option>
+            <option value="specific_departure">Specific departure – single date</option>
+          </select>
+        </div>
+        
+        <div id="rangeFields" style="display:none; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+          <div>
+            <label for="startDate">Start date</label>
+            <input id="startDate" type="date" />
+          </div>
+          <div>
+            <label for="endDate">End date</label>
+            <input id="endDate" type="date" />
+          </div>
+        </div>
+
+        <div id="singleFields" style="display:none; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+          <div>
+            <label for="flightNo">Flight number (e.g., FR2935 / 2935)</label>
+            <input id="flightNo" type="text" style="text-transform:uppercase" />
+          </div>
+          <div>
+            <label for="singleDate">Single date</label>
+            <input id="singleDate" type="date" />
+          </div>
+        </div>
+
+        <div style="margin-left:auto; display:flex; gap:6px; align-items:end;">
+          <button id="generateBtn" type="button">Generate</button>
+          <button id="copyBtn" type="button">Copy</button>
+          <button id="emailBtn" type="button">Email</button>
+        </div>
+      </div>
+      
+      <div class="scr-group">
+        <div class="heading">Output</div>
+        <div id="output" class="output-container" aria-live="polite" style="min-height:120px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>&copy; Created By: ArtemisByte/KunchackoBoben</footer>
+  <footer>Disclaimer: Use at your own risk. Provided “as is”.</footer>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/firebase.js"></script>
+
+  <script>
+    const $$ = s => document.querySelector(s);
+    const monAbbr=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+    const pad2 = n => String(n).padStart(2,'0');
+    const ddMMM = iso => { const d=new Date(iso+'T00:00:00Z'); return pad2(d.getUTCDate())+monAbbr[d.getUTCMonth()]; };
+
+    function seasonCode(date=new Date()){
+      const y=date.getUTCFullYear();
+      const lastSunday=(year,m)=>{ const d=new Date(Date.UTC(year,m+1,0,12)); d.setUTCDate(d.getUTCDate()-d.getUTCDay()); d.setUTCHours(0,0,0,0); return d; };
+      const S=lastSunday(y,2), W=lastSunday(y,9);
+      return (date>=W)?("W"+String(y).slice(-2)) : (date>=S)?("S"+String(y).slice(-2)) : ("W"+String(y-1).slice(-2));
+    }
+
+    function showError(m){ const e=$$('#errorMessage'); e.textContent=m; e.style.display='block'; setTimeout(()=>e.style.display='none',4000); }
+    function showSuccess(m){ const s=$$('#successMessage'); s.textContent=m; s.style.display='block'; setTimeout(()=>s.style.display='none',4000); }
+
+    const airportEl=$$('#sirAirport');
+    const headDateEl=$$('#sirDate');
+    const carrierEl=$$('#carrier');
+    const typeEl=$$('#sirType');
+    const rangeFields=$$('#rangeFields');
+    const singleFields=$$('#singleFields');
+    const out=$$('#output');
+
+    airportEl.addEventListener('input', e=> e.target.value=e.target.value.toUpperCase());
+    carrierEl.addEventListener('input', e=> e.target.value=e.target.value.toUpperCase());
+    headDateEl.value = new Date().toISOString().slice(0,10);
+
+    function setVis(){
+      const t=typeEl.value;
+      rangeFields.style.display = (t==='turnaround'||t==='unlinked'||t==='arrivals_only'||t==='departures_only') ? 'flex' : 'none';
+      singleFields.style.display = (t==='specific_arrival'||t==='specific_departure') ? 'flex' : 'none';
+    }
+    typeEl.addEventListener('change', setVis); setVis();
+
+    function header(apt, isoHeader){
+      const d=new Date(isoHeader+'T00:00:00Z');
+      return ['SIR', seasonCode(d), ddMMM(isoHeader), apt.toUpperCase()+' ']; 
+    }
+    function normalizeFlight(carrier, raw){
+      const c=(carrier||'FR').toUpperCase();
+      const f=(raw||'').toUpperCase().replace(/\s+/g,'');
+      return f.startsWith(c) ? f.slice(c.length) : f;
+    }
+    function body(type, carrier, opt){
+      const C=(carrier||'FR').toUpperCase().replace(/\s+/g,'');
+      const range = opt.range ? ddMMM(opt.range.start)+ddMMM(opt.range.end) : '';
+      const single = opt.singleDate ? ddMMM(opt.singleDate) : '';
+      const num = (opt.flightNo||'').replace(/\s+/g,'');
+      switch(type){
+        case 'whole_season':        return ['Q'+C];
+        case 'turnaround':          if(!opt.range) throw new Error('Start/End required.'); return ['Q'+C+' FR '+range];
+        case 'unlinked':            if(!opt.range) throw new Error('Start/End required.'); return ['Q'+C+' '+range, 'Q '+C+' '+range];
+        case 'arrivals_only':       if(!opt.range) throw new Error('Start/End required.'); return ['Q'+C+' '+range];
+        case 'departures_only':     if(!opt.range) throw new Error('Start/End required.'); return ['Q '+C+' '+range];
+        case 'specific_arrival':    if(!opt.flightNo || !opt.singleDate) throw new Error('Flight + date required.'); return ['Q'+C+num+' '+single];
+        case 'specific_departure':  if(!opt.flightNo || !opt.singleDate) throw new Error('Flight + date required.'); return ['Q '+C+num+' '+single];
+        default: return [];
+      }
+    }
+
+    $$('#generateBtn').addEventListener('click', ()=>{
+      try{
+        const apt = (airportEl.value||'').trim().toUpperCase();
+        const hdr = headDateEl.value;
+        const t   = typeEl.value;
+        const c   = (carrierEl.value||'FR').trim().toUpperCase();
+        if(!apt) return showError('Airport is required.');
+        if(!hdr) return showError('Header date is required.');
+
+        const opt={};
+        if (rangeFields.style.display!=='none'){
+          opt.range = { start: $$('#startDate').value, end: $$('#endDate').value };
+          if(!opt.range.start || !opt.range.end) return showError('Start and End dates are required.');
+        }
+        if (singleFields.style.display!=='none'){
+          opt.flightNo = normalizeFlight(c, $$('#flightNo').value);
+          opt.singleDate = $$('#singleDate').value;
+          if(!opt.flightNo || !opt.singleDate) return showError('Flight number and single date are required.');
+        }
+
+        const lines = [...header(apt, hdr), ...body(t, c, opt)];
+        out.textContent = lines.join('\n');
+        showSuccess('SIR generated.');
+      }catch(err){ showError(err.message||String(err)); }
+    });
+
+    $$('#copyBtn').addEventListener('click', async ()=>{
+      const txt=out.textContent.trim(); if(!txt) return showError('Generate first.');
+      try{ await navigator.clipboard.writeText(txt); showSuccess('Copied!'); }
+      catch{
+        const ta=document.createElement('textarea');
+        ta.value=txt; ta.style.position='fixed'; ta.style.opacity=0; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        showSuccess('Copied!');
+      }
+    });
+
+    async function getAirportEmail(apt){
+      const fallback='slotdesk@ryanair.com';
+      try{
+        if(!window.firebase || !firebase.database) return fallback;
+        const db=firebase.database();
+        const code=apt.toUpperCase().trim();
+        const dir=await db.ref('airports/'+code).once('value');
+        if(dir.exists()){ const v=dir.val()||{}; return v.email||v.emailGeneral||fallback; }
+        const q=await db.ref('airports').orderByChild('airportIcao').equalTo(code).once('value');
+        if(q.exists()){ let e=fallback; q.forEach(ch=>{ const v=ch.val()||{}; e=v.email||v.emailGeneral||e; }); return e; }
+        return fallback;
+      }catch{return fallback;}
+    }
+
+    $$('#emailBtn').addEventListener('click', async ()=>{
+      const txt=out.textContent.trim(); if(!txt) return showError('Generate first.');
+      const apt=airportEl.value.trim().toUpperCase();
+      const hdr=headDateEl.value;
+      const subject=`SIR '${apt}' ${ddMMM(hdr)}`;
+      const to = await getAirportEmail(apt);
+      const href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(txt)}`;
+      window.location.href=href;
+    });
+  </script>
+</body>
+</html>
 
