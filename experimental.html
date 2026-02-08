@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Multi Flight Formatter</title>
+
+  <style>
+    :root{
+      /* Carbon Copy / Dispatch Paperwork UI */
+      --bg:#0b0f14;
+      --paper:#f6f1e6;
+      --ink:#151515;
+
+      --blue:#1f4db8;
+      --red:#b61f2b;
+      --green:#1d7a4a;
+      --orange:#d0811d;
+
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
+      --shadow2: 0 10px 24px rgba(0,0,0,.22);
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--ui);
+      color: #eaeaea;
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(900px 520px at 85% 10%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, #090c10, #06080b);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position: fixed; inset:0; pointer-events:none;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(0,0,0,.28), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(0,0,0,.32), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0,0,0,.25), transparent 65%);
+      opacity:.9;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration: underline; }
+
+    header{
+      position: sticky; top:0; z-index: 50;
+      background: rgba(8,10,12,.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .top{
+      max-width: 1200px; margin: 0 auto; padding: 12px 14px;
+      display:flex; align-items:center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 12px;
+      padding: 10px 12px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+    }
+    .logo{
+      width: 34px; height: 34px; border-radius: 10px;
+      background:
+        radial-gradient(circle at 25% 25%, rgba(255,255,255,.40), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .brand strong{
+      display:block; font-size: 14px;
+      text-transform: uppercase; letter-spacing:.35px; font-family: var(--mono);
+    }
+    .brand span{
+      display:block; font-size: 12px; color: rgba(255,255,255,.70);
+      font-family: var(--mono); margin-top: 2px;
+    }
+
+    /* DB status indicator */
+    .db-status{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .25px;
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+    }
+
+    /* Pulsating light (online/offline/connecting) */
+    .db-dot{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+
+      /* default = connecting */
+      background: rgba(208,129,29,.95);
+      box-shadow:
+        0 0 0 4px rgba(208,129,29,.18),
+        0 0 14px rgba(208,129,29,.55);
+
+      animation: dbPulse 1.15s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .db-dot.online{
+      background: rgba(29,122,74,.95);
+      box-shadow:
+        0 0 0 4px rgba(29,122,74,.18),
+        0 0 14px rgba(29,122,74,.55);
+    }
+    .db-dot.offline{
+      background: rgba(182,31,43,.95);
+      box-shadow:
+        0 0 0 4px rgba(182,31,43,.18),
+        0 0 14px rgba(182,31,43,.55);
+    }
+    .db-dot.connecting{
+      background: rgba(208,129,29,.95);
+      box-shadow:
+        0 0 0 4px rgba(208,129,29,.18),
+        0 0 14px rgba(208,129,29,.55);
+    }
+    @keyframes dbPulse{
+      0%{ transform: scale(1); filter: brightness(1); }
+      50%{ transform: scale(1.22); filter: brightness(1.45); }
+      100%{ transform: scale(1); filter: brightness(1); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .db-dot{ animation: none; }
+    }
+
+    .db-label{
+      display:flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .db-label b{ font-weight: 950; }
+    .db-label small{
+      font-size: 11px;
+      opacity:.8;
+      text-transform:none;
+      letter-spacing:0;
+    }
+
+    nav{
+      max-width: 1200px; margin: 0 auto; padding: 0 14px 12px;
+      display:flex; flex-wrap: wrap; gap: 10px; align-items:center;
+    }
+    nav a{
+      font-size: 12px; padding: 10px 12px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.86);
+      white-space: nowrap;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+      font-family: var(--mono);
+      text-transform: uppercase;
+    }
+    nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.20);
+      text-decoration:none;
+    }
+    nav a.active{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.25);
+    }
+
+    main{
+      max-width: 1200px; margin: 0 auto;
+      padding: 18px 14px 44px;
+      position: relative; z-index: 1;
+    }
+
+    .clipboard{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    .clip{
+      position: absolute; top: 10px; left: 50%;
+      transform: translateX(-50%);
+      width: 240px; height: 34px; border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 20px rgba(0,0,0,.35);
+      z-index: 3;
+    }
+    .clip::before{
+      content:""; position:absolute; left: 50%; top: 8px; transform: translateX(-50%);
+      width: 90px; height: 16px; border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.25); background: rgba(0,0,0,.10);
+    }
+
+    .paper{
+      margin: 24px; margin-top: 54px;
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position: relative;
+    }
+    .paper::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(0,0,0,.03), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(0,0,0,.02), transparent 55%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,0,0,.028),
+          rgba(0,0,0,.028) 1px,
+          transparent 2px,
+          transparent 26px
+        );
+      opacity:.55;
+      mix-blend-mode: multiply;
+    }
+
+    .paper-head{
+      padding: 18px 18px 14px;
+      border-bottom: 2px solid rgba(0,0,0,.15);
+      position: relative; z-index: 1;
+      display:flex; justify-content: space-between; align-items:flex-start;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .paper-head h1{
+      margin:0; font-size: 16px;
+      letter-spacing:.35px; text-transform: uppercase;
+      font-family: var(--mono); color: #101010;
+    }
+    .paper-head p{
+      margin: 6px 0 0; font-size: 12px;
+      color: rgba(0,0,0,.65); font-family: var(--mono);
+      max-width: 95ch;
+    }
+    .stamp{
+      transform: rotate(-5deg);
+      border: 2px solid rgba(182,31,43,.75);
+      color: rgba(182,31,43,.88);
+      padding: 8px 12px; border-radius: 10px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      font-weight: 900; letter-spacing:.22px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.18);
+      background: rgba(182,31,43,.06);
+      white-space: nowrap;
+    }
+    .stamp small{
+      display:block; font-size: 11px; opacity:.9;
+      margin-top: 2px;
+    }
+
+    .paper-body{
+      padding: 16px 18px 18px;
+      position: relative; z-index: 1;
+    }
+
+    .error, .success{
+      display:none;
+      padding: 10px 12px; border-radius: 12px;
+      border: 1px dashed rgba(0,0,0,.28);
+      font-size: 12px; margin-bottom: 12px;
+      font-family: var(--mono);
+      background: rgba(0,0,0,.03);
+    }
+    .error{ border-color: rgba(182,31,43,.55); color: rgba(182,31,43,.90); }
+    .success{ border-color: rgba(29,122,74,.55); color: rgba(29,122,74,.95); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .paper{ margin: 18px; margin-top: 54px; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .form-card{
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.55);
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+      overflow:hidden;
+      position: relative;
+    }
+    .form-head{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0,0,0,.12);
+      background: rgba(0,0,0,.03);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing:.25px;
+      font-size: 12px;
+      color: rgba(0,0,0,.75);
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .form-body{ padding: 14px; }
+
+    label{
+      display:block;
+      margin: 0 0 6px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.25px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.78);
+      font-family: var(--mono);
+    }
+
+    textarea, input[type="text"], input[type="date"], select{
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.22);
+      background: rgba(255,255,255,.75);
+      color: #101010;
+      padding: 11px 12px;
+      font-size: 13px;
+      outline:none;
+      font-family: var(--mono);
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .textarea-wrap{ position: relative; }
+    .clear-bar{
+      width: 100%;
+      border-radius: 12px 12px 10px 10px;
+      border: 1px solid rgba(0,0,0,.22);
+      background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,.62));
+      color: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing:.25px;
+      font-weight: 950;
+      font-size: 12px;
+      margin-bottom: 8px;
+      box-shadow: 0 10px 16px rgba(0,0,0,.18);
+    }
+    .clear-bar .left{ display:flex; align-items:center; gap: 10px; }
+    .pill{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .clear-btn{
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .25px;
+      font-weight: 950;
+      cursor:pointer;
+      box-shadow: none;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+    }
+    .clear-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.14);
+      border-color: rgba(255,255,255,.30);
+    }
+    .clear-btn:active{ transform: translateY(0); }
+
+    textarea{
+      min-height: 210px;
+      resize: vertical;
+      background:
+        repeating-linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.06) 1px, transparent 1px, transparent 26px),
+        rgba(255,255,255,.78);
+    }
+    textarea::placeholder, input::placeholder{ color: rgba(0,0,0,.40); }
+    textarea:focus, input:focus, select:focus{
+      border-color: rgba(31,77,184,.55);
+      box-shadow: 0 0 0 4px rgba(31,77,184,.12);
+    }
+
+    .hint{
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(0,0,0,.58);
+      font-family: var(--mono);
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .controls.top{
+      margin-top: 0;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba(0,0,0,.20);
+    }
+
+    button{
+      cursor:pointer;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 12px;
+      font-weight: 950;
+      border: 1px solid rgba(0,0,0,.22);
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(244,238,226,.85));
+      color: rgba(0,0,0,.85);
+      box-shadow: 0 10px 18px rgba(0,0,0,.12);
+      transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .25px;
+    }
+    button:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 22px rgba(0,0,0,.16);
+      border-color: rgba(0,0,0,.30);
+    }
+    button:active{ transform: translateY(0); }
+
+    .btn-primary{
+      border-color: rgba(182,31,43,.40);
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,235,235,.84));
+      box-shadow: 0 12px 18px rgba(182,31,43,.10);
+    }
+
+    select{
+      cursor:pointer;
+      min-width: 180px;
+      text-transform: uppercase;
+    }
+
+    #aircraftSelection{
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px dashed rgba(0,0,0,.28);
+      background: rgba(0,0,0,.03);
+      padding: 12px;
+    }
+    #aircraftSelection span{
+      display:block; margin-bottom: 8px;
+      font-size: 12px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing:.25px;
+      color: rgba(0,0,0,.75);
+      font-weight: 900;
+    }
+    #aircraftSelection label{
+      display:flex; align-items:center; gap: 8px;
+      margin: 0 0 8px;
+      font-family: var(--mono);
+      color: rgba(0,0,0,.80);
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+    #aircraftSelection input[type="checkbox"]{ width: 16px; height: 16px; accent-color: var(--red); }
+
+    #outputList{ margin-top: 14px; display:grid; gap: 12px; }
+
+    .scr-group{
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.62);
+      box-shadow: 0 12px 26px rgba(0,0,0,.12);
+      overflow:hidden;
+      position: relative;
+    }
+    .scr-group::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(0,0,0,.03), rgba(0,0,0,.03) 1px, transparent 1px, transparent 18px);
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode: multiply;
+    }
+
+    .heading{
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0,0,0,.12);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .25px;
+      color: rgba(0,0,0,.75);
+      font-weight: 950;
+      font-family: var(--mono);
+      background: rgba(0,0,0,.03);
+      position: relative;
+      z-index: 1;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .heading .tag{
+      font-size: 11px;
+      color: rgba(31,77,184,.90);
+      border: 1px solid rgba(31,77,184,.22);
+      background: rgba(31,77,184,.06);
+      padding: 4px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .output-container{
+      padding: 12px 14px;
+      max-height: 520px;
+      overflow:auto;
+      background:
+        repeating-linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.05) 1px, transparent 1px, transparent 24px),
+        rgba(255,255,255,.55);
+      position: relative;
+      z-index: 1;
+    }
+    .output-container pre{
+      margin:0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.35;
+      font-family: var(--mono);
+      color: rgba(0,0,0,.84);
+    }
+
+    .send-button-container{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(0,0,0,.12);
+      background: rgba(0,0,0,.02);
+      position: relative;
+      z-index: 1;
+    }
+
+    .modified-scr-row{
+      border: 1px dashed rgba(0,0,0,.22);
+      border-radius: 12px;
+      padding: 10px;
+      margin: 8px 0 10px;
+      background: rgba(255,255,255,.70);
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .modified-scr-row label{
+      margin:0;
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.72);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .modified-scr-row input, .modified-scr-row select{
+      width: auto;
+      padding: 8px 10px;
+      font-size: 12px;
+      margin:0;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,.22);
+      background: rgba(255,255,255,.85);
+      font-family: var(--mono);
+    }
+    .modified-scr-row input.r-flight{ width: 92px; }
+    .modified-scr-row input.r-date{ width: 150px; }
+    .modified-scr-row input.r-day{ width: 92px; background: rgba(0,0,0,.05); }
+    .modified-scr-row input.r-combined-code{ width: 120px; text-transform: uppercase; }
+    .modified-scr-row input.r-time{ width: 110px; }
+    .modified-scr-row input.r-airport{ width: 86px; text-transform: uppercase; }
+    .modified-scr-row select.r-service{ width: 80px; }
+
+    @media (max-width: 700px){
+      .modified-scr-row{ flex-direction: column; align-items: stretch; }
+      .modified-scr-row label{ justify-content: space-between; }
+      .modified-scr-row input, .modified-scr-row select{ width: 100%; }
+      select{ min-width: 100%; }
+    }
+
+    .modal{
+      display:none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 18px;
+    }
+    .modal-content{
+      max-width: 980px;
+      margin: 6vh auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(25,25,25,.92);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      color: #f1f1f1;
+    }
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .25px;
+    }
+    .close-button{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      font-size: 18px;
+      line-height: 1;
+      color: #f1f1f1;
+    }
+    .modal-body{
+      padding: 14px;
+      max-height: 72vh;
+      overflow:auto;
+      background: rgba(0,0,0,.32);
+    }
+    .modal-body pre{
+      margin:0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #f1f1f1;
+      font-family: var(--mono);
+    }
+
+    footer{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      font-family: var(--mono);
+    }
+
+    code{
+      font-family: var(--mono);
+      font-size: .95em;
+      background: rgba(31,77,184,.10);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(31,77,184,.14);
+      color: rgba(31,77,184,.90);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="top">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <strong>Dispatch Carbon Copy</strong>
+          <span>Multi Flight Formatter • SCR/S25</span>
+        </div>
+      </div>
+
+      <!-- Real-time database status indicator -->
+      <div class="db-status" title="Firebase Realtime Database connectivity">
+        <span id="dbDot" class="db-dot connecting"></span>
+        <span class="db-label">
+          <b id="dbStatusText">Database: Connecting</b>
+          <small id="dbStatusSub">Checking Firebase connection…</small>
+        </span>
+      </div>
+    </div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="sir.html">SIR Request</a>
+      <a class="active" href="multiflight.html">Multi Flight</a>
+      <a href="airport-search.html">Airport Database</a>
+      <a href="gcrformat.html">GCR Format</a>
+      <a href="turnaround.html">Turnaround Format</a>
+      <a href="quicklinks.html">Quick Links</a>
+      <a href="test2.html">Experimental</a>
+      <a href="updates.html">System Updates</a>
+      <a href="https://forms.gle/Q4T4TbhEU9Sa7jbg7" target="_blank" rel="noopener noreferrer">Log Issues</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="clipboard">
+      <div class="clip"></div>
+
+      <div class="paper">
+        <div class="paper-head">
+          <div>
+            <h1>Slot Desk — Multi Flight SCR Builder</h1>
+            <p>SI supports extra text after <code>//</code> (example: <code>SI NEW SLOT REQ AMS // AOG AIRCRAFT</code>).</p>
+          </div>
+
+          <div class="stamp">
+            EXPERIMENTAL
+            <small>USE AT OWN RISK</small>
+          </div>
+        </div>
+
+        <div class="paper-body">
+          <div id="errorMessage" class="error"></div>
+          <div id="successMessage" class="success"></div>
+
+          <div class="grid">
+            <section class="form-card">
+              <div class="form-head">
+                <span>Flight Input</span>
+              </div>
+              <div class="form-body">
+                <label for="userInput">Flight Information (one per line)</label>
+
+                <div class="textarea-wrap">
+                  <div class="clear-bar" role="group" aria-label="Input actions">
+                    <div class="left">
+                      <span class="pill">Input</span>
+                      <span style="opacity:.88;">Paste flights below</span>
+                    </div>
+                    <button type="button" id="clearInputBtn" class="clear-btn">Clear</button>
+                  </div>
+
+                  <textarea id="userInput" placeholder="FR877P LPL NCL 15FEB2025 1430 1515 EIIHG 7M8"></textarea>
+                </div>
+
+                <div class="hint">Format: FLT FROM TO DDMMMYYYY DEP ARR SERVICE [ACFT]</div>
+              </div>
+            </section>
+
+            <section class="form-card">
+              <div class="form-head">Controls / SI</div>
+              <div class="form-body">
+
+                <div class="controls top">
+                  <select id="slotType" title="Select Slot Type">
+                    <option value="NEW">NEW SLOT</option>
+                    <option value="CANCEL">CANCEL SLOT</option>
+                    <option value="CHANGE">CHANGE SCR</option>
+                  </select>
+
+                  <select id="dropdownMenu" title="Select Flight Service Type">
+                    <option value="P">P</option>
+                    <option value="D">D</option>
+                    <option value="K">K</option>
+                    <option value="T">T</option>
+                    <option value="J">J</option>
+                    <option value="X">X</option>
+                  </select>
+                </div>
+
+                <label for="regInput">Learjet/Challenger Aircraft Reg</label>
+                <input type="text" id="regInput" placeholder="ENTER REGISTRATION" />
+                <div class="hint">Used for D service SI info unless a full reg is typed.</div>
+
+                <div style="height:12px;"></div>
+
+                <label for="siExtraInput">SI Extra (after //)</label>
+                <input type="text" id="siExtraInput" placeholder="e.g. AOG AIRCRAFT" />
+
+                <div id="aircraftSelection" style="display:none;">
+                  <span>Select Aircraft Type for “D”</span>
+                  <label><input type="checkbox" id="learjetCheckbox" name="aircraftType" checked> Learjet (L45)</label>
+                  <label><input type="checkbox" id="bombardierCheckbox" name="aircraftType"> Bombardier (CL5)</label>
+                </div>
+
+                <div class="controls">
+                  <button id="formatBtn" class="btn-primary">Generate SCR</button>
+                </div>
+
+                <div class="hint">CHANGE SCR: use <b>Update</b> to rebuild message; then <b>Send</b> to email it.</div>
+              </div>
+            </section>
+          </div>
+
+          <div id="outputList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Created By: ArtemisByte • Use at your own risk • No warranties
+  </footer>
+
+  <!-- SCR Modal -->
+  <div id="scrModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-head">
+        <div>SCR Preview</div>
+        <div class="close-button" id="closeScrModalBtn" aria-label="Close">&times;</div>
+      </div>
+      <div class="modal-body">
+        <pre id="scrModalText"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/firebase.js"></script>
+
+  <script>
+    /* ---------------------------
+       DB STATUS INDICATOR
+       Uses Firebase special path: .info/connected
+       - Orange while connecting
+       - Green when online
+       - Red when offline
+    ---------------------------- */
+    function setDbIndicator(state, subText) {
+      const dot = document.getElementById("dbDot");
+      const txt = document.getElementById("dbStatusText");
+      const sub = document.getElementById("dbStatusSub");
+      if (!dot || !txt || !sub) return;
+
+      dot.classList.remove("online","offline","connecting");
+
+      if (state === "online") {
+        dot.classList.add("online");
+        txt.textContent = "Database: Online";
+        sub.textContent = subText || "Realtime DB connected.";
+      } else if (state === "offline") {
+        dot.classList.add("offline");
+        txt.textContent = "Database: Offline";
+        sub.textContent = subText || "No realtime connection.";
+      } else {
+        dot.classList.add("connecting");
+        txt.textContent = "Database: Connecting";
+        sub.textContent = subText || "Checking Firebase connection…";
+      }
+    }
+
+    setDbIndicator("connecting");
+
+    if (typeof firebase === 'undefined' || typeof firebase.database !== 'function') {
+      setDbIndicator("offline", "Firebase not loaded.");
+    } else {
+      try {
+        firebase.database().ref(".info/connected").on("value", (snap) => {
+          const connected = !!snap.val();
+          setDbIndicator(connected ? "online" : "offline");
+        }, () => {
+          setDbIndicator("offline", "Connection listener error.");
+        });
+
+        window.addEventListener("online", () => setDbIndicator("connecting", "Browser online. Reconnecting…"));
+        window.addEventListener("offline", () => setDbIndicator("offline", "Browser offline."));
+      } catch (e) {
+        setDbIndicator("offline", "DB status unavailable.");
+      }
+    }
+
+    /* ---------------------------
+       Existing app code
+    ---------------------------- */
+
+    const STORAGE_KEY = "historicLog";
+    let currentSlotType = "";
+    const monthMap = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+    const monthAbbrArr = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    async function getAirportEmail(airportCode, serviceType) {
+      if (typeof firebase === 'undefined' || typeof firebase.database !== 'function') return "slotdesk@ryanair.com";
+      try {
+        const snapshot = await firebase.database().ref("airports/" + airportCode.toUpperCase()).once("value");
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const cleanST = serviceType ? serviceType.trim().toUpperCase() : '';
+          if (cleanST === "D") return data.emailGeneral?.trim() || data.email?.trim() || "slotdesk@ryanair.com";
+          return data.email?.trim() || "slotdesk@ryanair.com";
+        }
+        return "slotdesk@ryanair.com";
+      } catch (error) {
+        showError(`Email lookup failed for ${airportCode}.`);
+        return "slotdesk@ryanair.com";
+      }
+    }
+
+    function getHistoricLog() { try { const d = localStorage.getItem(STORAGE_KEY); return d ? JSON.parse(d) : []; } catch (e) { return []; } }
+    function setHistoricLog(l) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(l)); } catch (e) { showError("Could not save log."); } }
+    function addLogEntry(e) { const l = getHistoricLog(); l.push(e); setHistoricLog(l); }
+
+    function parseDateString(dStr) {
+      dStr = dStr ? dStr.toUpperCase() : '';
+      const mD = dStr.match(/^(\d{2})([A-Z]{3})$/);
+      const mDY = dStr.match(/^(\d{2})([A-Z]{3})(\d{4})$/);
+      let dy, mAb, yr;
+      if (mDY) { [, dy, mAb, yr] = mDY.map((v, i) => i === 1 || i === 3 ? parseInt(v, 10) : v); }
+      else if (mD) { [, dy, mAb] = mD.map((v, i) => i === 1 ? parseInt(v, 10) : v); yr = new Date().getFullYear(); }
+      else { return null; }
+      const mIdx = monthMap[mAb];
+      if (mIdx === undefined || isNaN(dy) || isNaN(yr) || dy < 1 || dy > 31) return null;
+      const dtO = new Date(Date.UTC(yr, mIdx, dy));
+      if (dtO.getUTCFullYear() === yr && dtO.getUTCMonth() === mIdx && dtO.getUTCDate() === dy) return dtO;
+      return null;
+    }
+
+    function getDayOfOperation(dayOfWeek) {
+      const fD = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1).toLowerCase();
+      const ds = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dgs = [7, 1, 2, 3, 4, 5, 6];
+      const pws = [0, 6, 5, 4, 3, 2, 1];
+      let idx = ds.indexOf(fD);
+      if (idx === -1) idx = 1;
+      const dg = dgs[idx];
+      const pw = pws[idx];
+      const cN = dg * Math.pow(10, pw);
+      return String(cN).padStart(7, '0');
+    }
+
+    function convertSCRDateToInput(sD) {
+      const p = parseDateString(sD);
+      if (!p) return "";
+      const dy = String(p.getUTCDate()).padStart(2, '0');
+      const mn = String(p.getUTCMonth() + 1).padStart(2, '0');
+      const yr = p.getUTCFullYear();
+      return `${yr}-${mn}-${dy}`;
+    }
+
+    function convertInputDateToSCR(iD) {
+      try {
+        const dO = new Date(iD + 'T00:00:00Z');
+        if (isNaN(dO.getTime())) return "01JAN";
+        const dy = String(dO.getUTCDate()).padStart(2, '0');
+        const mA = monthAbbrArr[dO.getUTCMonth()];
+        return dy + mA;
+      } catch (e) { return "01JAN"; }
+    }
+
+    function getCurrentDate() {
+      const dO = new Date();
+      const dy = String(dO.getDate()).padStart(2, '0');
+      const mn = monthAbbrArr[dO.getMonth()];
+      return `${dy}${mn}`;
+    }
+
+    function parseInput(input) {
+      const lines = input ? input.trim().split("\n") : [];
+      const pE = [];
+      let hasError = false;
+
+      lines.forEach((ln) => {
+        ln = ln.trim(); if (!ln) return;
+        const pts = ln.split(/\s+/);
+        if (pts.length < 7 || pts.length > 8) { hasError = true; return; }
+
+        const [fR, fRw, tRw, dS, dpT, arT] = pts;
+        let acTIn = pts[7] ? pts[7].toUpperCase() : null;
+
+        const frm = fRw.toUpperCase();
+        const to = tRw.toUpperCase();
+
+        if (acTIn === '738') acTIn = '73H';
+        if (acTIn === '197' || acTIn === '73M') acTIn = '7M8';
+
+        const pD = parseDateString(dS);
+        if (!pD) { hasError = true; return; }
+
+        if (!/^\d{4}$/.test(dpT) || !/^\d{4}$/.test(arT)) { hasError = true; return; }
+
+        const dOW = pD.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+        const dOO = getDayOfOperation(dOW);
+        const dt = convertInputDateToSCR(pD.toISOString().split('T')[0]);
+
+        const fP = fR.slice(0, 2).toUpperCase();
+        let fN = fR.slice(2);
+        const fDg = fN.match(/\d+/)?.[0] || "";
+        let fLt = fN.replace(/\d+/g, "").toUpperCase();
+        if (fLt.endsWith("P")) fLt = fLt.slice(0, -1);
+        const pFDg = fDg.padStart(3, "0");
+        const fl = `${fP}${pFDg}${fLt}`;
+
+        pE.push({
+          flight: fl, from: frm, to: to, date: dt, fullDate: pD,
+          departureTime: dpT, arrivalTime: arT,
+          dayOfOperation: dOO, aircraftTypeInput: acTIn, originalLine: ln
+        });
+      });
+
+      return { parsedEntries: pE, errors: hasError };
+    }
+
+    function getSelectedServiceType() { return document.getElementById("dropdownMenu").value; }
+    function getSlotType() {
+      const v = document.getElementById("slotType").value;
+      if (v === "NEW") return "NEW SLOT";
+      if (v === "CANCEL") return "CANCEL SLOT";
+      if (v === "CHANGE") return "CHANGE SCR";
+      return "";
+    }
+
+    function getAircraftReg() {
+      const sST = getSelectedServiceType();
+      const rIV = document.getElementById("regInput").value.trim().toUpperCase();
+      if (sST === "D") {
+        if (rIV && rIV !== "L45" && rIV !== "CL5") return rIV;
+        if (document.getElementById("learjetCheckbox").checked) return "L45";
+        if (document.getElementById("bombardierCheckbox").checked) return "CL5";
+        document.getElementById("learjetCheckbox").checked = true;
+        return "L45";
+      }
+      return rIV || "[UNKNOWN_REG]";
+    }
+
+    function getFinalCombinedCode(scrLineServiceType, aircraftTypeInput) {
+      const sT = scrLineServiceType.toUpperCase();
+      const aTI = aircraftTypeInput ? aircraftTypeInput.toUpperCase() : null;
+      if (sT === 'J') {
+        if (aTI === '73H') return '18973H';
+        if (aTI === '7M8') return '1977M8';
+        return '18973H';
+      } else if (sT === 'P') {
+        if (aTI === '73H') return '00073H';
+        if (aTI === '7M8') return '0007M8';
+        return '00073H';
+      } else if (sT === 'D') {
+        const pfx = document.getElementById("bombardierCheckbox").checked ? "009" : "008";
+        const oC = document.getElementById("bombardierCheckbox").checked ? "CL5" : "L45";
+        return pfx + oC;
+      } else {
+        const pfx = '000';
+        let oC = '73H';
+        if (aTI === '73H') oC = '73H';
+        else if (aTI === '7M8') oC = '7M8';
+        return pfx + oC;
+      }
+    }
+
+    function showError(m) { const eD = document.getElementById("errorMessage"); eD.innerHTML = m; eD.style.display = "block"; }
+    function showSuccess(m) { const sD = document.getElementById("successMessage"); sD.textContent = m; sD.style.display = "block"; setTimeout(() => { sD.style.display = "none"; }, 5000); }
+    function clearFeedback() { document.getElementById("errorMessage").style.display = "none"; document.getElementById("successMessage").style.display = "none"; }
+
+    function getSiExtraText() {
+      const v = document.getElementById("siExtraInput")?.value || "";
+      return v.replace(/\s+/g, " ").trim();
+    }
+
+    function buildSiLine(siAction, airportCode, scrLineServiceType, globalReg) {
+      let siLn = `SI ${siAction} ${airportCode}`;
+      const extra = getSiExtraText();
+      if (extra) siLn += ` // ${extra}`;
+      if (scrLineServiceType === "D") {
+        let lbl = document.getElementById("learjetCheckbox").checked ? "LEARJET" : "BOMBARDIER";
+        siLn += ` // ${lbl} REG: ${globalReg}`;
+      }
+      return siLn;
+    }
+
+    function showScrModal(scrText) {
+      document.getElementById("scrModalText").textContent = scrText;
+      document.getElementById("scrModal").style.display = "block";
+    }
+
+    async function copyScrToClipboard(scrText) {
+      try { await navigator.clipboard.writeText(scrText); showSuccess("SCR copied to clipboard!"); }
+      catch (err) { showError("Failed to copy SCR."); console.error(err); }
+    }
+
+    function normalizeUtcTimeInput(val) {
+      const raw = (val || "").trim();
+      if (/^\d{4}$/.test(raw)) return raw;
+      const m = raw.match(/^(\d{2}):(\d{2})$/);
+      if (m) return m[1] + m[2];
+      return null;
+    }
+    function asTimeBoxValue(hhmm) {
+      if (!/^\d{4}$/.test(hhmm || "")) return "";
+      return hhmm.slice(0,2) + ":" + hhmm.slice(2);
+    }
+
+    function attachSendButtonsListeners() {
+      const oL = document.getElementById("outputList");
+      oL.removeEventListener("click", handleOutputListClick);
+      oL.addEventListener("click", handleOutputListClick);
+    }
+
+    async function handleOutputListClick(event) {
+      const tgt = event.target.closest('button');
+      if (!tgt) return;
+      if (tgt.closest('.scr-group') && tgt.textContent.includes('Send Email') && !tgt.textContent.includes('Update')) {
+        const card = tgt.closest('.scr-group');
+        const aC = card.dataset.airportCode;
+        const sO = card.dataset.scrOutput;
+        if (aC && sO) await sendEmail(aC, sO);
+        else showError("Err: Missing data.");
+      }
+    }
+
+    function formatSCRMessages() {
+      clearFeedback();
+      const input = document.getElementById("userInput").value;
+      const { parsedEntries, errors } = parseInput(input);
+
+      if (errors) { showError(`Input validation failed. Check format.`); }
+      if (parsedEntries.length === 0) { if (!errors) showError("No valid flights."); return; }
+
+      currentSlotType = getSlotType();
+      const scrLineServiceType = getSelectedServiceType();
+      const globalReg = getAircraftReg();
+
+      const outputList = document.getElementById("outputList");
+      outputList.innerHTML = "";
+      const airportGroups = {};
+
+      parsedEntries.forEach((d) => {
+        const { from, to } = d;
+        if (!airportGroups[from]) airportGroups[from] = { airportCode: from, flights: [] };
+        airportGroups[from].flights.push({ type: 'departure', data: d });
+        if (!airportGroups[to]) airportGroups[to] = { airportCode: to, flights: [] };
+        airportGroups[to].flights.push({ type: 'arrival', data: d });
+      });
+
+      Object.values(airportGroups).forEach((grp) => {
+        const { airportCode, flights } = grp;
+        const sLs = ["SCR", "S25", getCurrentDate(), airportCode];
+
+        flights.forEach(fE => {
+          const { type, data } = fE;
+          const { flight, date, dayOfOperation: dOO, departureTime: dT, arrivalTime: aT, from, to, aircraftTypeInput: aTI } = data;
+          const fSt = (currentSlotType === "CANCEL SLOT") ? "D" : "N";
+          const fCC = getFinalCombinedCode(scrLineServiceType, aTI);
+          const ln = (type === 'departure')
+            ? `${fSt} ${flight} ${date}${date} ${dOO} ${fCC} ${dT}${to} ${scrLineServiceType}`
+            : `${fSt}${flight} ${date}${date} ${dOO} ${fCC} ${from}${aT} ${scrLineServiceType}`;
+          sLs.push(ln);
+        });
+
+        const siAct = (currentSlotType === "NEW SLOT") ? "NEW SLOT REQ" : "SLOT CANX REQ";
+        sLs.push(buildSiLine(siAct, airportCode, scrLineServiceType, globalReg));
+
+        const scrOut = sLs.join("\n");
+        createScrGroupElement(outputList, airportCode, scrOut, false);
+
+        addLogEntry({
+          type: currentSlotType,
+          flightNumber: flights.map(e => e.data.flight).join(", "),
+          airport: airportCode,
+          direction: flights.map(e => e.type).join("/"),
+          timestamp: new Date().toISOString().split(".")[0].replace("T", " "),
+          scrMessage: scrOut
+        });
+      });
+
+      showSuccess(`Formatted ${parsedEntries.length} leg(s) into ${Object.keys(airportGroups).length} message(s). ${errors ? 'Errors found.' : ''}`);
+      attachSendButtonsListeners();
+    }
+
+    function formatChangeSCRMessages() {
+      clearFeedback();
+      const input = document.getElementById("userInput").value;
+      const { parsedEntries, errors } = parseInput(input);
+
+      if (errors) { showError(`Input validation failed. Check format.`); }
+      if (parsedEntries.length === 0) { if (!errors) showError("No valid flights for change."); return; }
+
+      currentSlotType = "CHANGE SCR";
+      const scrLineServiceType = getSelectedServiceType();
+      const globalReg = getAircraftReg();
+
+      const outputList = document.getElementById("outputList");
+      outputList.innerHTML = "";
+      const airportGroups = {};
+
+      parsedEntries.forEach((d) => {
+        const { from, to } = d;
+        if (!airportGroups[from]) airportGroups[from] = { airportCode: from, flights: [] };
+        airportGroups[from].flights.push({ type: 'departure', data: d });
+        if (!airportGroups[to]) airportGroups[to] = { airportCode: to, flights: [] };
+        airportGroups[to].flights.push({ type: 'arrival', data: d });
+      });
+
+      Object.values(airportGroups).forEach((grp, gIdx) => {
+        const { airportCode, flights } = grp;
+
+        const headerLines = ["SCR", "S25", getCurrentDate(), airportCode];
+        const flightChangePairs = [];
+
+        flights.forEach((fE, fIdx) => {
+          const { type, data } = fE;
+          const { flight, date, dayOfOperation: dOO, departureTime: dT, arrivalTime: aT, from, to, aircraftTypeInput: aTI } = data;
+
+          const fCC = getFinalCombinedCode(scrLineServiceType, aTI);
+          const cLB = `${date}${date} ${dOO} ${fCC}`;
+
+          const rLineData = {
+            id: `rline-${gIdx}-${fIdx}`,
+            flight,
+            date: convertSCRDateToInput(date),
+            day: dOO,
+            combinedCode: fCC,
+            service: scrLineServiceType,
+            direction: type,
+            time: "",
+            airport: "",
+            aircraftTypeInput: aTI
+          };
+
+          let cLine;
+          if (type === 'departure') {
+            cLine = `C ${flight} ${cLB} ${dT}${to} ${scrLineServiceType}`;
+            rLineData.time = asTimeBoxValue(dT);
+            rLineData.airport = to;
+          } else {
+            cLine = `C${flight} ${cLB} ${from}${aT} ${scrLineServiceType}`;
+            rLineData.time = asTimeBoxValue(aT);
+            rLineData.airport = from;
+          }
+
+          flightChangePairs.push({ cLine, rLineData });
+        });
+
+        const scrGroup = createChangeScrGroupElement(outputList, airportCode, headerLines, flightChangePairs, gIdx);
+
+        const initialSiLine = buildSiLine("SLOT CHG REQ", airportCode, scrLineServiceType, globalReg);
+        const initialPairs = flightChangePairs.map(p => {
+          const r = p.rLineData;
+          const sD = convertInputDateToSCR(r.date);
+          const tF = normalizeUtcTimeInput(r.time) || "0000";
+          const rLine = (r.direction === 'departure')
+            ? `R ${r.flight} ${sD}${sD} ${r.day} ${r.combinedCode} ${tF}${r.airport} ${r.service}`
+            : `R${r.flight} ${sD}${sD} ${r.day} ${r.combinedCode} ${r.airport}${tF} ${r.service}`;
+          return `${p.cLine}\n${rLine}`;
+        }).join("\n");
+
+        const initialFull = [...headerLines, initialPairs, initialSiLine].join("\n");
+        scrGroup.dataset.scrOutput = initialFull;
+      });
+
+      showSuccess(`Formatted ${parsedEntries.length} leg(s) into ${Object.keys(airportGroups).length} editable message(s). ${errors ? 'Errors found.' : ''}`);
+      attachSendButtonsListeners();
+    }
+
+    function createScrGroupElement(outputList, airportCode, scrOutput) {
+      const scrGroup = document.createElement("div");
+      scrGroup.className = "scr-group";
+      scrGroup.dataset.airportCode = airportCode;
+      scrGroup.dataset.scrOutput = scrOutput;
+
+      const hD = document.createElement("div");
+      hD.className = "heading";
+      hD.innerHTML = `<span>SCR [${airportCode}]</span><span class="tag">CARBON</span>`;
+      scrGroup.appendChild(hD);
+
+      const oCD = document.createElement("div");
+      oCD.className = "output-container";
+      const pre = document.createElement("pre");
+      pre.textContent = scrOutput;
+      oCD.appendChild(pre);
+      scrGroup.appendChild(oCD);
+
+      const buttonFlexContainer = document.createElement("div");
+      buttonFlexContainer.className = "send-button-container";
+
+      const sendBtn = document.createElement("button");
+      sendBtn.className = "btn-primary";
+      sendBtn.textContent = "Send Email";
+      buttonFlexContainer.appendChild(sendBtn);
+
+      const showScrBtn = document.createElement("button");
+      showScrBtn.textContent = "Show SCR";
+      showScrBtn.addEventListener("click", () => showScrModal(scrGroup.dataset.scrOutput));
+      buttonFlexContainer.appendChild(showScrBtn);
+
+      const copyScrBtn = document.createElement("button");
+      copyScrBtn.textContent = "Copy SCR";
+      copyScrBtn.addEventListener("click", () => copyScrToClipboard(scrGroup.dataset.scrOutput));
+      buttonFlexContainer.appendChild(copyScrBtn);
+
+      const copyEmailBtn = document.createElement("button");
+      copyEmailBtn.textContent = "Copy Email";
+      copyEmailBtn.addEventListener("click", async () => {
+        const emailAddress = await getAirportEmail(airportCode, getSelectedServiceType());
+        await navigator.clipboard.writeText(emailAddress);
+        showSuccess(`Email for ${airportCode} (${emailAddress}) copied to clipboard!`);
+      });
+      buttonFlexContainer.appendChild(copyEmailBtn);
+
+      scrGroup.appendChild(buttonFlexContainer);
+      outputList.appendChild(scrGroup);
+      return scrGroup;
+    }
+
+    function rebuildChangeMessageFromCard(scrGroup, groupIndex) {
+      const airportCode = scrGroup.dataset.airportCode;
+      const editableContainer = document.getElementById(`editable-r-lines-${groupIndex}`);
+      if (!editableContainer) { showError("Editable area not found."); return null; }
+
+      const modifiedRows = editableContainer.querySelectorAll(".modified-scr-row");
+      const storedFlightChangePairs = JSON.parse(scrGroup.dataset.flightChangePairs || "[]");
+      const storedHeader = JSON.parse(scrGroup.dataset.headerLines || "[]");
+
+      let updatedMessageLines = [...storedHeader];
+      let reconstructionError = false;
+
+      modifiedRows.forEach((rowDiv) => {
+        const rowId = rowDiv.dataset.rowId;
+        const originalPair = storedFlightChangePairs.find(p => p.rLineData.id === rowId);
+        if (!originalPair) { reconstructionError = true; return; }
+
+        const originalCLine = originalPair.cLine;
+        const direction = originalPair.rLineData.direction;
+
+        try {
+          const fV = rowDiv.querySelector(".r-flight").value.toUpperCase();
+          const dV = rowDiv.querySelector(".r-date").value;
+          const sD = convertInputDateToSCR(dV);
+          const dayV = rowDiv.querySelector(".r-day").value;
+          const cCV = rowDiv.querySelector(".r-combined-code").value.toUpperCase();
+          const tVR = rowDiv.querySelector(".r-time").value;
+          const tV = normalizeUtcTimeInput(tVR);
+          const aV = rowDiv.querySelector(".r-airport").value.toUpperCase();
+          const sV = rowDiv.querySelector(".r-service").value.toUpperCase();
+
+          if(!fV || !sD || !dayV || !cCV || !tV || !aV || !sV) throw new Error("Invalid");
+
+          const uRL = (direction === 'departure')
+            ? `R ${fV} ${sD}${sD} ${dayV} ${cCV} ${tV}${aV} ${sV}`
+            : `R${fV} ${sD}${sD} ${dayV} ${cCV} ${aV}${tV} ${sV}`;
+
+          updatedMessageLines.push(originalCLine);
+          updatedMessageLines.push(uRL);
+        } catch(err){
+          reconstructionError = true;
+        }
+      });
+
+      if (reconstructionError) {
+        showError(`Failed to rebuild one or more R-lines for ${airportCode}. Time must be UTC (HH:MM).`);
+        return null;
+      }
+
+      const groupServiceType = scrGroup.dataset.serviceType || getSelectedServiceType();
+      const finalSiLine = buildSiLine("SLOT CHG REQ", airportCode, groupServiceType, getAircraftReg());
+
+      const siDiv = document.getElementById(`si-line-display-${groupIndex}`);
+      if (siDiv) siDiv.innerHTML = `<strong>--- SI Line ---</strong>\n${finalSiLine}`;
+
+      updatedMessageLines.push(finalSiLine);
+      return updatedMessageLines.join("\n");
+    }
+
+    function createChangeScrGroupElement(outputList, airportCode, headerLines, flightChangePairs, groupIndex) {
+      const scrGroup = document.createElement("div");
+      scrGroup.className = "scr-group";
+      scrGroup.dataset.airportCode = airportCode;
+      scrGroup.dataset.headerLines = JSON.stringify(headerLines);
+      scrGroup.dataset.flightChangePairs = JSON.stringify(flightChangePairs);
+
+      const scrLineServiceType = getSelectedServiceType();
+      scrGroup.dataset.serviceType = scrLineServiceType;
+
+      const headingDiv = document.createElement("div");
+      headingDiv.className = "heading";
+      headingDiv.innerHTML = `<span>CHANGE SCR [${airportCode}]</span><span class="tag">EDITABLE</span>`;
+      scrGroup.appendChild(headingDiv);
+
+      const outputContainerDiv = document.createElement("div");
+      outputContainerDiv.className = "output-container";
+
+      const headerDisplay = document.createElement("div");
+      headerDisplay.style.cssText = "white-space: pre-wrap; font-family: var(--mono); margin-bottom: 10px;";
+      headerDisplay.innerHTML = `<strong>--- Header ---</strong>\n${headerLines.join("\n")}`;
+      outputContainerDiv.appendChild(headerDisplay);
+
+      const cAndRLinesDiv = document.createElement("div");
+      cAndRLinesDiv.id = `editable-r-lines-${groupIndex}`;
+      cAndRLinesDiv.innerHTML = `<strong style="display:block;margin-bottom:8px;">--- Cancellation (C) / New Request (R) Lines ---</strong>`;
+
+      flightChangePairs.forEach((pair) => {
+        const cLT = document.createElement('div');
+        cLT.style.cssText = 'font-family: var(--mono); white-space: pre; font-size: 12px; color: rgba(0,0,0,.65); margin: 6px 0;';
+        cLT.textContent = pair.cLine;
+        cAndRLinesDiv.appendChild(cLT);
+        cAndRLinesDiv.appendChild(createEditableRLineRow(pair.rLineData));
+      });
+
+      outputContainerDiv.appendChild(cAndRLinesDiv);
+
+      const siDiv = document.createElement("div");
+      siDiv.id = `si-line-display-${groupIndex}`;
+      siDiv.style.cssText = "white-space: pre-wrap; font-family: var(--mono); margin-top: 10px;";
+      const initialSiLine = buildSiLine("SLOT CHG REQ", airportCode, scrLineServiceType, getAircraftReg());
+      siDiv.innerHTML = `<strong>--- SI Line ---</strong>\n${initialSiLine}`;
+      outputContainerDiv.appendChild(siDiv);
+
+      scrGroup.appendChild(outputContainerDiv);
+
+      const buttonContainer = document.createElement("div");
+      buttonContainer.className = "send-button-container";
+
+      const updateBtn = document.createElement("button");
+      updateBtn.className = "btn-primary";
+      updateBtn.textContent = "Update";
+      updateBtn.addEventListener("click", () => {
+        clearFeedback();
+        const updated = rebuildChangeMessageFromCard(scrGroup, groupIndex);
+        if (!updated) return;
+        scrGroup.dataset.scrOutput = updated;
+        showSuccess(`Updated ${airportCode}. (Not sent)`);
+      });
+      buttonContainer.appendChild(updateBtn);
+
+      const sendBtn = document.createElement("button");
+      sendBtn.textContent = "Send";
+      sendBtn.addEventListener("click", async () => {
+        clearFeedback();
+        const msg = scrGroup.dataset.scrOutput;
+        if (!msg) { showError("Nothing to send. Click Update first."); return; }
+        await sendEmail(airportCode, msg);
+      });
+      buttonContainer.appendChild(sendBtn);
+
+      const showScrBtn = document.createElement("button");
+      showScrBtn.textContent = "Show SCR";
+      showScrBtn.addEventListener("click", () => showScrModal(scrGroup.dataset.scrOutput || ""));
+      buttonContainer.appendChild(showScrBtn);
+
+      const copyScrBtn = document.createElement("button");
+      copyScrBtn.textContent = "Copy SCR";
+      copyScrBtn.addEventListener("click", () => copyScrToClipboard(scrGroup.dataset.scrOutput || ""));
+      buttonContainer.appendChild(copyScrBtn);
+
+      const copyEmailBtn = document.createElement("button");
+      copyEmailBtn.textContent = "Copy Email";
+      copyEmailBtn.addEventListener("click", async () => {
+        const currentServiceType = scrGroup.dataset.serviceType || getSelectedServiceType();
+        const emailAddress = await getAirportEmail(airportCode, currentServiceType);
+        await navigator.clipboard.writeText(emailAddress);
+        showSuccess(`Email for ${airportCode} (${emailAddress}) copied to clipboard!`);
+      });
+      buttonContainer.appendChild(copyEmailBtn);
+
+      scrGroup.appendChild(buttonContainer);
+      outputList.appendChild(scrGroup);
+
+      return scrGroup;
+    }
+
+    function createEditableRLineRow(rowData) {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "modified-scr-row";
+      rowDiv.dataset.rowId = rowData.id;
+
+      const createField = (labelText, inputType, className, value, disabled=false, options=null) => {
+        const lbl = document.createElement("label");
+        lbl.textContent = labelText + ": ";
+        let inp;
+
+        if (inputType === "select") {
+          inp = document.createElement("select");
+          inp.className = className;
+          (options || []).forEach(o => {
+            const op = document.createElement("option");
+            op.value = o;
+            op.textContent = o;
+            if (o === value) op.selected = true;
+            inp.appendChild(op);
+          });
+        } else {
+          inp = document.createElement("input");
+          inp.type = inputType;
+          inp.className = className;
+          inp.value = value;
+        }
+
+        inp.disabled = disabled;
+        lbl.appendChild(inp);
+        return { label: lbl, input: inp };
+      };
+
+      const flightField = createField("Flight", "text", "r-flight", rowData.flight);
+      const dateField = createField("Date", "date", "r-date", rowData.date);
+      const dayField = createField("Day", "text", "r-day", rowData.day, true);
+      const codeField = createField("Code", "text", "r-combined-code", rowData.combinedCode);
+
+      const timeField = createField("Time (UTC)", "text", "r-time", rowData.time || "");
+      timeField.input.placeholder = "HH:MM";
+      timeField.input.inputMode = "numeric";
+
+      const aptField = createField("Airport", "text", "r-airport", rowData.airport);
+      const svcField = createField("Service", "select", "r-service", rowData.service, false, ["P","J","T","K","D","X"]);
+
+      svcField.input.addEventListener("change", () => {
+        const svc = (svcField.input.value || "").toUpperCase();
+        if (svc === "J") codeField.input.value = getFinalCombinedCode("J", rowData.aircraftTypeInput);
+      });
+      if ((svcField.input.value || "").toUpperCase() === "J") codeField.input.value = getFinalCombinedCode("J", rowData.aircraftTypeInput);
+
+      timeField.input.addEventListener("blur", () => {
+        const hhmm = normalizeUtcTimeInput(timeField.input.value);
+        if (hhmm) timeField.input.value = asTimeBoxValue(hhmm);
+      });
+
+      dateField.input.addEventListener("change", (e) => {
+        try{
+          const sD = new Date(e.target.value + 'T00:00:00Z');
+          if (!isNaN(sD.getTime())) {
+            const dW = sD.toLocaleDateString("en-US",{weekday:"long", timeZone:"UTC"});
+            dayField.input.value = getDayOfOperation(dW);
+          } else {
+            dayField.input.value = "INVALID";
+          }
+        } catch {
+          dayField.input.value = "ERROR";
+        }
+      });
+
+      rowDiv.appendChild(flightField.label);
+      rowDiv.appendChild(dateField.label);
+      rowDiv.appendChild(dayField.label);
+      rowDiv.appendChild(codeField.label);
+      rowDiv.appendChild(timeField.label);
+      rowDiv.appendChild(aptField.label);
+      rowDiv.appendChild(svcField.label);
+      return rowDiv;
+    }
+
+    async function sendEmail(airportCode, scrOutput) {
+      let sP;
+      if (currentSlotType === "NEW SLOT") sP = "NEW SLOT REQ";
+      else if (currentSlotType === "CANCEL SLOT") sP = "SLOT CANX REQ";
+      else if (currentSlotType === "CHANGE SCR") sP = "SLOT CHG REQ";
+      else sP = "SLOT REQ";
+
+      const subj = `${sP} ${airportCode}`;
+
+      let serviceTypeForEmail = getSelectedServiceType();
+      const cardEl = Array.from(document.querySelectorAll('.scr-group'))
+        .find(c => c.dataset.airportCode === airportCode && c.dataset.scrOutput === scrOutput);
+      if (cardEl && cardEl.dataset.serviceType) serviceTypeForEmail = cardEl.dataset.serviceType;
+
+      const rE = await getAirportEmail(airportCode, serviceTypeForEmail);
+      const cE = "slotdesk@ryanair.com";
+
+      let mL = `mailto:${rE}`;
+      const pA = [];
+      if (rE.toLowerCase() !== cE.toLowerCase()) pA.push(`cc=${encodeURIComponent(cE)}`);
+      pA.push(`subject=${encodeURIComponent(subj)}`);
+      pA.push(`body=${encodeURIComponent(scrOutput)}`);
+      if (pA.length > 0) mL += `?${pA.join('&')}`;
+
+      if (mL.length > 2000) { showError(`Email for ${airportCode} is too long for mailto link.`); return; }
+      window.open(mL, '_blank');
+    }
+
+    function clearAllInputs() {
+      const ta = document.getElementById("userInput");
+      if (ta) ta.value = "";
+      const reg = document.getElementById("regInput");
+      if (reg) reg.value = "";
+      const si = document.getElementById("siExtraInput");
+      if (si) si.value = "";
+      const lCb = document.getElementById("learjetCheckbox");
+      const bCb = document.getElementById("bombardierCheckbox");
+      if (lCb && bCb) { lCb.checked = true; bCb.checked = false; }
+      const out = document.getElementById("outputList");
+      if (out) out.innerHTML = "";
+      clearFeedback();
+      showSuccess("Cleared all fields.");
+    }
+
+    function setupEventListeners() {
+      document.getElementById("formatBtn").addEventListener("click", () => {
+        const mode = document.getElementById("slotType").value;
+        if (mode === "CHANGE") formatChangeSCRMessages();
+        else formatSCRMessages();
+      });
+
+      document.getElementById("dropdownMenu").addEventListener("change", function() {
+        document.getElementById("aircraftSelection").style.display = (this.value === "D") ? "block" : "none";
+      });
+
+      const lCb = document.getElementById("learjetCheckbox");
+      const bCb = document.getElementById("bombardierCheckbox");
+      if (lCb && bCb) {
+        lCb.addEventListener("change", () => { if (lCb.checked) bCb.checked = false; else if (!bCb.checked) lCb.checked = true; });
+        bCb.addEventListener("change", () => { if (bCb.checked) lCb.checked = false; else if (!lCb.checked) lCb.checked = true; });
+      }
+
+      const clearBtn = document.getElementById("clearInputBtn");
+      if (clearBtn) clearBtn.addEventListener("click", clearAllInputs);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupEventListeners();
+      document.getElementById("aircraftSelection").style.display = (getSelectedServiceType() === "D") ? "block" : "none";
+      attachSendButtonsListeners();
+
+      const modal = document.getElementById("scrModal");
+      const closeModalBtn = document.getElementById("closeScrModalBtn");
+      if (closeModalBtn) closeModalBtn.onclick = function() { if (modal) modal.style.display = "none"; };
+      window.onclick = function(event) { if (event.target == modal && modal) modal.style.display = "none"; };
+      window.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal) modal.style.display = "none"; });
+    });
+  </script>
+</body>
+</html>
