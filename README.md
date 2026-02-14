@@ -69,6 +69,10 @@ Have feedback or feature requests? I'd love to hear from you! 📨
 
 CREATED BY ArtemisByte/KunchackoBoben 2026 
 
+Just Some Information: 
+Vibe Coded with A.I. but also had human intervention
+Wesbite tested thoroughly to ensure errors are not generated.
+
 
 
 COPYRIGHT INFORMATION:
