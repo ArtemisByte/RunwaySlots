@@ -566,6 +566,7 @@
       function detectAircraftTypeFromCombinedCode(code) {
         const upper = String(code || "").toUpperCase();
         if (upper.includes("73H")) return "73H";
+        if (upper.includes("320")) return "320";  
         if (upper.includes("7M8")) return "7M8";
         if (upper.includes("L45")) return "L45";
         if (upper.includes("CL5")) return "CL5";
