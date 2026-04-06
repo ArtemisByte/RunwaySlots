@@ -33,7 +33,7 @@ function showOverlay(show) {
 
 function getUserPersonalizationRef() {
   if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
-    throw new Error("Firebase is not initialized.");
+    throw new Error("Firebase is not initialized. Check scripts/firebase.js");
   }
   return firebase.database().ref("userPersonalization");
 }
@@ -56,26 +56,24 @@ function getReadableDateTime() {
   return { now, date, time };
 }
 
-function saveNameToFirebase(name) {
-  try {
-    const ref = getUserPersonalizationRef();
-    const { now, date, time } = getReadableDateTime();
+async function saveNameToFirebase(name) {
+  const ref = getUserPersonalizationRef();
+  const { now, date, time } = getReadableDateTime();
 
-    ref.push({
-      name: name,
-      savedAt: firebase.database.ServerValue.TIMESTAMP,
-      localSavedAtIso: now.toISOString(),
-      date: date,
-      time: time
-    }).catch((error) => {
-      console.error("Failed to save name to Firebase:", error);
-    });
-  } catch (error) {
-    console.error("Firebase write error:", error);
-  }
+  const payload = {
+    name: name,
+    savedAt: firebase.database.ServerValue.TIMESTAMP,
+    localSavedAtIso: now.toISOString(),
+    date: date,
+    time: time
+  };
+
+  const newRef = ref.push();
+  await newRef.set(payload);
+  console.log("Name saved to Firebase:", payload);
 }
 
-function saveNameFromInput() {
+async function saveNameFromInput() {
   const input = document.getElementById("nameInput");
   const err = document.getElementById("nameError");
   const clean = titleCaseName(input.value);
@@ -85,15 +83,22 @@ function saveNameFromInput() {
     return;
   }
 
+  err.textContent = "";
+
   try {
     localStorage.setItem(LS_KEY, clean);
-  } catch (e) {}
+  } catch (e) {
+    console.warn("Local storage save failed:", e);
+  }
 
-  saveNameToFirebase(clean);
-
-  err.textContent = "";
-  setGreeting(clean);
-  showOverlay(false);
+  try {
+    await saveNameToFirebase(clean);
+    setGreeting(clean);
+    showOverlay(false);
+  } catch (error) {
+    console.error("Firebase write error:", error);
+    err.textContent = "Could not save your name to Firebase. Check database rules.";
+  }
 }
 
 document.getElementById("saveNameBtn").addEventListener("click", saveNameFromInput);
