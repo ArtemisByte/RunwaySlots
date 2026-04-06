@@ -528,7 +528,7 @@
 
       <aside class="history-panel">
         <div class="title-bar">
-          <span>SCR History [DATA STORED LOCALLY]</span>
+          <span>SCR History [SHARED FIREBASE DATABASE]</span>
         </div>
 
         <div class="history-toolbar">
@@ -560,11 +560,18 @@
   <script src="scripts/firebase.js"></script>
 
   <script>
-    const STORAGE_KEY = "historicLog";
     let currentSlotType = "";
+    let sharedHistoryCache = [];
 
     const monthMap = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
     const monthAbbrArr = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    function getHistoryRef() {
+      if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
+        throw new Error("Firebase app is not initialized. Check scripts/firebase.js");
+      }
+      return firebase.database().ref("scrHistory");
+    }
 
     function getLastSundayOfMonthUTC(year, monthIndex) {
       const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0));
@@ -628,42 +635,91 @@
     }
 
     function getHistoricLog() {
-      try {
-        const d = localStorage.getItem(STORAGE_KEY);
-        return d ? JSON.parse(d) : [];
-      } catch (e) {
-        return [];
-      }
+      return sharedHistoryCache;
     }
 
     function setHistoricLog(log) {
+      sharedHistoryCache = Array.isArray(log) ? log : [];
+    }
+
+    function startHistoryListener() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-      } catch (e) {
-        showError("Could not save log.");
+        const historyRef = getHistoryRef();
+        historyRef.on("value", (snapshot) => {
+          const rows = [];
+
+          snapshot.forEach((child) => {
+            rows.push({
+              firebaseKey: child.key,
+              ...child.val()
+            });
+          });
+
+          rows.reverse();
+          setHistoricLog(rows);
+          renderHistoryPanel();
+        }, (error) => {
+          showError("Failed to load shared history.");
+          console.error("History listener error:", error);
+        });
+      } catch (error) {
+        showError("Shared history failed to start. Check Firebase config.");
+        console.error(error);
       }
     }
 
     function addLogEntry(entry) {
-      const log = getHistoricLog();
-      log.unshift(entry);
-      setHistoricLog(log);
-      renderHistoryPanel();
+      try {
+        const historyRef = getHistoryRef();
+        historyRef.push({
+          ...entry,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).catch((error) => {
+          showError("Could not save shared history.");
+          console.error("Add history error:", error);
+        });
+      } catch (error) {
+        showError("Could not save shared history.");
+        console.error(error);
+      }
     }
 
     function deleteLogEntry(index) {
       const log = getHistoricLog();
-      if (index < 0 || index >= log.length) return;
-      log.splice(index, 1);
-      setHistoricLog(log);
-      renderHistoryPanel();
-      showSuccess("History entry deleted.");
+      const item = log[index];
+      if (!item || !item.firebaseKey) return;
+
+      try {
+        const historyRef = getHistoryRef();
+        historyRef.child(item.firebaseKey).remove()
+          .then(() => {
+            showSuccess("History entry deleted.");
+          })
+          .catch((error) => {
+            showError("Could not delete history entry.");
+            console.error("Delete history error:", error);
+          });
+      } catch (error) {
+        showError("Could not delete history entry.");
+        console.error(error);
+      }
     }
 
     function clearHistory() {
-      localStorage.removeItem(STORAGE_KEY);
-      renderHistoryPanel();
-      showSuccess("All history cleared.");
+      try {
+        const historyRef = getHistoryRef();
+        historyRef.remove()
+          .then(() => {
+            showSuccess("All history cleared.");
+          })
+          .catch((error) => {
+            showError("Could not clear shared history.");
+            console.error("Clear history error:", error);
+          });
+      } catch (error) {
+        showError("Could not clear shared history.");
+        console.error(error);
+      }
     }
 
     function formatPreviewText(text, maxLength = 220) {
@@ -913,7 +969,7 @@
     }
 
     function getSelectedServiceType() {
-      return document.getElementById("dropdownMenu").value;
+      return document.getElementById("dropdownMenu").value.charAt(0);
     }
 
     function getSlotType() {
@@ -1612,7 +1668,7 @@
       }
 
       const airportCode = entry.airport || parsedEntries[0]?.from || "UNKNOWN";
-      const serviceType = entry.serviceType || "P";
+      const serviceType = entry.serviceType ? entry.serviceType.charAt(0) : "P";
       const headerLines = ["SCR", getIATASlotSeasonUTC(), getCurrentDate(), airportCode];
       const flightChangePairs = [];
 
@@ -1734,7 +1790,7 @@
           data.flightChangePairs,
           data.headerLines,
           data.airportCode,
-          entry.serviceType || "P"
+          entry.serviceType ? entry.serviceType.charAt(0) : "P"
         );
 
         if (!result) {
@@ -1773,7 +1829,7 @@
           data.flightChangePairs,
           data.headerLines,
           data.airportCode,
-          entry.serviceType || "P"
+          entry.serviceType ? entry.serviceType.charAt(0) : "P"
         );
         if (!result) return;
 
@@ -1786,7 +1842,7 @@
           result.finalSiLine
         );
 
-        showScrModal(`<strong>--- Generated SCR Preview ---</strong>\n${highlightedHtml}`, true);
+        showScrModal(`--- Generated SCR Preview ---\n${highlightedHtml}`, true);
       });
       actionBar.appendChild(previewBtn);
 
@@ -1799,7 +1855,7 @@
           data.flightChangePairs,
           data.headerLines,
           data.airportCode,
-          entry.serviceType || "P"
+          entry.serviceType ? entry.serviceType.charAt(0) : "P"
         );
         if (!result) return;
 
@@ -1810,7 +1866,7 @@
           result.finalSiLine
         );
 
-        showScrModal(`<strong>--- Generated SCR Preview ---</strong>\n${highlightedHtml}`, true);
+        showScrModal(`--- Generated SCR Preview ---\n${highlightedHtml}`, true);
       });
       actionBar.appendChild(viewHighlightedBtn);
 
@@ -1823,7 +1879,7 @@
           data.flightChangePairs,
           data.headerLines,
           data.airportCode,
-          entry.serviceType || "P"
+          entry.serviceType ? entry.serviceType.charAt(0) : "P"
         );
         if (!result) return;
         siDiv.textContent = `--- SI Line ---\n${result.finalSiLine}`;
@@ -1841,13 +1897,13 @@
           data.flightChangePairs,
           data.headerLines,
           data.airportCode,
-          entry.serviceType || "P"
+          entry.serviceType ? entry.serviceType.charAt(0) : "P"
         );
         if (!result) return;
 
         siDiv.textContent = `--- SI Line ---\n${result.finalSiLine}`;
 
-        await sendEmail(data.airportCode, result.updatedScrMessage, entry.serviceType || "P");
+        await sendEmail(data.airportCode, result.updatedScrMessage, entry.serviceType ? entry.serviceType.charAt(0) : "P");
 
         addLogEntry({
           type: "CHANGE SCR (Updated)",
@@ -1895,7 +1951,7 @@
       }
 
       const airportCode = entry.airport || lines[3] || "UNKNOWN";
-      const serviceType = entry.serviceType || "P";
+      const serviceType = entry.serviceType ? entry.serviceType.charAt(0) : "P";
 
       const headerLines = lines.slice(0, 4);
       const siLine = (() => {
@@ -1959,7 +2015,7 @@
       currentSlotType = "CANCEL SLOT";
 
       for (const msg of cancellationMessages) {
-        await sendEmail(msg.airportCode, msg.scrMessage, entry.serviceType || "P");
+        await sendEmail(msg.airportCode, msg.scrMessage, entry.serviceType ? entry.serviceType.charAt(0) : "P");
 
         addLogEntry({
           type: "CANCEL SLOT",
@@ -2088,7 +2144,7 @@
       });
 
       document.getElementById("dropdownMenu").addEventListener("change", function() {
-        document.getElementById("aircraftSelection").style.display = (this.value === "D") ? "block" : "none";
+        document.getElementById("aircraftSelection").style.display = (this.value.charAt(0) === "D") ? "block" : "none";
       });
 
       const lCb = document.getElementById("learjetCheckbox");
@@ -2116,7 +2172,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       setupEventListeners();
-      renderHistoryPanel();
+      startHistoryListener();
 
       document.getElementById("aircraftSelection").style.display =
         (getSelectedServiceType() === "D") ? "block" : "none";
