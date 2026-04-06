@@ -548,6 +548,24 @@
     </footer>
   </div>
 
+  <div id="clearAllModal" class="modal">
+    <div class="modal-content" style="max-width: 460px; white-space: normal; font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;">
+      <div class="title-bar" style="margin: -20px -20px 12px -20px;">
+        <span>Warning</span>
+      </div>
+
+      <div style="font-size: 13px; line-height: 1.5; color: black; margin-bottom: 14px;">
+        This will clear all SCR history data for <strong>all users</strong>.<br><br>
+        Are you sure you want to proceed?
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button id="confirmClearAllBtn" type="button">Proceed</button>
+        <button id="cancelClearAllBtn" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div id="scrModal" class="modal">
     <div class="modal-content">
       <span class="close-button" id="closeScrModalBtn">&times;</span>
@@ -1044,6 +1062,16 @@
         modalText.textContent = scrText;
       }
       document.getElementById("scrModal").style.display = "block";
+    }
+
+    function showClearAllModal() {
+      const modal = document.getElementById("clearAllModal");
+      if (modal) modal.style.display = "block";
+    }
+
+    function hideClearAllModal() {
+      const modal = document.getElementById("clearAllModal");
+      if (modal) modal.style.display = "none";
     }
 
     async function copyScrToClipboard(scrText) {
@@ -2162,9 +2190,7 @@
 
       document.getElementById("refreshHistoryBtn").addEventListener("click", renderHistoryPanel);
       document.getElementById("clearHistoryBtn").addEventListener("click", () => {
-        if (confirm("Are you sure you want to clear all SCR history?")) {
-          clearHistory();
-        }
+        showClearAllModal();
       });
       document.getElementById("historySearch").addEventListener("input", renderHistoryPanel);
       document.getElementById("historySearch").addEventListener("keyup", renderHistoryPanel);
@@ -2186,9 +2212,32 @@
         };
       }
 
+      const confirmClearAllBtn = document.getElementById("confirmClearAllBtn");
+      const cancelClearAllBtn = document.getElementById("cancelClearAllBtn");
+
+      if (confirmClearAllBtn) {
+        confirmClearAllBtn.onclick = function() {
+          hideClearAllModal();
+          clearHistory();
+        };
+      }
+
+      if (cancelClearAllBtn) {
+        cancelClearAllBtn.onclick = function() {
+          hideClearAllModal();
+        };
+      }
+
       window.onclick = function(event) {
-        if (event.target == modal && modal) {
-          modal.style.display = "none";
+        const scrModal = document.getElementById("scrModal");
+        const clearAllModal = document.getElementById("clearAllModal");
+
+        if (event.target === scrModal && scrModal) {
+          scrModal.style.display = "none";
+        }
+
+        if (event.target === clearAllModal && clearAllModal) {
+          clearAllModal.style.display = "none";
         }
       };
     });
