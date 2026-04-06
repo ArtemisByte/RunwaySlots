@@ -438,10 +438,14 @@
       if (sT === 'J') {
         if (aTI === '73H') return '18973H';
         if (aTI === '7M8') return '1977M8';
+        if (aTI === '320') return '180320';
+        if (aTI === '7MJ') return '2287MJ';
         return '18973H';
       } else if (sT === 'P') {
         if (aTI === '73H') return '00073H';
         if (aTI === '7M8') return '0007M8';
+        if (aTI === '320') return '000320';
+        if (aTI === '7MJ') return '0007MJ';
         return '00073H';
       } else if (sT === 'D') {
         const pfx = document.getElementById("bombardierCheckbox").checked ? "009" : "008";
@@ -452,6 +456,8 @@
         let oC = '73H';
         if (aTI === '73H') oC = '73H';
         else if (aTI === '7M8') oC = '7M8';
+        else if (aTI === '320') oC = '320';
+        else if (aTI === '7MJ') oC = '7MJ';
         return pfx + oC;
       }
     }
