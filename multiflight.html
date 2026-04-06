@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Multi Flight SCR Generator</title>
+  <title>Multi Flight Formatter</title>
   <link rel="stylesheet" href="styles/multiflight.css">
   <link rel="stylesheet" href="styles/navi-ui.css">
   <link rel="stylesheet" href="styles/infobar.css"> 
- </head>
+</head>
 <body>
-  <nav>
-     <ul>
+
+  <div id="mainApp">
+    <nav>
+      <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="sir.html">SIR Request</a></li>
       <li><a href="multiflight.html">Multi Flight</a></li>
@@ -21,10 +23,11 @@
       <li><a href="test2.html">EXPERIMENTAL</a></li>
       <li><a href="updates.html">SYSTEM UPDATES</a></li>
       <li><a href="https://forms.gle/Q4T4TbhEU9Sa7jbg7" target="_blank" rel="noopener noreferrer">Log Issues</a></li>
-    </ul>
-  </nav>
+      </ul>
+      <div style="display:flex; align-items:center; gap:6px;"></div>
+    </nav>
 
-  <div class="info-bar">
+    <div class="info-bar">
     <div class="left-tools">
       <div id="utcTopClock" class="utc-clock" aria-live="polite">UTC: --:--:-- • --MON----</div>
     </div>
@@ -40,46 +43,104 @@
     </div>
   </div>
 
-  <div class="container">
-    <div class="title-bar">Multi Flight SCR Generator -> Current Season S26</div>
-    <div class="window-content">
-      <h1>Multi Flight SCR Generator</h1>
+    <div class="app-shell">
+      <div class="main-panel">
+        <div class="container">
+          <div class="title-bar">
+            <span>Multi Flight Formatter - Current Season S26</span>
+          </div>
+          <div class="window-content">
+            <h1>Multi Flight Formatter</h1>
 
-      <div id="errorMessage" class="error"></div>
-      <div id="successMessage" class="success"></div>
+            <div id="errorMessage" class="error"></div>
+            <div id="successMessage" class="success"></div>
 
-      <label for="userInput">Insert Flight Leg Data:</label>
-      <textarea id="userInput" placeholder="FR877P LPL NCL 15FEB2025 1430 1515 EIIHG 7M8"></textarea>
+            <label for="userInput">Flight Information (One per line):</label>
+            <textarea id="userInput" placeholder="FR877P LPL NCL 15FEB2025 1430 1515 EIIHG 7M8"></textarea>
 
-      <label for="regInput">Aircraft Registration (ONLY FOR LEARJET/CHALLENGER):</label>
-      <input type="text" id="regInput" placeholder="ENTER REGISTRATION" />
+            <label for="regInput">Type Learjet/Challenger Aircraft Reg:</label>
+            <input type="text" id="regInput" placeholder="ENTER REGISTRATION" />
 
-      <div id="aircraftSelection" style="display: none;">
-        <span>Select Aircraft Type for 'D' Service:</span><br>
-        <label><input type="checkbox" id="learjetCheckbox" name="aircraftType" checked> Learjet (L45)</label>
-        <label><input type="checkbox" id="bombardierCheckbox" name="aircraftType"> Bombardier (CL5)</label>
+            <div id="aircraftSelection" style="display: none;">
+              <span>Select Aircraft Type for 'D' Service:</span><br>
+              <label><input type="checkbox" id="learjetCheckbox" name="aircraftType" checked> Learjet (L45)</label>
+              <label><input type="checkbox" id="bombardierCheckbox" name="aircraftType"> Bombardier (CL5)</label>
+            </div>
+
+            <div>
+              <button id="formatBtn">Click Here To Generate SCR Messages</button>
+              <select id="slotType" title="Select Slot Type">
+                <option value="NEW">NEW SLOT</option>
+                <option value="CANCEL">CANCEL SLOT</option>
+                <option value="CHANGE">CHANGE SCR</option>
+              </select>
+              <select id="dropdownMenu" title="Select Flight Service Type">
+                <option value="P">P - Positioner</option>
+                <option value="D">D - General Aviation</option>
+                <option value="K">K - Training</option>
+                <option value="T">T - Technical Test</option>
+                <option value="J">J - Passenger Schedule</option>
+                <option value="X">X - Technical Stop</option>
+              </select>
+            </div>
+
+            <div id="outputList"></div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <button id="formatBtn">Click Here To Generate SCR Messages</button>
-        <select id="slotType" title="Select Slot Type"><option value="NEW">NEW SLOT</option><option value="CANCEL">CANCEL SLOT</option><option value="CHANGE">CHANGE SCR</option></select>
-        <select id="dropdownMenu" title="Select Flight Service Type"><option value="P">P - Positioner</option><option value="D">D - General Aviation</option><option value="K">K - Training</option><option value="T">T - Training</option><option value="J">J - Passenger</option><option value="X">X - Technical</option></select>
-      </div>
+      <aside class="history-panel">
+        <div class="title-bar">
+          <span>SCR History [SHARED HISTORY DATABASE]</span>
+        </div>
 
-      <div id="outputList"></div>
+        <div class="history-toolbar">
+          <input type="text" id="historySearch" placeholder="Search airport, flight, type..." />
+          <button id="refreshHistoryBtn" type="button">Refresh</button>
+          <button id="clearHistoryBtn" type="button">Clear All</button>
+        </div>
+
+        <div class="history-list" id="historyList"></div>
+      </aside>
     </div>
-  </div>
 
-  <footer>Created By: ArtemisByte/KunchackoBoben 2026</footer>
+    <footer>Created By: ArtemisByte/KunchackoBoben 2026</footer>
   <footer>Disclaimer:
 
 Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use. You assume all responsibility.</footer>
+
+  </div>
+
+  <div id="clearAllModal" class="modal">
+    <div class="modal-content" style="max-width: 460px; white-space: normal; font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;">
+      <div class="title-bar" style="margin: -20px -20px 12px -20px;">
+        <span>Warning</span>
+      </div>
+
+      <div style="font-size: 13px; line-height: 1.5; color: black; margin-bottom: 14px;">
+        This will clear all SCR history data for <strong>all users</strong>.<br><br>
+        Are you sure you want to proceed?
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button id="confirmClearAllBtn" type="button">Proceed</button>
+        <button id="cancelClearAllBtn" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scrModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="closeScrModalBtn">&times;</span>
+      <pre id="scrModalText"></pre>
+    </div>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="scripts/firebase.js"></script>
   <script src="scripts/multiflight.js"></script>
   <script src="scripts/infobar.js"></script>
-  
- </body>
- </html>
+
+</body>
+</html>
