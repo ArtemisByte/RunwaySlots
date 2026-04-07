@@ -586,7 +586,7 @@ const monthAbbrArr = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "S
 
 function getHistoryRef() {
   if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
-    throw new Error("Firebase app is not initialized. Check scripts/firebase.js");
+    throw new Error("Firebase app is not initialized. Check scripts/testfirebase.js");
   }
   return firebase.database().ref("scrHistory");
 }
