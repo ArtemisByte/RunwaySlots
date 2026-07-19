@@ -1,5 +1,5 @@
-const LIVE_HISTORY_PATH = "analytics/slotEvents";
-const BACKUP_HISTORY_PATH = "analytics/slotEventsBackup";
+const LIVE_HISTORY_PATH = "scrHistory";
+const BACKUP_HISTORY_PATH = "scrHistoryBackup";
 
 const state = {
   database: null,
@@ -10,8 +10,7 @@ const state = {
   allRecords: [],
   filteredRecords: [],
   charts: {},
-  selectedRecord: null,
-  backupRunning: false
+  selectedRecord: null
 };
 
 const elements = {
@@ -60,34 +59,42 @@ const elements = {
 function updateClock() {
   const now = new Date();
 
-  elements.utcClock.textContent = now.toLocaleTimeString("en-GB", {
-    timeZone: "UTC",
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
-
-  elements.utcDate.textContent = now
-    .toLocaleDateString("en-GB", {
+  if (elements.utcClock) {
+    elements.utcClock.textContent = now.toLocaleTimeString("en-GB", {
       timeZone: "UTC",
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    })
-    .replace(/\s/g, "")
-    .toUpperCase();
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+  }
+
+  if (elements.utcDate) {
+    elements.utcDate.textContent = now
+      .toLocaleDateString("en-GB", {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+      .replace(/\s/g, "")
+      .toUpperCase();
+  }
 }
 
 function setDatabaseStatus(status, text) {
-  elements.databaseStatus.className =
-    `info-box database-status ${status}`;
+  if (elements.databaseStatus) {
+    elements.databaseStatus.className =
+      `info-box database-status ${status}`;
+  }
 
-  elements.databaseStatusText.textContent = text;
+  if (elements.databaseStatusText) {
+    elements.databaseStatusText.textContent = text;
+  }
 }
 
 function normaliseAction(value) {
-  const action = String(value || "").toUpperCase();
+  const action = String(value || "").trim().toUpperCase();
 
   if (
     action.includes("CHANGE") ||
@@ -108,123 +115,166 @@ function normaliseAction(value) {
   return "NEW";
 }
 
+function getRecordTimestamp(value) {
+  const candidates = [
+    value.createdAt,
+    value.clientTimestamp,
+    value.timestamp,
+    value.time,
+    value.dateCreated,
+    value.savedAt
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate === undefined || candidate === null || candidate === "") {
+      continue;
+    }
+
+    if (typeof candidate === "number" && Number.isFinite(candidate)) {
+      return candidate;
+    }
+
+    if (
+      typeof candidate === "object" &&
+      typeof candidate.toMillis === "function"
+    ) {
+      return candidate.toMillis();
+    }
+
+    const numericValue = Number(candidate);
+
+    if (Number.isFinite(numericValue) && numericValue > 0) {
+      return numericValue;
+    }
+
+    const parsedValue = Date.parse(String(candidate));
+
+    if (Number.isFinite(parsedValue)) {
+      return parsedValue;
+    }
+  }
+
+  return Date.now();
+}
+
 function normaliseRecord(id, value) {
-  const timestamp =
-    Number(value.createdAt) ||
-    Number(value.clientTimestamp) ||
-    Number(value.timestamp) ||
-    Date.parse(value.timestamp || "") ||
-    Date.now();
+  const record = value && typeof value === "object" ? value : {};
 
   return {
     id,
+
     type: normaliseAction(
-      value.type ||
-      value.action ||
-      value.slotType
+      record.type ||
+      record.action ||
+      record.slotType ||
+      record.requestType
     ),
+
     airport: String(
-      value.airport ||
-      value.airportCode ||
+      record.airport ||
+      record.airportCode ||
+      record.iata ||
       "--"
     ).toUpperCase(),
+
     flightNumber: String(
-      value.flightNumber ||
-      value.flight ||
+      record.flightNumber ||
+      record.flight ||
+      record.flightNo ||
+      "--"
+    ).toUpperCase(),
+
+    direction: String(
+      record.direction ||
+      record.movement ||
       "--"
     ),
-    direction: String(value.direction || "--"),
+
     serviceType: String(
-      value.serviceType ||
-      value.service ||
+      record.serviceType ||
+      record.service ||
+      record.stc ||
       "--"
     ).toUpperCase(),
+
     registration: String(
-      value.registration ||
-      value.reg ||
+      record.registration ||
+      record.reg ||
+      record.aircraftRegistration ||
       "-"
     ).toUpperCase(),
+
     scrMessage: String(
-      value.scrMessage ||
-      value.message ||
-      value.output ||
+      record.scrMessage ||
+      record.scr ||
+      record.message ||
+      record.output ||
       ""
     ),
-    createdAt: timestamp
+
+    createdAt: getRecordTimestamp(record)
   };
 }
 
-function snapshotToMap(snapshot) {
-  const result = {};
-  const data = snapshot.val() || {};
-
-  Object.entries(data).forEach(([id, value]) => {
-    if (!value || typeof value !== "object") {
-      return;
-    }
-
-    result[id] = normaliseRecord(id, value);
-  });
-
-  return result;
-}
-
 function rebuildRecords() {
-  const combinedRecords = {
+  /*
+    Backup records are loaded first.
+
+    A matching live record temporarily replaces the archived record
+    while it exists. If Multi Flight deletes the live child, the backup
+    record automatically becomes visible again.
+  */
+  const combined = {
     ...state.backupRecords,
     ...state.liveRecords
   };
 
-  state.allRecords = Object.values(combinedRecords)
+  state.allRecords = Object.values(combined)
     .sort((a, b) => b.createdAt - a.createdAt);
 
   applyFilters();
 }
 
-function createBackupPayload(id, value) {
+function createBackupPayload(recordId, value) {
+  const source =
+    value && typeof value === "object"
+      ? { ...value }
+      : {};
+
   return {
-    ...value,
-    originalHistoryKey: id,
+    ...source,
+    originalHistoryKey: recordId,
     backupSourcePath: LIVE_HISTORY_PATH,
     backupCreatedAt: firebase.database.ServerValue.TIMESTAMP
   };
 }
 
-async function backupSnapshot(snapshot) {
-  if (
-    !state.backupReference ||
-    state.backupRunning
-  ) {
+async function archiveRecord(recordId, value) {
+  if (!state.backupReference || !recordId || !value) {
     return;
   }
-
-  const entries = Object.entries(snapshot.val() || {})
-    .filter(([, value]) => {
-      return value && typeof value === "object";
-    });
-
-  if (!entries.length) {
-    return;
-  }
-
-  state.backupRunning = true;
 
   try {
-    for (const [id, value] of entries) {
-      await state.backupReference
-        .child(id)
-        .transaction(currentValue => {
-          if (currentValue !== null) {
-            return;
-          }
+    /*
+      Transaction creates the backup only when it does not already exist.
 
-          return createBackupPayload(id, value);
-        });
-    }
+      Returning undefined leaves an existing backup unchanged.
+      No remove(), set(null), or null update is used anywhere.
+    */
+    await state.backupReference
+      .child(recordId)
+      .transaction(currentBackup => {
+        if (currentBackup !== null) {
+          return;
+        }
+
+        return createBackupPayload(recordId, value);
+      });
   } catch (error) {
-    console.error("History backup failed:", error);
-  } finally {
-    state.backupRunning = false;
+    console.error(
+      `Unable to archive SCR history record ${recordId}:`,
+      error
+    );
   }
 }
 
@@ -233,22 +283,20 @@ function startFirebase() {
     if (
       typeof firebase === "undefined" ||
       !firebase.apps ||
-      !firebase.apps.length
+      firebase.apps.length === 0
     ) {
       throw new Error(
-        "Firebase has not been initialised. Load firebase.js before this script."
+        "Firebase is not initialised. Load firebase.js before the analytics script."
       );
     }
 
     state.database = firebase.database();
 
-    state.liveReference = state.database.ref(
-      LIVE_HISTORY_PATH
-    );
+    state.liveReference =
+      state.database.ref(LIVE_HISTORY_PATH);
 
-    state.backupReference = state.database.ref(
-      BACKUP_HISTORY_PATH
-    );
+    state.backupReference =
+      state.database.ref(BACKUP_HISTORY_PATH);
 
     state.database
       .ref(".info/connected")
@@ -263,40 +311,108 @@ function startFirebase() {
         );
       });
 
+    /*
+      Load archived records.
+
+      The analytics page only reads this path after records have been
+      archived. It never removes backup records.
+    */
     state.backupReference.on(
-      "value",
+      "child_added",
       snapshot => {
-        state.backupRecords = snapshotToMap(snapshot);
+        state.backupRecords[snapshot.key] =
+          normaliseRecord(snapshot.key, snapshot.val());
+
         rebuildRecords();
       },
       error => {
-        console.error(
-          "Backup history read failed:",
-          error
-        );
+        console.error("Backup history read failed:", error);
       }
     );
 
-    state.liveReference.on(
-      "value",
+    state.backupReference.on(
+      "child_changed",
       snapshot => {
-        state.liveRecords = snapshotToMap(snapshot);
+        state.backupRecords[snapshot.key] =
+          normaliseRecord(snapshot.key, snapshot.val());
 
         rebuildRecords();
-        backupSnapshot(snapshot);
+      }
+    );
+
+    /*
+      This only updates browser memory if a backup was deleted outside
+      this page. It does not delete anything from Firebase.
+    */
+    state.backupReference.on(
+      "child_removed",
+      snapshot => {
+        delete state.backupRecords[snapshot.key];
+        rebuildRecords();
+      }
+    );
+
+    /*
+      Existing live children trigger child_added when the page opens.
+      New history records also trigger child_added.
+    */
+    state.liveReference.on(
+      "child_added",
+      snapshot => {
+        const recordId = snapshot.key;
+        const value = snapshot.val();
+
+        state.liveRecords[recordId] =
+          normaliseRecord(recordId, value);
+
+        rebuildRecords();
+
+        archiveRecord(recordId, value);
       },
       error => {
-        console.error(
-          "Live history read failed:",
-          error
-        );
+        console.error("Live history read failed:", error);
 
         setDatabaseStatus(
           "offline",
           "Database Read Failed"
         );
+      }
+    );
 
-        state.liveRecords = {};
+    /*
+      Updated shared-history records remain visible live.
+
+      The original archived record is not overwritten because archiveRecord()
+      only creates a backup when one does not already exist.
+    */
+    state.liveReference.on(
+      "child_changed",
+      snapshot => {
+        const recordId = snapshot.key;
+        const value = snapshot.val();
+
+        state.liveRecords[recordId] =
+          normaliseRecord(recordId, value);
+
+        rebuildRecords();
+
+        archiveRecord(recordId, value);
+      }
+    );
+
+    /*
+      Multi Flight may remove a child from /scrHistory.
+
+      This handler removes only the in-memory live version. It never calls
+      Firebase remove(), set(null), or update({ key: null }).
+
+      The archived record remains in /scrHistoryBackup and continues to
+      appear on the analytics page.
+    */
+    state.liveReference.on(
+      "child_removed",
+      snapshot => {
+        delete state.liveRecords[snapshot.key];
         rebuildRecords();
       }
     );
@@ -313,7 +429,7 @@ function startFirebase() {
 }
 
 function getRangeCutoff() {
-  const range = elements.rangeFilter.value;
+  const range = elements.rangeFilter?.value || "7";
 
   if (range === "all") {
     return 0;
@@ -331,8 +447,8 @@ function getRangeCutoff() {
 
 function applyFilters() {
   const cutoff = getRangeCutoff();
-  const action = elements.actionFilter.value;
-  const search = elements.searchFilter.value
+  const action = elements.actionFilter?.value || "ALL";
+  const search = String(elements.searchFilter?.value || "")
     .trim()
     .toUpperCase();
 
@@ -348,20 +464,12 @@ function applyFilters() {
     const searchMatch =
       !search ||
       record.airport.includes(search) ||
-      record.flightNumber
-        .toUpperCase()
-        .includes(search) ||
-      record.direction
-        .toUpperCase()
-        .includes(search) ||
+      record.flightNumber.includes(search) ||
+      record.direction.toUpperCase().includes(search) ||
       record.serviceType.includes(search) ||
       record.registration.includes(search);
 
-    return (
-      rangeMatch &&
-      actionMatch &&
-      searchMatch
-    );
+    return rangeMatch && actionMatch && searchMatch;
   });
 
   renderDashboard();
@@ -371,8 +479,7 @@ function countBy(records, property) {
   return records.reduce((result, record) => {
     const key = record[property];
 
-    result[key] =
-      (result[key] || 0) + 1;
+    result[key] = (result[key] || 0) + 1;
 
     return result;
   }, {});
@@ -425,46 +532,66 @@ function renderSummary() {
 
   const topAirport = getTopEntry(airportCounts);
 
-  elements.totalRequests.textContent =
-    total.toLocaleString("en-GB");
+  if (elements.totalRequests) {
+    elements.totalRequests.textContent =
+      total.toLocaleString("en-GB");
+  }
 
-  elements.totalNote.textContent =
-    `${total} FILTERED RECORDS`;
+  if (elements.totalNote) {
+    elements.totalNote.textContent =
+      `${total} FILTERED RECORDS`;
+  }
 
-  elements.newRequests.textContent =
-    (actionCounts.NEW || 0).toLocaleString("en-GB");
+  if (elements.newRequests) {
+    elements.newRequests.textContent =
+      (actionCounts.NEW || 0).toLocaleString("en-GB");
+  }
 
-  elements.newNote.textContent =
-    `${percentage(
-      actionCounts.NEW || 0,
-      total
-    )}% OF FILTERED ACTIVITY`;
+  if (elements.newNote) {
+    elements.newNote.textContent =
+      `${percentage(
+        actionCounts.NEW || 0,
+        total
+      )}% OF FILTERED ACTIVITY`;
+  }
 
-  elements.changeRequests.textContent =
-    (actionCounts.CHANGE || 0).toLocaleString("en-GB");
+  if (elements.changeRequests) {
+    elements.changeRequests.textContent =
+      (actionCounts.CHANGE || 0).toLocaleString("en-GB");
+  }
 
-  elements.changeNote.textContent =
-    `${percentage(
-      actionCounts.CHANGE || 0,
-      total
-    )}% OF FILTERED ACTIVITY`;
+  if (elements.changeNote) {
+    elements.changeNote.textContent =
+      `${percentage(
+        actionCounts.CHANGE || 0,
+        total
+      )}% OF FILTERED ACTIVITY`;
+  }
 
-  elements.cancelRequests.textContent =
-    (actionCounts.CANCEL || 0).toLocaleString("en-GB");
+  if (elements.cancelRequests) {
+    elements.cancelRequests.textContent =
+      (actionCounts.CANCEL || 0).toLocaleString("en-GB");
+  }
 
-  elements.cancelNote.textContent =
-    `${percentage(
-      actionCounts.CANCEL || 0,
-      total
-    )}% OF FILTERED ACTIVITY`;
+  if (elements.cancelNote) {
+    elements.cancelNote.textContent =
+      `${percentage(
+        actionCounts.CANCEL || 0,
+        total
+      )}% OF FILTERED ACTIVITY`;
+  }
 
-  elements.uniqueAirports.textContent =
-    Object.keys(airportCounts).length;
+  if (elements.uniqueAirports) {
+    elements.uniqueAirports.textContent =
+      Object.keys(airportCounts).length;
+  }
 
-  elements.topAirportNote.textContent =
-    topAirport
-      ? `TOP AIRPORT: ${topAirport[0]} (${topAirport[1]})`
-      : "TOP AIRPORT: --";
+  if (elements.topAirportNote) {
+    elements.topAirportNote.textContent =
+      topAirport
+        ? `TOP AIRPORT: ${topAirport[0]} (${topAirport[1]})`
+        : "TOP AIRPORT: --";
+  }
 }
 
 function chartOptions() {
@@ -527,14 +654,17 @@ function chartOptions() {
 }
 
 function replaceChart(name, elementId, config) {
+  const canvas = document.getElementById(elementId);
+
+  if (!canvas || typeof Chart === "undefined") {
+    return;
+  }
+
   if (state.charts[name]) {
     state.charts[name].destroy();
   }
 
-  state.charts[name] = new Chart(
-    document.getElementById(elementId),
-    config
-  );
+  state.charts[name] = new Chart(canvas, config);
 }
 
 function renderCharts() {
@@ -667,13 +797,6 @@ function renderActionChart() {
             },
             boxWidth: 13
           }
-        },
-        tooltip: {
-          backgroundColor: "#ffffdf",
-          titleColor: "#000000",
-          bodyColor: "#000000",
-          borderColor: "#000000",
-          borderWidth: 1
         }
       }
     }
@@ -742,6 +865,10 @@ function renderHourChart() {
 }
 
 function renderTable() {
+  if (!elements.activityTableBody) {
+    return;
+  }
+
   elements.activityTableBody.innerHTML = "";
 
   state.filteredRecords
@@ -759,7 +886,7 @@ function renderTable() {
         <td>${escapeHtml(formatUtc(record.createdAt))}</td>
         <td>
           <span class="badge ${record.type}">
-            ${record.type}
+            ${escapeHtml(record.type)}
           </span>
         </td>
         <td>${escapeHtml(record.airport)}</td>
@@ -792,63 +919,89 @@ function renderTable() {
       elements.activityTableBody.appendChild(row);
     });
 
-  elements.recordSummary.textContent =
-    `SHOWING ${Math.min(
-      state.filteredRecords.length,
-      150
-    )} OF ${state.filteredRecords.length} FILTERED RECORDS`;
+  if (elements.recordSummary) {
+    elements.recordSummary.textContent =
+      `SHOWING ${Math.min(
+        state.filteredRecords.length,
+        150
+      )} OF ${state.filteredRecords.length} FILTERED RECORDS`;
+  }
 
-  elements.emptyState.classList.toggle(
-    "show",
-    state.filteredRecords.length === 0
-  );
+  if (elements.emptyState) {
+    elements.emptyState.classList.toggle(
+      "show",
+      state.filteredRecords.length === 0
+    );
+  }
 
-  elements.exportButton.disabled =
-    state.filteredRecords.length === 0;
+  if (elements.exportButton) {
+    elements.exportButton.disabled =
+      state.filteredRecords.length === 0;
+  }
 
-  elements.exportTopButton.disabled =
-    state.filteredRecords.length === 0;
+  if (elements.exportTopButton) {
+    elements.exportTopButton.disabled =
+      state.filteredRecords.length === 0;
+  }
 
-  elements.objectCount.textContent =
-    `${state.filteredRecords.length.toLocaleString(
-      "en-GB"
-    )} OBJECT(S)`;
+  if (elements.objectCount) {
+    elements.objectCount.textContent =
+      `${state.filteredRecords.length.toLocaleString(
+        "en-GB"
+      )} OBJECT(S)`;
+  }
 }
 
 function openDialog(record) {
   state.selectedRecord = record;
 
-  elements.detailTitle.textContent =
-    `${record.type} SLOT - ${record.airport}`;
+  if (elements.detailTitle) {
+    elements.detailTitle.textContent =
+      `${record.type} SLOT - ${record.airport}`;
+  }
 
-  elements.detailTime.textContent =
-    formatUtc(record.createdAt);
+  if (elements.detailTime) {
+    elements.detailTime.textContent =
+      formatUtc(record.createdAt);
+  }
 
-  elements.detailAction.textContent =
-    record.type;
+  if (elements.detailAction) {
+    elements.detailAction.textContent =
+      record.type;
+  }
 
-  elements.detailAirport.textContent =
-    record.airport;
+  if (elements.detailAirport) {
+    elements.detailAirport.textContent =
+      record.airport;
+  }
 
-  elements.detailFlight.textContent =
-    record.flightNumber;
+  if (elements.detailFlight) {
+    elements.detailFlight.textContent =
+      record.flightNumber;
+  }
 
-  elements.detailDirection.textContent =
-    record.direction;
+  if (elements.detailDirection) {
+    elements.detailDirection.textContent =
+      record.direction;
+  }
 
-  elements.detailService.textContent =
-    `${record.serviceType} / ${record.registration}`;
+  if (elements.detailService) {
+    elements.detailService.textContent =
+      `${record.serviceType} / ${record.registration}`;
+  }
 
-  elements.detailMessage.textContent =
-    record.scrMessage ||
-    "No SCR message stored.";
+  if (elements.detailMessage) {
+    elements.detailMessage.textContent =
+      record.scrMessage ||
+      "No SCR message stored.";
+  }
 
-  elements.detailBackdrop.classList.add("show");
+  elements.detailBackdrop?.classList.add("show");
 }
 
 function closeDialog() {
   state.selectedRecord = null;
-  elements.detailBackdrop.classList.remove("show");
+  elements.detailBackdrop?.classList.remove("show");
 }
 
 async function copySelectedScr() {
@@ -938,22 +1091,22 @@ function exportCsv() {
   URL.revokeObjectURL(url);
 }
 
-elements.rangeFilter.addEventListener(
+elements.rangeFilter?.addEventListener(
   "change",
   applyFilters
 );
 
-elements.actionFilter.addEventListener(
+elements.actionFilter?.addEventListener(
   "change",
   applyFilters
 );
 
-elements.searchFilter.addEventListener(
+elements.searchFilter?.addEventListener(
   "input",
   applyFilters
 );
 
-elements.resetButton.addEventListener(
+elements.resetButton?.addEventListener(
   "click",
   () => {
     elements.rangeFilter.value = "7";
@@ -964,32 +1117,32 @@ elements.resetButton.addEventListener(
   }
 );
 
-elements.exportButton.addEventListener(
+elements.exportButton?.addEventListener(
   "click",
   exportCsv
 );
 
-elements.exportTopButton.addEventListener(
+elements.exportTopButton?.addEventListener(
   "click",
   exportCsv
 );
 
-elements.closeDialogButton.addEventListener(
+elements.closeDialogButton?.addEventListener(
   "click",
   closeDialog
 );
 
-elements.dialogCloseButton.addEventListener(
+elements.dialogCloseButton?.addEventListener(
   "click",
   closeDialog
 );
 
-elements.copyDialogButton.addEventListener(
+elements.copyDialogButton?.addEventListener(
   "click",
   copySelectedScr
 );
 
-elements.detailBackdrop.addEventListener(
+elements.detailBackdrop?.addEventListener(
   "click",
   event => {
     if (event.target === elements.detailBackdrop) {
