@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runway Slots - Analytics</title>
+  <link rel="stylesheet" href="styles/analytics.css">
+</head>
+
+<body>
+  <nav class="top-nav" aria-label="Main navigation">
+    <a href="#">Home</a>
+    <a href="#">SIR Request</a>
+    <a href="#">Multi Flight</a>
+    <a href="#">Airport Database</a>
+    <a href="#">GCR Format</a>
+    <a href="#">Turnaround Format</a>
+    <a href="#">Quick Links</a>
+    <a href="#">Experimental</a>
+    <a class="active" href="#">Analytics</a>
+    <a href="#">System Updates</a>
+    <a href="#">Log Issues</a>
+  </nav>
+
+  <header class="info-bar">
+    <div class="info-box">
+      UTC:
+      <span id="utcClock">--:--:--</span>
+      <span>•</span>
+      <span id="utcDate">--MON----</span>
+    </div>
+
+    <div class="info-box database-status" id="databaseStatus">
+      <span class="status-dot"></span>
+      <span id="databaseStatusText">Realtime Database</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <div class="page">
+      <section class="window">
+        <header class="window-title">
+          <span>Analytics Controls</span>
+          <small>REALTIME DATABASE</small>
+        </header>
+
+        <div class="window-body">
+          <div class="filters">
+            <div class="field">
+              <label for="rangeFilter">Date Range:</label>
+              <select id="rangeFilter">
+                <option value="1">LAST 24 HOURS</option>
+                <option value="7" selected>LAST 7 DAYS</option>
+                <option value="30">LAST 30 DAYS</option>
+                <option value="90">LAST 90 DAYS</option>
+                <option value="all">ALL TIME</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="actionFilter">Action:</label>
+              <select id="actionFilter">
+                <option value="ALL">ALL ACTIONS</option>
+                <option value="NEW">NEW SLOT</option>
+                <option value="CHANGE">CHANGE SLOT</option>
+                <option value="CANCEL">CANCEL SLOT</option>
+              </select>
+            </div>
+
+            <div class="field search-field">
+              <label for="searchFilter">Search:</label>
+              <input
+                id="searchFilter"
+                type="search"
+                placeholder="Search airport, flight, direction or registration..."
+              />
+            </div>
+
+            <button class="win-button" id="resetButton" type="button">
+              Reset
+            </button>
+
+            <button class="win-button" id="exportTopButton" type="button">
+              Export CSV
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="window">
+        <header class="window-title">
+          <span>Slot Activity Summary</span>
+        </header>
+
+        <div class="window-body">
+          <div class="kpis">
+            <article class="kpi">
+              <div class="kpi-title">
+                <span class="kpi-symbol">Σ</span>
+                Total Requests
+              </div>
+              <div class="kpi-body">
+                <div class="kpi-value" id="totalRequests">0</div>
+                <div class="kpi-note" id="totalNote">0 FILTERED RECORDS</div>
+              </div>
+            </article>
+
+            <article class="kpi">
+              <div class="kpi-title">
+                <span class="kpi-symbol">N</span>
+                New Slots
+              </div>
+              <div class="kpi-body">
+                <div class="kpi-value" id="newRequests">0</div>
+                <div class="kpi-note" id="newNote">0% OF FILTERED ACTIVITY</div>
+              </div>
+            </article>
+
+            <article class="kpi">
+              <div class="kpi-title">
+                <span class="kpi-symbol">C</span>
+                Changed Slots
+              </div>
+              <div class="kpi-body">
+                <div class="kpi-value" id="changeRequests">0</div>
+                <div class="kpi-note" id="changeNote">0% OF FILTERED ACTIVITY</div>
+              </div>
+            </article>
+
+            <article class="kpi">
+              <div class="kpi-title">
+                <span class="kpi-symbol">D</span>
+                Cancelled Slots
+              </div>
+              <div class="kpi-body">
+                <div class="kpi-value" id="cancelRequests">0</div>
+                <div class="kpi-note" id="cancelNote">0% OF FILTERED ACTIVITY</div>
+              </div>
+            </article>
+
+            <article class="kpi">
+              <div class="kpi-title">
+                <span class="kpi-symbol">A</span>
+                Unique Airports
+              </div>
+              <div class="kpi-body">
+                <div class="kpi-value" id="uniqueAirports">0</div>
+                <div class="kpi-note" id="topAirportNote">TOP AIRPORT: --</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="window">
+        <header class="window-title">
+          <span>Slot Activity Charts</span>
+          <small>UTC REPORTING</small>
+        </header>
+
+        <div class="window-body">
+          <div class="charts-grid">
+            <div>
+              <p class="chart-label">Daily Slot Activity</p>
+              <div class="chart-frame tall">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+
+            <div>
+              <p class="chart-label">Action Distribution</p>
+              <div class="chart-frame tall">
+                <canvas id="actionChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div>
+              <p class="chart-label">Most Active Airports</p>
+              <div class="chart-frame">
+                <canvas id="airportChart"></canvas>
+              </div>
+            </div>
+
+            <div>
+              <p class="chart-label">Busiest UTC Hours</p>
+              <div class="chart-frame">
+                <canvas id="hourChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="window">
+        <header class="window-title">
+          <span>Analytics Activity Table</span>
+        </header>
+
+        <div class="window-body">
+          <div class="table-tools">
+            <div class="table-summary" id="recordSummary">
+              SHOWING 0 RECORDS
+            </div>
+
+            <button class="win-button" id="exportButton" type="button">
+              Export CSV
+            </button>
+          </div>
+
+          <div class="table-frame">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time UTC</th>
+                  <th>Action</th>
+                  <th>Airport</th>
+                  <th>Flight</th>
+                  <th>Direction</th>
+                  <th>Service</th>
+                  <th>Registration</th>
+                  <th>SCR Message</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="empty" id="emptyState">
+            No analytics records were found.
+          </div>
+        </div>
+
+        <footer class="status-strip">
+          <div class="status-box">
+            REALTIME ANALYTICS
+          </div>
+
+          <div class="status-box" id="objectCount">
+            0 OBJECT(S)
+          </div>
+        </footer>
+      </section>
+    </div>
+  </main>
+
+  <div class="dialog-backdrop" id="detailBackdrop">
+    <section
+      class="dialog-window"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detailTitle"
+    >
+      <header class="dialog-title">
+        <span id="detailTitle">SCR Details</span>
+        <button class="dialog-close" id="dialogCloseButton" type="button">
+          ×
+        </button>
+      </header>
+
+      <div class="dialog-content">
+        <div class="dialog-meta">
+          <div>
+            <span>Time UTC</span>
+            <strong id="detailTime">--</strong>
+          </div>
+
+          <div>
+            <span>Action</span>
+            <strong id="detailAction">--</strong>
+          </div>
+
+          <div>
+            <span>Airport</span>
+            <strong id="detailAirport">--</strong>
+          </div>
+
+          <div>
+            <span>Flight</span>
+            <strong id="detailFlight">--</strong>
+          </div>
+
+          <div>
+            <span>Direction</span>
+            <strong id="detailDirection">--</strong>
+          </div>
+
+          <div>
+            <span>Service / Registration</span>
+            <strong id="detailService">--</strong>
+          </div>
+        </div>
+
+        <div class="dialog-message" id="detailMessage"></div>
+
+        <div class="dialog-actions">
+          <button class="win-button" id="copyDialogButton" type="button">
+            Copy SCR
+          </button>
+
+          <button class="win-button" id="closeDialogButton" type="button">
+            Close
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <script src="scripts/analytics.js"></script>
+
+</body>
+</html>
+
+
