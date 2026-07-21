@@ -1,40 +1,101 @@
+"use strict";
+
 const LS_KEY = "rb_username";
 
-function titleCaseName(str) {
-  return (str || "")
+function titleCaseName(value) {
+  return String(value || "")
     .trim()
     .replace(/\s+/g, " ")
     .split(" ")
-    .map(s => s ? (s[0].toUpperCase() + s.slice(1).toLowerCase()) : "")
+    .map((part) => {
+      if (!part) {
+        return "";
+      }
+
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    })
     .join(" ");
 }
 
-function getGreetingForHour(h) {
-  if (h < 12) return "Good Morning";
-  if (h < 16) return "Good Afternoon";
+function getGreetingForHour(hour) {
+  if (hour < 12) {
+    return "Good Morning";
+  }
+
+  if (hour < 16) {
+    return "Good Afternoon";
+  }
+
   return "Good Evening";
 }
 
 function setGreeting(name) {
-  const hour = new Date().getHours();
-  const greet = getGreetingForHour(hour);
-  document.getElementById("greeting").textContent = name ? `${greet}, ${name}` : greet;
+  const greetingElement = document.getElementById("greeting");
+
+  if (!greetingElement) {
+    return;
+  }
+
+  const currentHour = new Date().getHours();
+  const greeting = getGreetingForHour(currentHour);
+
+  greetingElement.textContent = name
+    ? `${greeting}, ${name}`
+    : greeting;
 }
 
 function showOverlay(show) {
   const overlay = document.getElementById("nameOverlay");
+  const input = document.getElementById("nameInput");
+
+  if (!overlay) {
+    return;
+  }
+
   if (show) {
     overlay.classList.remove("hidden");
-    setTimeout(() => document.getElementById("nameInput").focus(), 0);
+
+    window.setTimeout(() => {
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
   } else {
     overlay.classList.add("hidden");
   }
 }
 
-function getUserPersonalizationRef() {
-  if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
-    throw new Error("Firebase is not initialized. Check scripts/firebase.js");
+function getStoredName() {
+  try {
+    return localStorage.getItem(LS_KEY) || "";
+  } catch (error) {
+    console.warn("Local storage could not be read:", error);
+    return "";
   }
+}
+
+function saveNameLocally(name) {
+  try {
+    localStorage.setItem(LS_KEY, name);
+    return true;
+  } catch (error) {
+    console.warn("Local storage save failed:", error);
+    return false;
+  }
+}
+
+function getUserPersonalizationRef() {
+  if (
+    typeof firebase === "undefined" ||
+    !firebase.apps ||
+    !firebase.apps.length
+  ) {
+    throw new Error(
+      "Firebase is not initialized. Check scripts/firebase.js."
+    );
+  }
+
   return firebase.database().ref("userPersonalization");
 }
 
@@ -53,80 +114,199 @@ function getReadableDateTime() {
     second: "2-digit"
   });
 
-  return { now, date, time };
+  return {
+    now,
+    date,
+    time
+  };
 }
 
 async function saveNameToFirebase(name) {
-  const ref = getUserPersonalizationRef();
+  const personalizationRef = getUserPersonalizationRef();
   const { now, date, time } = getReadableDateTime();
 
   const payload = {
-    name: name,
+    name,
     savedAt: firebase.database.ServerValue.TIMESTAMP,
     localSavedAtIso: now.toISOString(),
-    date: date,
-    time: time
+    date,
+    time
   };
 
-  const newRef = ref.push();
-  await newRef.set(payload);
+  const newPersonalizationRef = personalizationRef.push();
+
+  await newPersonalizationRef.set(payload);
+
   console.log("Name saved to Firebase:", payload);
 }
 
 async function saveNameFromInput() {
   const input = document.getElementById("nameInput");
-  const err = document.getElementById("nameError");
-  const clean = titleCaseName(input.value);
+  const errorElement = document.getElementById("nameError");
+  const saveButton = document.getElementById("saveNameBtn");
 
-  if (!clean || clean.length < 2) {
-    err.textContent = "Please enter a valid name.";
+  if (!input || !errorElement) {
     return;
   }
 
-  err.textContent = "";
+  const cleanName = titleCaseName(input.value);
 
-  try {
-    localStorage.setItem(LS_KEY, clean);
-  } catch (e) {
-    console.warn("Local storage save failed:", e);
+  if (!cleanName || cleanName.length < 2) {
+    errorElement.textContent = "Please enter a valid name.";
+    input.focus();
+    return;
   }
 
+  errorElement.textContent = "";
+
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+  }
+
+  saveNameLocally(cleanName);
+
+  /*
+   * Update the greeting immediately so the page still works if
+   * Firebase is temporarily unavailable.
+   */
+  setGreeting(cleanName);
+
   try {
-    await saveNameToFirebase(clean);
-    setGreeting(clean);
+    await saveNameToFirebase(cleanName);
     showOverlay(false);
   } catch (error) {
     console.error("Firebase write error:", error);
-    err.textContent = "Could not save your name to Firebase. Check database rules.";
+
+    errorElement.textContent =
+      "Your name was saved on this device, but Firebase could not be updated.";
+
+    /*
+     * Keep the dialog visible so the user can see the Firebase warning.
+     * The locally stored name will still be available after reloading.
+     */
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = "OK";
+    }
   }
 }
 
-document.getElementById("saveNameBtn").addEventListener("click", saveNameFromInput);
-document.getElementById("cancelNameBtn").addEventListener("click", () => showOverlay(false));
-document.getElementById("closeDialog").addEventListener("click", () => showOverlay(false));
+function openChangeNameDialog() {
+  const input = document.getElementById("nameInput");
+  const errorElement = document.getElementById("nameError");
 
-document.getElementById("nameInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") saveNameFromInput();
-  if (e.key === "Escape") showOverlay(false);
-});
-
-document.getElementById("changeName").addEventListener("click", () => {
-  showOverlay(true);
-  document.getElementById("nameInput").value = localStorage.getItem(LS_KEY) || "";
-  document.getElementById("nameError").textContent = "";
-});
-
-(function init() {
-  let name = "";
-  try {
-    name = localStorage.getItem(LS_KEY) || "";
-  } catch (e) {}
-
-  setGreeting(name);
-
-  if (!name) {
-    showOverlay(true);
-  } else {
-    showOverlay(false);
+  if (input) {
+    input.value = getStoredName();
   }
-})();
+
+  if (errorElement) {
+    errorElement.textContent = "";
+  }
+
+  showOverlay(true);
+}
+
+function closeNameDialog() {
+  const currentName = getStoredName();
+
+  /*
+   * Do not allow the initial dialog to close when no name has
+   * previously been stored.
+   */
+  if (!currentName) {
+    const errorElement = document.getElementById("nameError");
+
+    if (errorElement) {
+      errorElement.textContent = "Please enter your name to continue.";
+    }
+
+    return;
+  }
+
+  showOverlay(false);
+}
+
+function bindEvents() {
+  const saveButton = document.getElementById("saveNameBtn");
+  const cancelButton = document.getElementById("cancelNameBtn");
+  const closeButton = document.getElementById("closeDialog");
+  const changeNameButton = document.getElementById("changeName");
+  const input = document.getElementById("nameInput");
+  const overlay = document.getElementById("nameOverlay");
+
+  if (saveButton) {
+    saveButton.addEventListener("click", saveNameFromInput);
+  }
+
+  if (cancelButton) {
+    cancelButton.addEventListener("click", closeNameDialog);
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeNameDialog);
+  }
+
+  if (changeNameButton) {
+    changeNameButton.addEventListener("click", openChangeNameDialog);
+  }
+
+  if (input) {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveNameFromInput();
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeNameDialog();
+      }
+    });
+
+    input.addEventListener("input", () => {
+      const errorElement = document.getElementById("nameError");
+
+      if (errorElement) {
+        errorElement.textContent = "";
+      }
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        closeNameDialog();
+      }
+    });
+  }
+}
+
+function initialiseWelcomePage() {
+  const storedName = getStoredName();
+  const input = document.getElementById("nameInput");
+
+  setGreeting(storedName);
+  bindEvents();
+
+  if (input) {
+    input.value = storedName;
+  }
+
+  showOverlay(!storedName);
+
+  /*
+   * Refresh the greeting periodically in case the page remains open
+   * when the greeting changes from morning to afternoon or evening.
+   */
+  window.setInterval(() => {
+    setGreeting(getStoredName());
+  }, 60 * 1000);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialiseWelcomePage);
+} else {
+  initialiseWelcomePage();
+}
