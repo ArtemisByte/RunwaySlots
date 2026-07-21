@@ -2,91 +2,241 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Runway Slots - Welcome</title>
-  <meta name="color-scheme" content="light only">
-  <link rel="stylesheet" href="styles/welco.css">
-  <link rel="stylesheet" href="styles/infobar.css">
+
+  <meta name="color-scheme" content="light only" />
+
+  <link rel="stylesheet" href="styles/welco.css" />
+  <link rel="stylesheet" href="styles/infobar.css" />
 </head>
+
 <body>
-  <div class="overlay" id="nameOverlay" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+
+  <!-- User name dialog -->
+  <div
+    class="overlay"
+    id="nameOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dlgTitle"
+  >
     <div class="dialog" role="document">
+
       <div class="titlebar">
-        <div id="dlgTitle" class="title">User Personalization</div>
+        <div id="dlgTitle" class="title">
+          User Personalization
+        </div>
+
         <div class="controls">
-          <button class="ctrl-btn" id="closeDialog" aria-label="Close name dialog"><span class="ctrl-x">×</span></button>
+          <button
+            class="ctrl-btn"
+            id="closeDialog"
+            type="button"
+            aria-label="Close name dialog"
+          >
+            <span class="ctrl-x">×</span>
+          </button>
         </div>
       </div>
+
       <div class="dialog-body">
+
         <div>Let me personalise your greeting.</div>
+
         <div class="row">
           <label for="nameInput">Your name:</label>
-          <input id="nameInput" class="input" type="text" maxlength="50" autocomplete="name" placeholder="e.g., ArtemisByte" />
+
+          <input
+            id="nameInput"
+            class="input"
+            type="text"
+            maxlength="50"
+            autocomplete="name"
+            placeholder="e.g., ArtemisByte"
+          />
         </div>
-        <div class="row" style="justify-content:flex-end; gap:6px;">
-          <button class="btn" id="saveNameBtn">OK</button>
-          <button class="btn" id="cancelNameBtn">Cancel</button>
+
+        <div class="row dialog-actions">
+          <button class="btn" id="saveNameBtn" type="button">
+            OK
+          </button>
+
+          <button class="btn" id="cancelNameBtn" type="button">
+            Cancel
+          </button>
         </div>
+
         <div id="nameError" class="error" role="alert"></div>
+
       </div>
     </div>
   </div>
 
-  <div class="window" id="wrapper" aria-live="polite">
+  <!-- Main window -->
+  <main class="window" id="wrapper" aria-live="polite">
+
     <div class="titlebar">
-      <div class="title">Welcome to ArtemisByte's Runway Slot Generator</div>
+      <div class="title">
+        Welcome to ArtemisByte's Runway Slot Generator
       </div>
+    </div>
+
     <div class="window-body">
 
-      <div class="group" aria-labelledby="grpGreeting">
-        <div id="grpGreeting" class="label">Information</div>
-        <div class="greeting" id="greeting">Welcome</div>
-      </div>
+      <!-- Greeting -->
+      <section class="group" aria-labelledby="grpGreeting">
 
-       <div class="info-bar">
-    <div class="left-tools">
-      <div id="utcTopClock" class="utc-clock" aria-live="polite">UTC: --:--:-- • --MON----</div>
-    </div>
-    <div class="right-tools">
-      <label class="auto-refresh" title="Automatically reload this page every 15 minutes">
-        <input type="checkbox" id="autoRefreshToggle" checked>
-        <span>Auto-refresh (15 min)</span>
-      </label>
-      <div id="fbStatus" class="status-indicator" title="Firebase Realtime Database status">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="text">DB Not Connected</span>
-      </div>
-    </div>
-  </div>
+        <div id="grpGreeting" class="label">
+          Information
+        </div>
 
-      <div class="group">
-        <div class="label">Navigation</div>
-        <div class="grid" role="list">
-          <a role="listitem" class="w95-button" href="multiflight.html">SCR Generator</a>
-          <a role="listitem" class="w95-button" href="gcrformat.html">GCR Generator</a>
-          <a role="listitem" class="w95-button center" href="airport-search.html">Airport Database</a>
-          <a role="listitem" class="w95-button" href="turnaround.html">Turnaround Generator</a>
-          <a role="listitem" class="w95-button" href="sir.html">SIR Request</a>
-          <a role="listitem" class="w95-button" href="scrbackup.html">SCR-BACKUP</a>
-          <span role="listitem" class="w95-button" style="pointer-events:none; opacity:.6;">—</span>
+        <div class="greeting" id="greeting">
+          Welcome
+        </div>
+
+      </section>
+
+      <!-- Information bar -->
+      <div class="info-bar">
+
+        <div class="left-tools">
+          <div
+            id="utcTopClock"
+            class="utc-clock"
+            aria-live="polite"
+          >
+            UTC: --:--:-- • --MON----
+          </div>
+        </div>
+
+        <div class="right-tools">
+
+          <label
+            class="auto-refresh"
+            title="Automatically reload this page every 15 minutes"
+          >
+            <input
+              type="checkbox"
+              id="autoRefreshToggle"
+              checked
+            />
+
+            <span>Auto-refresh (15 min)</span>
+          </label>
+
+          <div
+            id="fbStatus"
+            class="status-indicator"
+            title="Firebase Realtime Database status"
+          >
+            <span class="dot" aria-hidden="true"></span>
+            <span class="text">DB Not Connected</span>
+          </div>
+
         </div>
       </div>
 
-      <div class="footer">
-        <span id="changeName" class="link">Click here to change name</span>
+      <!-- Navigation -->
+      <section class="group" aria-labelledby="navigationTitle">
+
+        <div id="navigationTitle" class="label">
+          Navigation
+        </div>
+
+        <div class="grid" role="list">
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="multiflight.html"
+          >
+            SCR Generator
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="gcrformat.html"
+          >
+            GCR Generator
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="airport-search.html"
+          >
+            Airport Database
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="turnaround.html"
+          >
+            Turnaround Generator
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="sir.html"
+          >
+            SIR Request
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button"
+            href="scrbackup.html"
+          >
+            SCR-BACKUP
+          </a>
+
+          <a
+            role="listitem"
+            class="w95-button analytics-button"
+            href="analytics.html"
+          >
+            Analytics
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Change name -->
+      <div class="footer-actions">
+        <button
+          id="changeName"
+          class="link-button"
+          type="button"
+        >
+          Click here to change name
+        </button>
       </div>
 
     </div>
-  </div>
+  </main>
 
-  <footer>Created By: ArtemisByte/KunchackoBoben 2026</footer>
-  <footer>Disclaimer:
-Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use. You assume all responsibility.</footer>
+  <!-- Page footer -->
+  <footer class="page-footer">
+    <div>Created By: ArtemisByte/KunchackoBoben 2026</div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script> 
-<script src="scripts/firebase.js"></script>  
-<script src="scripts/welco.js"></script>
-<script src="scripts/infobar.js"></script>
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong>
+      Use of this Service is at your own risk. The creator provides this
+      Service "as is" without any warranties and is not liable for any
+      damages or losses resulting from its use. You assume all responsibility.
+    </div>
+  </footer>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <script src="scripts/welco.js"></script>
+  <script src="scripts/infobar.js"></script>
+
 </body>
 </html>
