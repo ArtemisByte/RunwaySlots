@@ -10,7 +10,8 @@ const state = {
   allRecords: [],
   filteredRecords: [],
   charts: {},
-  selectedRecord: null
+  selectedRecord: null,
+  initialLoadComplete: false
 };
 
 const elements = {
@@ -53,8 +54,194 @@ const elements = {
   detailMessage: document.getElementById("detailMessage"),
   copyDialogButton: document.getElementById("copyDialogButton"),
   closeDialogButton: document.getElementById("closeDialogButton"),
-  dialogCloseButton: document.getElementById("dialogCloseButton")
+  dialogCloseButton: document.getElementById("dialogCloseButton"),
+
+  loadingScreen: document.getElementById("analyticsLoadingScreen"),
+  loadingBar: document.getElementById("analyticsLoadingBar"),
+  loadingTrack: document.getElementById("analyticsLoadingTrack"),
+  loadingPercent: document.getElementById("analyticsLoadingPercent"),
+  loadingStage: document.getElementById("analyticsLoadingStage"),
+  loadingMessage: document.getElementById("analyticsLoadingMessage"),
+  loadingError: document.getElementById("analyticsLoadingError"),
+  loadingErrorMessage: document.getElementById(
+    "analyticsLoadingErrorMessage"
+  ),
+  retryAnalyticsButton: document.getElementById(
+    "retryAnalyticsButton"
+  ),
+  loadingSteps: Array.from(
+    document.querySelectorAll("[data-loading-step]")
+  )
 };
+
+
+function setLoadingStep(activeStep) {
+  const stepOrder = [
+    "connect",
+    "download",
+    "process",
+    "render"
+  ];
+
+  const activeIndex = stepOrder.indexOf(activeStep);
+  const allComplete = activeStep === "complete";
+
+  elements.loadingSteps.forEach(step => {
+    const stepIndex = stepOrder.indexOf(
+      step.dataset.loadingStep
+    );
+
+    step.classList.toggle(
+      "is-complete",
+      allComplete ||
+      (
+        activeIndex >= 0 &&
+        stepIndex < activeIndex
+      )
+    );
+
+    step.classList.toggle(
+      "is-active",
+      !allComplete &&
+      activeIndex >= 0 &&
+      stepIndex === activeIndex
+    );
+  });
+}
+
+function updateLoadingScreen(
+  percent,
+  stage,
+  message,
+  activeStep
+) {
+  const safePercent = Math.max(
+    0,
+    Math.min(100, Number(percent) || 0)
+  );
+
+  if (elements.loadingBar) {
+    elements.loadingBar.style.width =
+      `${safePercent}%`;
+  }
+
+  if (elements.loadingTrack) {
+    elements.loadingTrack.setAttribute(
+      "aria-valuenow",
+      String(Math.round(safePercent))
+    );
+  }
+
+  if (elements.loadingPercent) {
+    elements.loadingPercent.textContent =
+      `${Math.round(safePercent)}%`;
+  }
+
+  if (elements.loadingStage) {
+    elements.loadingStage.textContent = stage;
+  }
+
+  if (elements.loadingMessage) {
+    elements.loadingMessage.textContent = message;
+  }
+
+  if (activeStep) {
+    setLoadingStep(activeStep);
+  }
+}
+
+function showLoadingScreen() {
+  elements.loadingScreen?.classList.remove(
+    "is-hidden"
+  );
+
+  elements.loadingScreen?.setAttribute(
+    "aria-busy",
+    "true"
+  );
+
+  if (elements.loadingError) {
+    elements.loadingError.hidden = true;
+  }
+
+  updateLoadingScreen(
+    0,
+    "Initialising",
+    "Preparing the analytics dashboard...",
+    "connect"
+  );
+}
+
+function waitForUiFrame() {
+  return new Promise(resolve => {
+    requestAnimationFrame(resolve);
+  });
+}
+
+async function waitForAnalyticsPaint() {
+  await new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
+    });
+  });
+
+  /*
+    Chart.js uses a short 100 ms animation on this page.
+    Waiting slightly longer ensures all four charts have
+    finished drawing before the loader disappears.
+  */
+  await new Promise(resolve => {
+    window.setTimeout(resolve, 140);
+  });
+}
+
+async function finishLoadingScreen() {
+  setLoadingStep("complete");
+
+  updateLoadingScreen(
+    100,
+    "Complete",
+    "Realtime analytics loaded successfully."
+  );
+
+  elements.loadingScreen?.setAttribute(
+    "aria-busy",
+    "false"
+  );
+
+  await new Promise(resolve => {
+    window.setTimeout(resolve, 300);
+  });
+
+  elements.loadingScreen?.classList.add(
+    "is-hidden"
+  );
+}
+
+function failLoadingScreen(error) {
+  console.error("Analytics initial load failed:", error);
+
+  updateLoadingScreen(
+    100,
+    "Loading Failed",
+    "The realtime analytics data could not be loaded."
+  );
+
+  elements.loadingScreen?.setAttribute(
+    "aria-busy",
+    "false"
+  );
+
+  if (elements.loadingErrorMessage) {
+    elements.loadingErrorMessage.textContent =
+      error?.message ||
+      "Check the database connection and try again.";
+  }
+
+  if (elements.loadingError) {
+    elements.loadingError.hidden = false;
+  }
+}
 
 function updateClock() {
   const now = new Date();
@@ -278,8 +465,64 @@ async function archiveRecord(recordId, value) {
   }
 }
 
-function startFirebase() {
+
+function normaliseSnapshot(snapshot) {
+  const records = {};
+
+  snapshot.forEach(childSnapshot => {
+    records[childSnapshot.key] = normaliseRecord(
+      childSnapshot.key,
+      childSnapshot.val()
+    );
+  });
+
+  return records;
+}
+
+function startArchiveListeners() {
+  /*
+    These listeners preserve the original analytics-backup
+    behaviour without repeatedly rebuilding the dashboard
+    once for every child during the initial page load.
+  */
+  state.liveReference.on(
+    "child_added",
+    snapshot => {
+      archiveRecord(
+        snapshot.key,
+        snapshot.val()
+      );
+    },
+    error => {
+      console.error(
+        "Live history archive listener failed:",
+        error
+      );
+    }
+  );
+
+  state.liveReference.on(
+    "child_changed",
+    snapshot => {
+      archiveRecord(
+        snapshot.key,
+        snapshot.val()
+      );
+    }
+  );
+}
+
+async function startFirebase() {
+  showLoadingScreen();
+
   try {
+    updateLoadingScreen(
+      8,
+      "Checking Firebase",
+      "Checking the Firebase configuration...",
+      "connect"
+    );
+
     if (
       typeof firebase === "undefined" ||
       !firebase.apps ||
@@ -298,6 +541,13 @@ function startFirebase() {
     state.backupReference =
       state.database.ref(BACKUP_HISTORY_PATH);
 
+    updateLoadingScreen(
+      16,
+      "Connecting",
+      "Connecting to the realtime database...",
+      "connect"
+    );
+
     state.database
       .ref(".info/connected")
       .on("value", snapshot => {
@@ -312,119 +562,177 @@ function startFirebase() {
       });
 
     /*
-      Load archived records.
-
-      The analytics page only reads this path after records have been
-      archived. It never removes backup records.
+      The first value event from each path represents its
+      complete initial Firebase snapshot. Later value events
+      keep the dashboard updated in realtime.
     */
-    state.backupReference.on(
-      "child_added",
-      snapshot => {
-        state.backupRecords[snapshot.key] =
-          normaliseRecord(snapshot.key, snapshot.val());
+    let loadedSources = 0;
+    let backupInitialResolved = false;
+    let liveInitialResolved = false;
 
-        rebuildRecords();
-      },
-      error => {
-        console.error("Backup history read failed:", error);
-      }
-    );
+    const updateSourceProgress = sourceName => {
+      loadedSources += 1;
 
-    state.backupReference.on(
-      "child_changed",
-      snapshot => {
-        state.backupRecords[snapshot.key] =
-          normaliseRecord(snapshot.key, snapshot.val());
+      const progress =
+        loadedSources === 1 ? 42 : 64;
 
-        rebuildRecords();
-      }
-    );
+      updateLoadingScreen(
+        progress,
+        "Downloading",
+        `${sourceName} loaded. ${
+          loadedSources === 1
+            ? "Waiting for the remaining database source..."
+            : "All realtime database sources are ready."
+        }`,
+        "download"
+      );
+    };
 
-    /*
-      This only updates browser memory if a backup was deleted outside
-      this page. It does not delete anything from Firebase.
-    */
-    state.backupReference.on(
-      "child_removed",
-      snapshot => {
-        delete state.backupRecords[snapshot.key];
-        rebuildRecords();
-      }
-    );
+    const backupInitialPromise =
+      new Promise((resolve, reject) => {
+        state.backupReference.on(
+          "value",
+          snapshot => {
+            state.backupRecords =
+              normaliseSnapshot(snapshot);
 
-    /*
-      Existing live children trigger child_added when the page opens.
-      New history records also trigger child_added.
-    */
-    state.liveReference.on(
-      "child_added",
-      snapshot => {
-        const recordId = snapshot.key;
-        const value = snapshot.val();
+            if (!backupInitialResolved) {
+              backupInitialResolved = true;
+              updateSourceProgress(
+                "Archived SCR history"
+              );
+              resolve();
+              return;
+            }
 
-        state.liveRecords[recordId] =
-          normaliseRecord(recordId, value);
+            if (state.initialLoadComplete) {
+              rebuildRecords();
+            }
+          },
+          error => {
+            console.error(
+              "Backup history read failed:",
+              error
+            );
 
-        rebuildRecords();
+            if (!backupInitialResolved) {
+              reject(error);
+              return;
+            }
 
-        archiveRecord(recordId, value);
-      },
-      error => {
-        console.error("Live history read failed:", error);
-
-        setDatabaseStatus(
-          "offline",
-          "Database Read Failed"
+            setDatabaseStatus(
+              "offline",
+              "Backup Read Failed"
+            );
+          }
         );
-      }
+      });
+
+    const liveInitialPromise =
+      new Promise((resolve, reject) => {
+        state.liveReference.on(
+          "value",
+          snapshot => {
+            state.liveRecords =
+              normaliseSnapshot(snapshot);
+
+            if (!liveInitialResolved) {
+              liveInitialResolved = true;
+              updateSourceProgress(
+                "Live SCR history"
+              );
+              resolve();
+              return;
+            }
+
+            if (state.initialLoadComplete) {
+              rebuildRecords();
+            }
+          },
+          error => {
+            console.error(
+              "Live history read failed:",
+              error
+            );
+
+            if (!liveInitialResolved) {
+              reject(error);
+              return;
+            }
+
+            setDatabaseStatus(
+              "offline",
+              "Database Read Failed"
+            );
+          }
+        );
+      });
+
+    startArchiveListeners();
+
+    await Promise.all([
+      backupInitialPromise,
+      liveInitialPromise
+    ]);
+
+    const initialRecordCount = new Set([
+      ...Object.keys(state.backupRecords),
+      ...Object.keys(state.liveRecords)
+    ]).size;
+
+    updateLoadingScreen(
+      72,
+      "Processing",
+      `Combining ${initialRecordCount.toLocaleString(
+        "en-GB"
+      )} live and archived analytics records...`,
+      "process"
     );
 
     /*
-      Updated shared-history records remain visible live.
-
-      The original archived record is not overwritten because archiveRecord()
-      only creates a backup when one does not already exist.
+      Yielding one animation frame lets the browser display
+      each genuine loading stage before the heavier render.
     */
-    state.liveReference.on(
-      "child_changed",
-      snapshot => {
-        const recordId = snapshot.key;
-        const value = snapshot.val();
-
-        state.liveRecords[recordId] =
-          normaliseRecord(recordId, value);
-
-        rebuildRecords();
-
-        archiveRecord(recordId, value);
-      }
-    );
+    await waitForUiFrame();
 
     /*
-      Multi Flight may remove a child from /scrHistory.
-
-      This handler removes only the in-memory live version. It never calls
-      Firebase remove(), set(null), or update({ key: null }).
-
-      The archived record remains in /scrHistoryBackup and continues to
-      appear on the analytics page.
+      This performs the filtering, counters, table creation,
+      and all four Chart.js renders.
     */
-    state.liveReference.on(
-      "child_removed",
-      snapshot => {
-        delete state.liveRecords[snapshot.key];
-        rebuildRecords();
-      }
+    updateLoadingScreen(
+      86,
+      "Rendering",
+      "Rendering counters, charts, and the activity table...",
+      "render"
     );
+
+    await waitForUiFrame();
+    rebuildRecords();
+
+    updateLoadingScreen(
+      94,
+      "Finalising",
+      "Waiting for the completed dashboard to be painted...",
+      "render"
+    );
+
+    await waitForAnalyticsPaint();
+
+    state.initialLoadComplete = true;
+
+    await finishLoadingScreen();
   } catch (error) {
-    console.error(error);
-
     setDatabaseStatus(
       "offline",
       "Database Error"
     );
 
+    /*
+      Keep any data that was successfully received visible
+      behind the error window.
+    */
     rebuildRecords();
+    failLoadingScreen(error);
   }
 }
 
@@ -1148,6 +1456,13 @@ elements.detailBackdrop?.addEventListener(
     if (event.target === elements.detailBackdrop) {
       closeDialog();
     }
+  }
+);
+
+elements.retryAnalyticsButton?.addEventListener(
+  "click",
+  () => {
+    window.location.reload();
   }
 );
 
