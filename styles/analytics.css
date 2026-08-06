@@ -616,3 +616,277 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Realtime analytics initial loading screen */
+    .analytics-loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .5);
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity .2s linear,
+        visibility .2s linear;
+    }
+
+    .analytics-loading-screen.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .analytics-loading-window {
+      width: min(520px, 100%);
+      border-top: 2px solid #f3f3f3;
+      border-left: 2px solid #f3f3f3;
+      border-right: 2px solid #3f3f3f;
+      border-bottom: 2px solid #3f3f3f;
+      background: var(--panel);
+      box-shadow: 2px 2px 0 #000000;
+    }
+
+    .analytics-loading-title {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 3px 5px 3px 8px;
+      color: var(--white);
+      background: var(--blue);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .analytics-loading-title-icon {
+      width: 23px;
+      height: 21px;
+      display: grid;
+      place-items: center;
+      border-top: 2px solid var(--white);
+      border-left: 2px solid var(--white);
+      border-right: 2px solid #777777;
+      border-bottom: 2px solid #777777;
+      color: var(--black);
+      background: #c9c9c9;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .analytics-loading-body {
+      padding: 18px;
+    }
+
+    .analytics-loading-icon {
+      float: left;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 14px 12px 0;
+      border: 2px solid;
+      border-color: var(--white) #555555 #555555 var(--white);
+      color: var(--white);
+      background: var(--navy);
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .analytics-loading-copy {
+      min-height: 70px;
+    }
+
+    .analytics-loading-copy h1 {
+      margin: 0 0 7px;
+      font-size: 17px;
+    }
+
+    .analytics-loading-copy p {
+      min-height: 34px;
+      margin: 0;
+      color: #333333;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .analytics-loading-track {
+      clear: both;
+      width: 100%;
+      height: 24px;
+      padding: 3px;
+      overflow: hidden;
+      border: 2px solid;
+      border-color: #555555 var(--white) var(--white) #555555;
+      background: var(--white);
+    }
+
+    .analytics-loading-bar {
+      width: 0;
+      height: 100%;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--navy) 0,
+          var(--navy) 14px,
+          transparent 14px,
+          transparent 17px
+        );
+      transition: width .25s linear;
+    }
+
+    .analytics-loading-details {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 7px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .analytics-loading-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-top: 13px;
+    }
+
+    .analytics-loading-steps span {
+      min-height: 24px;
+      display: grid;
+      place-items: center;
+      padding: 3px 5px;
+      border: 1px solid #888888;
+      color: #777777;
+      background: #dddddd;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .analytics-loading-steps span.is-active {
+      color: var(--white);
+      background: var(--navy);
+    }
+
+    .analytics-loading-steps span.is-complete {
+      color: var(--white);
+      background: var(--green);
+    }
+
+    .analytics-loading-error {
+      clear: both;
+      margin-top: 14px;
+      padding: 10px;
+      border: 2px solid;
+      border-color: #555555 var(--white) var(--white) #555555;
+      background: #fff0f0;
+    }
+
+    .analytics-loading-error strong,
+    .analytics-loading-error p {
+      display: block;
+    }
+
+    .analytics-loading-error strong {
+      color: var(--red);
+    }
+
+    .analytics-loading-error p {
+      margin: 5px 0 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .analytics-loading-body {
+        padding: 13px;
+      }
+
+      .analytics-loading-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .analytics-loading-copy h1 {
+        font-size: 15px;
+      }
+
+      .analytics-loading-steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .analytics-loading-screen,
+      .analytics-loading-bar {
+        transition: none;
+      }
+    }
+
+
+
+    /* Embedded navigation styling (replaces styles/navi-ui.css) */
+    body > nav {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      min-height: 31px;
+      overflow-x: auto;
+      border-top: 2px solid #efefef;
+      border-bottom: 3px solid #777777;
+      background: #bdbdbd;
+      white-space: nowrap;
+    }
+
+    body > nav ul {
+      display: flex;
+      align-items: stretch;
+      min-width: max-content;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    body > nav li {
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    body > nav a {
+      display: flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 10px;
+      border-top: 2px solid #eeeeee;
+      border-left: 2px solid #eeeeee;
+      border-right: 2px solid #858585;
+      border-bottom: 0;
+      color: var(--black);
+      background: #c6c6c6;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    body > nav a:hover,
+    body > nav a:focus-visible,
+    body > nav a[href="analytics.html"] {
+      background: #dddddd;
+    }
+
+    body > nav a:active {
+      border-top-color: #858585;
+      border-left-color: #858585;
+      border-right-color: #eeeeee;
+      padding: 4px 9px 2px 11px;
+    }
