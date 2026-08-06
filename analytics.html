@@ -10,6 +10,77 @@
 </head>
 
 <body>
+  <div
+    class="analytics-loading-screen"
+    id="analyticsLoadingScreen"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <section class="analytics-loading-window">
+      <header class="analytics-loading-title">
+        <span>Runway Slots Analytics</span>
+        <span class="analytics-loading-title-icon" aria-hidden="true">×</span>
+      </header>
+
+      <div class="analytics-loading-body">
+        <div class="analytics-loading-icon" aria-hidden="true">RS</div>
+
+        <div class="analytics-loading-copy">
+          <h1>Loading Realtime Analytics</h1>
+          <p id="analyticsLoadingMessage">
+            Preparing the analytics dashboard...
+          </p>
+        </div>
+
+        <div
+          class="analytics-loading-track"
+          id="analyticsLoadingTrack"
+          role="progressbar"
+          aria-label="Analytics loading progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div
+            class="analytics-loading-bar"
+            id="analyticsLoadingBar"
+          ></div>
+        </div>
+
+        <div class="analytics-loading-details">
+          <span id="analyticsLoadingStage">Initialising</span>
+          <strong id="analyticsLoadingPercent">0%</strong>
+        </div>
+
+        <div class="analytics-loading-steps" aria-hidden="true">
+          <span data-loading-step="connect">Connect</span>
+          <span data-loading-step="download">Download</span>
+          <span data-loading-step="process">Process</span>
+          <span data-loading-step="render">Render</span>
+        </div>
+
+        <div
+          class="analytics-loading-error"
+          id="analyticsLoadingError"
+          hidden
+        >
+          <strong>Analytics could not be loaded.</strong>
+          <p id="analyticsLoadingErrorMessage">
+            Check the database connection and try again.
+          </p>
+          <button
+            class="win-button"
+            id="retryAnalyticsButton"
+            type="button"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <nav>
       <ul>
       <li><a href="index.html">Home</a></li>
