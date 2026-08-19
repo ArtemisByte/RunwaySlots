@@ -15,17 +15,16 @@
     }
 
     :root {
+      --desktop: #008080;
+
       --win-grey: #c0c0c0;
       --win-light: #ffffff;
-      --win-highlight: #dfdfdf;
+      --win-mid: #dfdfdf;
       --win-dark: #808080;
       --win-darker: #404040;
-      --win-black: #000000;
 
       --win-blue: #000080;
       --win-blue-light: #1084d0;
-
-      --desktop: #008080;
 
       --font:
         "MS Sans Serif",
@@ -63,36 +62,28 @@
 
       margin: 0 auto;
 
-      padding:
-        22px
-        18px
-        45px;
+      padding: 22px 18px 45px;
     }
 
     .window {
       background: var(--win-grey);
 
-      border-top: 2px solid var(--win-light);
-      border-left: 2px solid var(--win-light);
-      border-right: 2px solid var(--win-darker);
-      border-bottom: 2px solid var(--win-darker);
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
 
-      box-shadow:
-        1px 1px 0 #000;
+      box-shadow: 2px 2px 0 #000;
     }
 
     .window-titlebar {
+      min-height: 28px;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
 
-      min-height: 28px;
-
-      padding:
-        3px
-        4px
-        3px
-        6px;
+      padding: 3px 4px 3px 6px;
 
       background:
         linear-gradient(
@@ -114,17 +105,17 @@
     }
 
     .window-icon {
+      width: 17px;
+      height: 17px;
+
       display: inline-flex;
       align-items: center;
       justify-content: center;
 
-      width: 17px;
-      height: 17px;
+      border: 1px solid #000;
 
       background: #fff;
       color: #000080;
-
-      border: 1px solid #000;
 
       font-size: 11px;
       font-weight: bold;
@@ -139,11 +130,11 @@
       width: 20px;
       height: 18px;
 
-      padding: 0;
-
       display: flex;
       align-items: center;
       justify-content: center;
+
+      padding: 0;
 
       border-top: 2px solid #fff;
       border-left: 2px solid #fff;
@@ -151,13 +142,10 @@
       border-bottom: 2px solid #404040;
 
       background: #c0c0c0;
-
       color: #000;
 
-      font-weight: bold;
       font-size: 11px;
-
-      cursor: default;
+      font-weight: bold;
     }
 
     .window-body {
@@ -168,45 +156,47 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
 
-      padding: 7px 8px;
+      gap: 10px;
 
       margin-bottom: 10px;
 
-      background: #c0c0c0;
+      padding: 7px 8px;
 
       border-top: 1px solid #fff;
       border-left: 1px solid #fff;
       border-right: 1px solid #808080;
       border-bottom: 1px solid #808080;
+
+      background: #c0c0c0;
     }
 
     .toolbar-left {
       display: flex;
       align-items: center;
-      gap: 7px;
       flex-wrap: wrap;
+
+      gap: 8px;
     }
 
     .toolbar-description {
-      color: #000;
       font-size: 11px;
     }
 
     .connection-status {
       display: inline-flex;
       align-items: center;
+
       gap: 6px;
 
       padding: 4px 7px;
-
-      background: #c0c0c0;
 
       border-top: 1px solid #fff;
       border-left: 1px solid #fff;
       border-right: 1px solid #808080;
       border-bottom: 1px solid #808080;
+
+      background: #c0c0c0;
 
       white-space: nowrap;
     }
@@ -227,18 +217,6 @@
 
     .connection-status.disconnected .status-dot {
       background: #ff0000;
-    }
-
-    .workspace {
-      display: grid;
-
-      grid-template-columns:
-        minmax(400px, 0.85fr)
-        minmax(620px, 1.35fr);
-
-      gap: 10px;
-
-      align-items: start;
     }
 
     .panel {
@@ -262,7 +240,6 @@
       padding: 3px 5px;
 
       background: #000080;
-
       color: #fff;
 
       font-weight: bold;
@@ -272,15 +249,19 @@
       padding: 9px;
     }
 
+    .editor-panel {
+      margin-bottom: 10px;
+    }
+
     .group-box {
       position: relative;
 
       margin-top: 12px;
 
       padding:
-        14px
+        15px
         9px
-        9px;
+        10px;
 
       border-top: 1px solid #808080;
       border-left: 1px solid #808080;
@@ -305,12 +286,20 @@
       display: grid;
 
       grid-template-columns:
-        1fr
-        1fr;
+        repeat(2, minmax(0, 1fr));
 
-      gap:
-        8px
-        10px;
+      gap: 9px 12px;
+    }
+
+    .airline-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(200px, 1.5fr)
+        minmax(100px, 0.5fr)
+        minmax(100px, 0.5fr);
+
+      gap: 9px 12px;
     }
 
     .field {
@@ -318,10 +307,6 @@
       flex-direction: column;
 
       gap: 4px;
-    }
-
-    .field-full {
-      grid-column: 1 / -1;
     }
 
     .field label {
@@ -335,7 +320,7 @@
     input,
     select {
       width: 100%;
-      height: 24px;
+      height: 25px;
 
       padding: 2px 4px;
 
@@ -356,12 +341,8 @@
       outline-offset: -4px;
     }
 
-    input[readonly] {
-      background: #e5e5e5;
-    }
-
     .field-help {
-      min-height: 13px;
+      min-height: 12px;
 
       color: #404040;
 
@@ -369,74 +350,8 @@
       line-height: 1.25;
     }
 
-    .new-airline-box {
-      margin-top: 8px;
-      padding: 8px;
-
-      background: #d4d0c8;
-
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-    }
-
-    .airline-info {
-      display: grid;
-
-      grid-template-columns:
-        minmax(140px, 1fr)
-        70px
-        80px;
-
-      margin-top: 8px;
-
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-
-      background: #fff;
-    }
-
-    .info-item {
-      min-width: 0;
-
-      padding: 6px;
-
-      border-right: 1px solid #c0c0c0;
-    }
-
-    .info-item:last-child {
-      border-right: none;
-    }
-
-    .info-label {
-      display: block;
-
-      margin-bottom: 3px;
-
-      color: #404040;
-
-      font-size: 9px;
-      font-weight: bold;
-
-      text-transform: uppercase;
-    }
-
-    .info-value {
-      display: block;
-
-      overflow: hidden;
-
-      font-weight: bold;
-
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .scr-preview {
-      margin-top: 8px;
+    .preview-box {
+      margin-top: 9px;
 
       border-top: 2px solid #404040;
       border-left: 2px solid #404040;
@@ -446,23 +361,22 @@
       background: #fff;
     }
 
-    .scr-preview-title {
+    .preview-title {
       padding: 4px 6px;
 
       border-bottom: 1px solid #808080;
 
-      background: #e5e5e5;
+      background: #dfdfdf;
 
       font-weight: bold;
     }
 
-    .scr-preview-body {
+    .preview-body {
+      min-height: 46px;
+
       display: flex;
       align-items: center;
-
-      gap: 10px;
-
-      min-height: 45px;
+      gap: 12px;
 
       padding: 7px;
     }
@@ -476,7 +390,6 @@
 
     .preview-label {
       color: #404040;
-
       font-size: 9px;
     }
 
@@ -490,7 +403,7 @@
     }
 
     .preview-arrow {
-      font-size: 16px;
+      font-size: 17px;
     }
 
     .preview-seats {
@@ -499,7 +412,6 @@
 
     .button-bar {
       display: flex;
-      align-items: center;
       flex-wrap: wrap;
 
       gap: 6px;
@@ -525,40 +437,23 @@
     }
 
     .win-button:hover {
-      background: #d0d0d0;
+      background: #d2d2d2;
     }
 
     .win-button:active {
-      padding-top: 4px;
-      padding-left: 11px;
-
       border-top: 2px solid #404040;
       border-left: 2px solid #404040;
       border-right: 2px solid #fff;
       border-bottom: 2px solid #fff;
     }
 
-    .win-button:focus {
-      outline: 1px dotted #000;
-      outline-offset: -5px;
-    }
-
     .win-button:disabled {
       color: #808080;
-
       cursor: default;
-    }
-
-    .small-button {
-      height: 20px;
-      min-width: 54px;
-
-      padding: 0 7px;
     }
 
     .danger-button {
       color: #900000;
-
       font-weight: bold;
     }
 
@@ -604,9 +499,9 @@
       display: grid;
 
       grid-template-columns:
-        minmax(220px, 1fr)
-        170px
-        130px;
+        minmax(260px, 1fr)
+        180px
+        140px;
 
       gap: 7px;
     }
@@ -640,11 +535,10 @@
       cursor: pointer;
 
       font-weight: bold;
-      line-height: 15px;
     }
 
     .table-frame {
-      max-height: 600px;
+      max-height: 610px;
 
       overflow: auto;
 
@@ -666,9 +560,7 @@
 
     thead {
       position: sticky;
-
       top: 0;
-
       z-index: 2;
     }
 
@@ -682,8 +574,8 @@
 
       background: #c0c0c0;
 
-      text-align: left;
       font-weight: normal;
+      text-align: left;
 
       white-space: nowrap;
     }
@@ -707,21 +599,11 @@
 
     tbody tr.selected {
       background: #000080;
-
       color: #fff;
     }
 
-    tbody tr.selected .legacy-badge {
-      color: #000;
-    }
-
-    .airline-cell {
-      min-width: 140px;
-    }
-
-    .airline-name {
-      display: block;
-
+    .airline-name-cell {
+      min-width: 160px;
       font-weight: bold;
     }
 
@@ -733,23 +615,13 @@
       font-weight: bold;
     }
 
-    .legacy-badge {
-      display: inline-block;
-
-      margin-top: 3px;
-      padding: 1px 4px;
-
-      border: 1px solid #000;
-
-      background: #ffff80;
-
-      font-size: 9px;
-      font-weight: bold;
+    .aircraft-name-cell {
+      min-width: 180px;
     }
 
     .edit-button {
+      min-width: 50px;
       height: 22px;
-      min-width: 48px;
 
       padding: 1px 6px;
 
@@ -856,7 +728,6 @@
 
     .modal-overlay {
       position: fixed;
-
       inset: 0;
 
       z-index: 10000;
@@ -867,13 +738,7 @@
 
       padding: 15px;
 
-      background:
-        rgba(
-          0,
-          0,
-          0,
-          0.35
-        );
+      background: rgba(0, 0, 0, 0.35);
     }
 
     .dialog-window {
@@ -887,8 +752,7 @@
       border-right: 2px solid #404040;
       border-bottom: 2px solid #404040;
 
-      box-shadow:
-        2px 2px 0 #000;
+      box-shadow: 2px 2px 0 #000;
     }
 
     .dialog-titlebar {
@@ -896,14 +760,9 @@
       align-items: center;
       justify-content: space-between;
 
-      padding:
-        3px
-        4px
-        3px
-        6px;
+      padding: 3px 4px 3px 6px;
 
       background: #000080;
-
       color: #fff;
 
       font-weight: bold;
@@ -927,9 +786,9 @@
       align-items: center;
       justify-content: center;
 
-      background: #ffff00;
-
       border: 2px solid #000;
+
+      background: #ffff00;
 
       font-size: 25px;
       font-weight: bold;
@@ -949,25 +808,27 @@
 
       gap: 7px;
 
-      padding:
-        0
-        14px
-        14px;
+      padding: 0 14px 14px;
     }
 
     .hidden {
       display: none !important;
     }
 
-    @media (max-width: 1100px) {
-      .workspace {
+    @media (max-width: 850px) {
+
+      .airline-grid,
+      .form-grid,
+      .search-row {
         grid-template-columns: 1fr;
       }
-    }
 
-    @media (max-width: 720px) {
-      .page-shell {
-        padding: 8px;
+      .preview-body {
+        flex-wrap: wrap;
+      }
+
+      .preview-seats {
+        margin-left: 0;
       }
 
       .toolbar {
@@ -975,28 +836,14 @@
         flex-direction: column;
       }
 
-      .form-grid {
-        grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 600px) {
+
+      .page-shell {
+        padding: 8px;
       }
 
-      .search-row {
-        grid-template-columns: 1fr;
-      }
-
-      .airline-info {
-        grid-template-columns:
-          1fr
-          70px
-          80px;
-      }
-
-      .preview-seats {
-        margin-left: 0;
-      }
-
-      .scr-preview-body {
-        flex-wrap: wrap;
-      }
     }
   </style>
 </head>
@@ -1009,11 +856,21 @@
       <li><a href="sir.html">SIR Request</a></li>
       <li><a href="multiflight.html">Multi Flight</a></li>
       <li><a href="airport-search.html">Airport Database</a></li>
-      <li><a class="active" href="aircraft-types.html">Aircraft Types</a></li>
+
+      <li>
+        <a
+          class="active"
+          href="aircraft-types.html"
+        >
+          Aircraft Types
+        </a>
+      </li>
+
       <li><a href="gcrformat.html">GCR Format</a></li>
       <li><a href="turnaround.html">Turnaround</a></li>
     </ul>
   </nav>
+
 
   <div class="page-shell">
 
@@ -1038,7 +895,6 @@
           <button
             type="button"
             class="window-control"
-            aria-label="Minimise"
           >
             _
           </button>
@@ -1046,7 +902,6 @@
           <button
             type="button"
             class="window-control"
-            aria-label="Maximise"
           >
             □
           </button>
@@ -1054,7 +909,6 @@
           <button
             type="button"
             class="window-control"
-            aria-label="Close"
           >
             ×
           </button>
@@ -1062,6 +916,7 @@
         </div>
 
       </div>
+
 
       <div class="window-body">
 
@@ -1072,16 +927,17 @@
             <button
               type="button"
               class="win-button"
-              id="newAircraftTopBtn"
+              id="newAircraftBtn"
             >
               New Aircraft
             </button>
 
             <span class="toolbar-description">
-              Add and maintain airline-specific aircraft types and total seat capacities.
+              Add or edit airline-specific aircraft types and total seat capacities.
             </span>
 
           </div>
+
 
           <div
             class="connection-status"
@@ -1098,520 +954,491 @@
 
         </div>
 
-        <div class="workspace">
 
-          <section class="panel">
+        <section
+          class="panel editor-panel hidden"
+          id="aircraftEditor"
+        >
 
-            <div class="panel-title">
+          <div class="panel-title">
 
-              <span>
-                Aircraft Record
-              </span>
+            <span id="editorTitle">
+              New Aircraft
+            </span>
 
-              <button
-                type="button"
-                class="win-button small-button"
-                id="newAircraftBtn"
+          </div>
+
+
+          <div class="panel-body">
+
+            <form id="aircraftForm">
+
+
+              <input
+                type="hidden"
+                id="originalAirlineIcao"
               >
-                New
-              </button>
 
-            </div>
+              <input
+                type="hidden"
+                id="originalAircraftCode"
+              >
 
-            <div class="panel-body">
 
-              <form id="aircraftForm">
+              <div class="group-box">
 
-                <input
-                  type="hidden"
-                  id="originalAirlineIcao"
-                >
+                <div class="group-title">
+                  Airline
+                </div>
 
-                <input
-                  type="hidden"
-                  id="originalAircraftCode"
-                >
 
-                <input
-                  type="hidden"
-                  id="legacyRecordKey"
-                >
-
-                <div class="group-box">
-
-                  <div class="group-title">
-                    Airline
-                  </div>
+                <div class="airline-grid">
 
                   <div class="field">
 
-                    <label for="airlineSelect">
-                      Airline:
+                    <label for="airlineName">
+                      Airline Name:
+                      <span class="required">*</span>
                     </label>
 
-                    <select id="airlineSelect">
+                    <input
+                      type="text"
+                      id="airlineName"
+                      list="airlineNameSuggestions"
+                      maxlength="100"
+                      placeholder="e.g. Ryanair"
+                      autocomplete="off"
+                      required
+                    >
 
-                      <option value="">
-                        Select airline...
-                      </option>
+                    <datalist id="airlineNameSuggestions"></datalist>
 
-                      <option value="__new__">
-                        [Add New Airline]
-                      </option>
-
-                    </select>
-
-                  </div>
-
-                  <div
-                    id="existingAirlineInfo"
-                    class="airline-info hidden"
-                  >
-
-                    <div class="info-item">
-
-                      <span class="info-label">
-                        Airline
-                      </span>
-
-                      <span
-                        class="info-value"
-                        id="selectedAirlineName"
-                      >
-                        —
-                      </span>
-
-                    </div>
-
-                    <div class="info-item">
-
-                      <span class="info-label">
-                        IATA
-                      </span>
-
-                      <span
-                        class="info-value"
-                        id="selectedAirlineIata"
-                      >
-                        —
-                      </span>
-
-                    </div>
-
-                    <div class="info-item">
-
-                      <span class="info-label">
-                        ICAO
-                      </span>
-
-                      <span
-                        class="info-value"
-                        id="selectedAirlineIcao"
-                      >
-                        —
-                      </span>
-
+                    <div class="field-help">
+                      Type the airline name directly.
                     </div>
 
                   </div>
 
-                  <div
-                    id="newAirlineBox"
-                    class="new-airline-box hidden"
-                  >
 
-                    <div class="form-grid">
+                  <div class="field">
 
-                      <div class="field field-full">
+                    <label for="airlineIata">
+                      IATA:
+                      <span class="required">*</span>
+                    </label>
 
-                        <label for="airlineName">
-                          Airline Name:
-                          <span class="required">*</span>
-                        </label>
+                    <input
+                      type="text"
+                      id="airlineIata"
+                      maxlength="3"
+                      placeholder="FR"
+                      autocomplete="off"
+                      required
+                    >
 
-                        <input
-                          type="text"
-                          id="airlineName"
-                          maxlength="100"
-                          placeholder="e.g. Ryanair"
-                          autocomplete="off"
-                        >
+                    <div class="field-help">
+                      Airline IATA code.
+                    </div>
 
-                      </div>
+                  </div>
 
-                      <div class="field">
 
-                        <label for="airlineIata">
-                          IATA Code:
-                          <span class="required">*</span>
-                        </label>
+                  <div class="field">
 
-                        <input
-                          type="text"
-                          id="airlineIata"
-                          maxlength="3"
-                          placeholder="FR"
-                          autocomplete="off"
-                        >
+                    <label for="airlineIcao">
+                      ICAO:
+                      <span class="required">*</span>
+                    </label>
 
-                      </div>
+                    <input
+                      type="text"
+                      id="airlineIcao"
+                      maxlength="4"
+                      placeholder="RYR"
+                      autocomplete="off"
+                      required
+                    >
 
-                      <div class="field">
-
-                        <label for="airlineIcao">
-                          ICAO Code:
-                          <span class="required">*</span>
-                        </label>
-
-                        <input
-                          type="text"
-                          id="airlineIcao"
-                          maxlength="4"
-                          placeholder="RYR"
-                          autocomplete="off"
-                        >
-
-                      </div>
-
+                    <div class="field-help">
+                      Airline ICAO code.
                     </div>
 
                   </div>
 
                 </div>
-
-                <div class="group-box">
-
-                  <div class="group-title">
-                    Aircraft Details
-                  </div>
-
-                  <div class="form-grid">
-
-                    <div class="field">
-
-                      <label for="inputCode">
-                        Aircraft Input Code:
-                        <span class="required">*</span>
-                      </label>
-
-                      <input
-                        type="text"
-                        id="inputCode"
-                        maxlength="15"
-                        placeholder="738"
-                        autocomplete="off"
-                        required
-                      >
-
-                      <div class="field-help">
-                        Aircraft code entered into Multi Flight.
-                      </div>
-
-                    </div>
-
-                    <div class="field">
-
-                      <label for="scrCode">
-                        SCR Aircraft Code:
-                        <span class="required">*</span>
-                      </label>
-
-                      <input
-                        type="text"
-                        id="scrCode"
-                        maxlength="15"
-                        placeholder="73H"
-                        autocomplete="off"
-                        required
-                      >
-
-                      <div class="field-help">
-                        Aircraft code inserted into the SCR.
-                      </div>
-
-                    </div>
-
-                    <div class="field">
-
-                      <label for="seats">
-                        Total Seats:
-                        <span class="required">*</span>
-                      </label>
-
-                      <input
-                        type="number"
-                        id="seats"
-                        min="0"
-                        max="999"
-                        placeholder="189"
-                        required
-                      >
-
-                      <div class="field-help">
-                        Total seats for this airline's aircraft.
-                      </div>
-
-                    </div>
-
-                    <div class="field">
-
-                      <label for="aircraftName">
-                        Aircraft Name:
-                        <span class="required">*</span>
-                      </label>
-
-                      <input
-                        type="text"
-                        id="aircraftName"
-                        maxlength="120"
-                        placeholder="Boeing 737-800"
-                        autocomplete="off"
-                        required
-                      >
-
-                      <div class="field-help">
-                        Full aircraft type description.
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div class="group-box">
-
-                  <div class="group-title">
-                    SCR Mapping Preview
-                  </div>
-
-                  <div class="scr-preview">
-
-                    <div class="scr-preview-title">
-                      Aircraft Mapping
-                    </div>
-
-                    <div class="scr-preview-body">
-
-                      <div class="preview-item">
-
-                        <span class="preview-label">
-                          INPUT
-                        </span>
-
-                        <span
-                          class="preview-value"
-                          id="previewInput"
-                        >
-                          ---
-                        </span>
-
-                      </div>
-
-                      <span class="preview-arrow">
-                        →
-                      </span>
-
-                      <div class="preview-item">
-
-                        <span class="preview-label">
-                          SCR CODE
-                        </span>
-
-                        <span
-                          class="preview-value"
-                          id="previewScr"
-                        >
-                          ---
-                        </span>
-
-                      </div>
-
-                      <div class="preview-item preview-seats">
-
-                        <span class="preview-label">
-                          TOTAL SEATS
-                        </span>
-
-                        <span
-                          class="preview-value"
-                          id="previewSeats"
-                        >
-                          ---
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div
-                  id="formMessage"
-                  class="form-message"
-                ></div>
-
-                <div class="button-bar">
-
-                  <button
-                    type="submit"
-                    class="win-button"
-                    id="saveAircraftBtn"
-                  >
-                    Add Aircraft
-                  </button>
-
-                  <button
-                    type="button"
-                    class="win-button danger-button hidden"
-                    id="deleteAircraftBtn"
-                  >
-                    Delete
-                  </button>
-
-                  <button
-                    type="button"
-                    class="win-button"
-                    id="clearFormBtn"
-                  >
-                    Clear
-                  </button>
-
-                </div>
-
-              </form>
-
-            </div>
-
-          </section>
-
-          <section class="panel">
-
-            <div class="panel-title">
-
-              <span>
-                Aircraft Database
-              </span>
-
-            </div>
-
-            <div class="database-tools">
-
-              <div class="search-row">
-
-                <div class="search-field">
-
-                  <input
-                    type="search"
-                    id="aircraftSearch"
-                    placeholder="Search airline, aircraft, IATA or ICAO..."
-                    autocomplete="off"
-                  >
-
-                  <button
-                    type="button"
-                    id="clearSearchBtn"
-                    class="clear-search hidden"
-                    aria-label="Clear search"
-                  >
-                    ×
-                  </button>
-
-                </div>
-
-                <select id="airlineFilter">
-
-                  <option value="">
-                    All Airlines
-                  </option>
-
-                </select>
-
-                <select id="sortSelect">
-
-                  <option value="airline">
-                    Sort: Airline
-                  </option>
-
-                  <option value="aircraft">
-                    Sort: Aircraft
-                  </option>
-
-                  <option value="seats">
-                    Sort: Seats
-                  </option>
-
-                </select>
 
               </div>
 
-            </div>
 
-            <div
-              id="databaseLoading"
-              class="loading-state"
-            >
+              <div class="group-box">
 
-              <div class="progress-icon"></div>
+                <div class="group-title">
+                  Aircraft Details
+                </div>
 
-              <span>
-                Loading aircraft database...
-              </span>
 
-            </div>
+                <div class="form-grid">
 
-            <div
-              id="emptyDatabase"
-              class="empty-state hidden"
-            >
+                  <div class="field">
 
-              <div class="empty-icon">
-                ✈
+                    <label for="inputCode">
+                      Aircraft Type:
+                      <span class="required">*</span>
+                    </label>
+
+                    <input
+                      type="text"
+                      id="inputCode"
+                      maxlength="15"
+                      placeholder="738"
+                      autocomplete="off"
+                      required
+                    >
+
+                    <div class="field-help">
+                      Aircraft type entered into Multi Flight.
+                    </div>
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label for="scrCode">
+                      SCR Aircraft Code:
+                      <span class="required">*</span>
+                    </label>
+
+                    <input
+                      type="text"
+                      id="scrCode"
+                      maxlength="15"
+                      placeholder="73H"
+                      autocomplete="off"
+                      required
+                    >
+
+                    <div class="field-help">
+                      Aircraft code used in SCR output.
+                    </div>
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label for="seats">
+                      Total Seats:
+                      <span class="required">*</span>
+                    </label>
+
+                    <input
+                      type="number"
+                      id="seats"
+                      min="0"
+                      max="999"
+                      placeholder="189"
+                      required
+                    >
+
+                    <div class="field-help">
+                      Total seat capacity for this airline.
+                    </div>
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label for="aircraftName">
+                      Aircraft Name:
+                      <span class="required">*</span>
+                    </label>
+
+                    <input
+                      type="text"
+                      id="aircraftName"
+                      maxlength="120"
+                      placeholder="Boeing 737-800"
+                      autocomplete="off"
+                      required
+                    >
+
+                    <div class="field-help">
+                      Full aircraft description.
+                    </div>
+
+                  </div>
+
+                </div>
+
               </div>
 
-              <h3>
-                No aircraft found
-              </h3>
 
-              <p id="emptyDatabaseText">
-                No aircraft types are currently available.
-              </p>
+              <div class="group-box">
+
+                <div class="group-title">
+                  SCR Mapping Preview
+                </div>
+
+
+                <div class="preview-box">
+
+                  <div class="preview-title">
+                    Aircraft Mapping
+                  </div>
+
+
+                  <div class="preview-body">
+
+                    <div class="preview-item">
+
+                      <span class="preview-label">
+                        AIRLINE
+                      </span>
+
+                      <span
+                        class="preview-value"
+                        id="previewAirline"
+                      >
+                        ---
+                      </span>
+
+                    </div>
+
+
+                    <div class="preview-item">
+
+                      <span class="preview-label">
+                        INPUT
+                      </span>
+
+                      <span
+                        class="preview-value"
+                        id="previewInput"
+                      >
+                        ---
+                      </span>
+
+                    </div>
+
+
+                    <span class="preview-arrow">
+                      →
+                    </span>
+
+
+                    <div class="preview-item">
+
+                      <span class="preview-label">
+                        SCR
+                      </span>
+
+                      <span
+                        class="preview-value"
+                        id="previewScr"
+                      >
+                        ---
+                      </span>
+
+                    </div>
+
+
+                    <div class="preview-item preview-seats">
+
+                      <span class="preview-label">
+                        TOTAL SEATS
+                      </span>
+
+                      <span
+                        class="preview-value"
+                        id="previewSeats"
+                      >
+                        ---
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                id="formMessage"
+                class="form-message"
+              ></div>
+
+
+              <div class="button-bar">
+
+                <button
+                  type="submit"
+                  class="win-button"
+                  id="saveAircraftBtn"
+                >
+                  Save Aircraft
+                </button>
+
+
+                <button
+                  type="button"
+                  class="win-button danger-button hidden"
+                  id="deleteAircraftBtn"
+                >
+                  Delete
+                </button>
+
+
+                <button
+                  type="button"
+                  class="win-button"
+                  id="cancelEditBtn"
+                >
+                  Cancel
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </section>
+
+
+        <section class="panel">
+
+          <div class="panel-title">
+
+            <span>
+              Aircraft Database
+            </span>
+
+          </div>
+
+
+          <div class="database-tools">
+
+            <div class="search-row">
+
+              <div class="search-field">
+
+                <input
+                  type="search"
+                  id="aircraftSearch"
+                  placeholder="Search airline, aircraft, IATA, ICAO or name..."
+                  autocomplete="off"
+                >
+
+                <button
+                  type="button"
+                  class="clear-search hidden"
+                  id="clearSearchBtn"
+                >
+                  ×
+                </button>
+
+              </div>
+
+
+              <select id="airlineFilter">
+
+                <option value="">
+                  All Airlines
+                </option>
+
+              </select>
+
+
+              <select id="sortSelect">
+
+                <option value="airline">
+                  Sort: Airline
+                </option>
+
+                <option value="aircraft">
+                  Sort: Aircraft
+                </option>
+
+                <option value="seats">
+                  Sort: Seats
+                </option>
+
+              </select>
 
             </div>
 
-            <div
-              id="aircraftTableContainer"
-              class="table-frame hidden"
-            >
+          </div>
 
-              <table>
 
-                <thead>
+          <div
+            id="databaseLoading"
+            class="loading-state"
+          >
 
-                  <tr>
-                    <th>Airline</th>
-                    <th>IATA</th>
-                    <th>ICAO</th>
-                    <th>Aircraft</th>
-                    <th>SCR</th>
-                    <th>Seats</th>
-                    <th>Aircraft Name</th>
-                    <th>Action</th>
-                  </tr>
+            <div class="progress-icon"></div>
 
-                </thead>
+            <span>
+              Loading aircraft database...
+            </span>
 
-                <tbody id="aircraftTableBody"></tbody>
+          </div>
 
-              </table>
 
+          <div
+            id="emptyDatabase"
+            class="empty-state hidden"
+          >
+
+            <div class="empty-icon">
+              ✈
             </div>
 
-          </section>
+            <h3>
+              No aircraft found
+            </h3>
 
-        </div>
+            <p id="emptyDatabaseText">
+              No aircraft types are currently available.
+            </p>
+
+          </div>
+
+
+          <div
+            id="aircraftTableContainer"
+            class="table-frame hidden"
+          >
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Airline</th>
+                  <th>IATA</th>
+                  <th>ICAO</th>
+                  <th>Aircraft Type</th>
+                  <th>SCR</th>
+                  <th>Seats</th>
+                  <th>Aircraft Name</th>
+                  <th>Action</th>
+                </tr>
+
+              </thead>
+
+
+              <tbody id="aircraftTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+        </section>
+
 
         <div class="status-bar">
 
@@ -1634,6 +1461,7 @@
 
   </div>
 
+
   <div
     id="deleteModal"
     class="modal-overlay hidden"
@@ -1651,12 +1479,12 @@
           type="button"
           class="window-control"
           id="modalCloseBtn"
-          aria-label="Close"
         >
           ×
         </button>
 
       </div>
+
 
       <div class="dialog-body">
 
@@ -1664,10 +1492,11 @@
           !
         </div>
 
+
         <div class="dialog-text">
 
           <p>
-            Are you sure you want to delete:
+            Are you sure you want to permanently delete:
           </p>
 
           <p>
@@ -1675,12 +1504,13 @@
           </p>
 
           <p>
-            This aircraft will no longer be available to the slot generators.
+            This aircraft will no longer be available to the generators.
           </p>
 
         </div>
 
       </div>
+
 
       <div class="dialog-actions">
 
@@ -1706,45 +1536,29 @@
 
   </div>
 
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
   <script src="testfirebase.js"></script>
-
   <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-      const database = firebase.database();
+      const database =
+        firebase.database();
 
       const rootRef =
         database.ref("aircraftTypes");
 
+
+      const aircraftEditor =
+        document.getElementById("aircraftEditor");
+
+      const editorTitle =
+        document.getElementById("editorTitle");
+
       const aircraftForm =
         document.getElementById("aircraftForm");
 
-      const airlineSelect =
-        document.getElementById("airlineSelect");
-
-      const airlineFilter =
-        document.getElementById("airlineFilter");
-
-      const sortSelect =
-        document.getElementById("sortSelect");
-
-      const newAirlineBox =
-        document.getElementById("newAirlineBox");
-
-      const existingAirlineInfo =
-        document.getElementById("existingAirlineInfo");
-
-      const selectedAirlineName =
-        document.getElementById("selectedAirlineName");
-
-      const selectedAirlineIata =
-        document.getElementById("selectedAirlineIata");
-
-      const selectedAirlineIcao =
-        document.getElementById("selectedAirlineIcao");
 
       const airlineName =
         document.getElementById("airlineName");
@@ -1754,6 +1568,10 @@
 
       const airlineIcao =
         document.getElementById("airlineIcao");
+
+      const airlineNameSuggestions =
+        document.getElementById("airlineNameSuggestions");
+
 
       const inputCode =
         document.getElementById("inputCode");
@@ -1767,14 +1585,16 @@
       const aircraftName =
         document.getElementById("aircraftName");
 
+
       const originalAirlineIcao =
         document.getElementById("originalAirlineIcao");
 
       const originalAircraftCode =
         document.getElementById("originalAircraftCode");
 
-      const legacyRecordKey =
-        document.getElementById("legacyRecordKey");
+
+      const newAircraftBtn =
+        document.getElementById("newAircraftBtn");
 
       const saveAircraftBtn =
         document.getElementById("saveAircraftBtn");
@@ -1782,20 +1602,39 @@
       const deleteAircraftBtn =
         document.getElementById("deleteAircraftBtn");
 
-      const clearFormBtn =
-        document.getElementById("clearFormBtn");
+      const cancelEditBtn =
+        document.getElementById("cancelEditBtn");
 
-      const newAircraftBtn =
-        document.getElementById("newAircraftBtn");
 
-      const newAircraftTopBtn =
-        document.getElementById("newAircraftTopBtn");
+      const previewAirline =
+        document.getElementById("previewAirline");
+
+      const previewInput =
+        document.getElementById("previewInput");
+
+      const previewScr =
+        document.getElementById("previewScr");
+
+      const previewSeats =
+        document.getElementById("previewSeats");
+
+
+      const formMessage =
+        document.getElementById("formMessage");
+
 
       const aircraftSearch =
         document.getElementById("aircraftSearch");
 
       const clearSearchBtn =
         document.getElementById("clearSearchBtn");
+
+      const airlineFilter =
+        document.getElementById("airlineFilter");
+
+      const sortSelect =
+        document.getElementById("sortSelect");
+
 
       const aircraftTableBody =
         document.getElementById("aircraftTableBody");
@@ -1812,23 +1651,16 @@
       const emptyDatabaseText =
         document.getElementById("emptyDatabaseText");
 
-      const formMessage =
-        document.getElementById("formMessage");
-
-      const previewInput =
-        document.getElementById("previewInput");
-
-      const previewScr =
-        document.getElementById("previewScr");
-
-      const previewSeats =
-        document.getElementById("previewSeats");
 
       const connectionStatus =
         document.getElementById("connectionStatus");
 
       const connectionText =
         document.getElementById("connectionText");
+
+      const statusText =
+        document.getElementById("statusText");
+
 
       const deleteModal =
         document.getElementById("deleteModal");
@@ -1845,18 +1677,21 @@
       const modalCloseBtn =
         document.getElementById("modalCloseBtn");
 
-      const statusText =
-        document.getElementById("statusText");
 
       let rawDatabase = {};
+
       let airlines = {};
+
       let aircraftRecords = [];
+
       let selectedRecordId = null;
 
 
       function normaliseCode(value) {
 
-        return String(value || "")
+        return String(
+          value || ""
+        )
           .trim()
           .toUpperCase();
 
@@ -1870,30 +1705,46 @@
           value === null ||
           typeof value === "undefined"
         ) {
+
           return "";
+
         }
+
 
         const number =
-          parseInt(value, 10);
+          parseInt(
+            value,
+            10
+          );
 
-        if (Number.isNaN(number)) {
+
+        if (
+          Number.isNaN(number)
+        ) {
+
           return "";
+
         }
 
+
         return String(number)
-          .padStart(3, "0");
+          .padStart(
+            3,
+            "0"
+          );
 
       }
 
 
       function validCode(value) {
 
-        return /^[A-Z0-9-]+$/.test(value);
+        return /^[A-Z0-9-]+$/
+          .test(value);
 
       }
 
 
-      function uppercaseField(element) {
+      function uppercaseInput(element) {
 
         element.addEventListener(
           "input",
@@ -1902,8 +1753,10 @@
             const position =
               element.selectionStart;
 
+
             element.value =
               element.value.toUpperCase();
+
 
             try {
 
@@ -1915,16 +1768,30 @@
             } catch (error) {
             }
 
+
+            updatePreview();
+
           }
         );
 
       }
 
 
-      uppercaseField(airlineIata);
-      uppercaseField(airlineIcao);
-      uppercaseField(inputCode);
-      uppercaseField(scrCode);
+      uppercaseInput(
+        airlineIata
+      );
+
+      uppercaseInput(
+        airlineIcao
+      );
+
+      uppercaseInput(
+        inputCode
+      );
+
+      uppercaseInput(
+        scrCode
+      );
 
 
       function updateStatus(message) {
@@ -1935,10 +1802,14 @@
       }
 
 
-      function setMessage(message, type) {
+      function setMessage(
+        message,
+        type
+      ) {
 
         formMessage.textContent =
           message || "";
+
 
         formMessage.classList.remove(
           "success",
@@ -1946,12 +1817,15 @@
           "warning"
         );
 
+
         if (
           message &&
           type
         ) {
 
-          formMessage.classList.add(type);
+          formMessage.classList.add(
+            type
+          );
 
         }
 
@@ -1960,15 +1834,25 @@
 
       function updatePreview() {
 
+        previewAirline.textContent =
+          airlineIata.value.trim()
+            ? normaliseCode(
+                airlineIata.value
+              )
+            : "---";
+
+
         previewInput.textContent =
           normaliseCode(
             inputCode.value
           ) || "---";
 
+
         previewScr.textContent =
           normaliseCode(
             scrCode.value
           ) || "---";
+
 
         previewSeats.textContent =
           formatSeats(
@@ -1978,426 +1862,66 @@
       }
 
 
-      function parseDatabase() {
+      airlineName.addEventListener(
+        "input",
+        function () {
 
-        airlines = {};
-        aircraftRecords = [];
-
-
-        Object.entries(
-          rawDatabase || {}
-        ).forEach(
-          function (
-            [
-              rootKey,
-              value
-            ]
-          ) {
-
-            if (
-              !value ||
-              typeof value !== "object"
-            ) {
-              return;
-            }
+          updatePreview();
 
 
-            if (
-              value.aircraft &&
-              typeof value.aircraft === "object"
-            ) {
-
-              const icao =
-                normaliseCode(
-                  value.icaoCode ||
-                  rootKey
-                );
-
-              const iata =
-                normaliseCode(
-                  value.iataCode
-                );
-
-              const name =
-                String(
-                  value.airlineName ||
-                  icao
-                ).trim();
+          const typedName =
+            airlineName.value
+              .trim()
+              .toLowerCase();
 
 
-              airlines[icao] = {
-                name: name,
-                iata: iata,
-                icao: icao
-              };
+          const matchingAirline =
+            Object.values(
+              airlines
+            )
+              .find(
+                function (airline) {
 
-
-              Object.entries(
-                value.aircraft
-              ).forEach(
-                function (
-                  [
-                    aircraftKey,
-                    aircraft
-                  ]
-                ) {
-
-                  if (
-                    !aircraft ||
-                    typeof aircraft !== "object"
-                  ) {
-                    return;
-                  }
-
-
-                  aircraftRecords.push({
-
-                    id:
-                      icao +
-                      "::" +
-                      aircraftKey,
-
-                    airlineName:
-                      name,
-
-                    iata:
-                      iata,
-
-                    icao:
-                      icao,
-
-                    aircraftKey:
-                      aircraftKey,
-
-                    inputCode:
-                      normaliseCode(
-                        aircraft.inputCode ||
-                        aircraftKey
-                      ),
-
-                    scrCode:
-                      normaliseCode(
-                        aircraft.scrCode
-                      ),
-
-                    seats:
-                      formatSeats(
-                        aircraft.seats
-                      ),
-
-                    name:
-                      String(
-                        aircraft.name ||
-                        ""
-                      ),
-
-                    legacy:
-                      false
-
-                  });
+                  return (
+                    airline.name
+                      .toLowerCase() ===
+                    typedName
+                  );
 
                 }
               );
 
-            }
 
-            else if (
-              value.inputCode ||
-              value.scrCode ||
-              value.seats ||
-              value.name
-            ) {
+          if (
+            matchingAirline &&
+            !originalAircraftCode.value
+          ) {
 
-              aircraftRecords.push({
+            airlineIata.value =
+              matchingAirline.iata;
 
-                id:
-                  "legacy::" +
-                  rootKey,
+            airlineIcao.value =
+              matchingAirline.icao;
 
-                airlineName:
-                  "Unassigned",
 
-                iata:
-                  "",
-
-                icao:
-                  "",
-
-                aircraftKey:
-                  rootKey,
-
-                inputCode:
-                  normaliseCode(
-                    value.inputCode ||
-                    rootKey
-                  ),
-
-                scrCode:
-                  normaliseCode(
-                    value.scrCode
-                  ),
-
-                seats:
-                  formatSeats(
-                    value.seats
-                  ),
-
-                name:
-                  String(
-                    value.name ||
-                    ""
-                  ),
-
-                legacy:
-                  true,
-
-                legacyKey:
-                  rootKey
-
-              });
-
-            }
+            updatePreview();
 
           }
-        );
-
-
-        populateAirlineSelectors();
-
-      }
-
-
-      function populateAirlineSelectors() {
-
-        const currentSelect =
-          airlineSelect.value;
-
-        const currentFilter =
-          airlineFilter.value;
-
-
-        airlineSelect.innerHTML = `
-          <option value="">
-            Select airline...
-          </option>
-
-          <option value="__new__">
-            [Add New Airline]
-          </option>
-        `;
-
-
-        airlineFilter.innerHTML = `
-          <option value="">
-            All Airlines
-          </option>
-        `;
-
-
-        Object.values(airlines)
-          .sort(
-            function (a, b) {
-
-              return a.name
-                .localeCompare(
-                  b.name
-                );
-
-            }
-          )
-          .forEach(
-            function (airline) {
-
-              const option =
-                document.createElement(
-                  "option"
-                );
-
-              option.value =
-                airline.icao;
-
-              option.textContent =
-                airline.name +
-                " (" +
-                airline.iata +
-                " / " +
-                airline.icao +
-                ")";
-
-
-              airlineSelect.appendChild(
-                option
-              );
-
-
-              const filterOption =
-                document.createElement(
-                  "option"
-                );
-
-              filterOption.value =
-                airline.icao;
-
-              filterOption.textContent =
-                airline.name;
-
-
-              airlineFilter.appendChild(
-                filterOption
-              );
-
-            }
-          );
-
-
-        if (
-          currentSelect &&
-          (
-            currentSelect === "__new__" ||
-            airlines[currentSelect]
-          )
-        ) {
-
-          airlineSelect.value =
-            currentSelect;
 
         }
+      );
 
 
-        if (
-          currentFilter &&
-          airlines[currentFilter]
-        ) {
-
-          airlineFilter.value =
-            currentFilter;
-
-        }
-
-      }
+      seats.addEventListener(
+        "input",
+        updatePreview
+      );
 
 
-      function updateAirlineSection() {
-
-        const value =
-          airlineSelect.value;
-
-
-        existingAirlineInfo
-          .classList
-          .add("hidden");
-
-        newAirlineBox
-          .classList
-          .add("hidden");
-
-
-        if (
-          value === "__new__"
-        ) {
-
-          newAirlineBox
-            .classList
-            .remove("hidden");
-
-          return;
-
-        }
-
-
-        if (
-          value &&
-          airlines[value]
-        ) {
-
-          const airline =
-            airlines[value];
-
-
-          selectedAirlineName.textContent =
-            airline.name;
-
-          selectedAirlineIata.textContent =
-            airline.iata || "—";
-
-          selectedAirlineIcao.textContent =
-            airline.icao;
-
-
-          existingAirlineInfo
-            .classList
-            .remove("hidden");
-
-        }
-
-      }
-
-
-      function getSelectedAirline() {
-
-        const value =
-          airlineSelect.value;
-
-
-        if (
-          value === "__new__"
-        ) {
-
-          return {
-
-            isNew:
-              true,
-
-            name:
-              airlineName.value.trim(),
-
-            iata:
-              normaliseCode(
-                airlineIata.value
-              ),
-
-            icao:
-              normaliseCode(
-                airlineIcao.value
-              )
-
-          };
-
-        }
-
-
-        if (
-          value &&
-          airlines[value]
-        ) {
-
-          return {
-
-            isNew:
-              false,
-
-            name:
-              airlines[value].name,
-
-            iata:
-              airlines[value].iata,
-
-            icao:
-              airlines[value].icao
-
-          };
-
-        }
-
-
-        return null;
-
-      }
-
-
-      function clearForm() {
+      function showNewAircraftForm() {
 
         aircraftForm.reset();
+
 
         originalAirlineIcao.value =
           "";
@@ -2405,25 +1929,19 @@
         originalAircraftCode.value =
           "";
 
-        legacyRecordKey.value =
-          "";
-
         selectedRecordId =
           null;
 
 
+        editorTitle.textContent =
+          "New Aircraft";
+
+
         saveAircraftBtn.textContent =
-          "Add Aircraft";
+          "Save Aircraft";
+
 
         deleteAircraftBtn
-          .classList
-          .add("hidden");
-
-        existingAirlineInfo
-          .classList
-          .add("hidden");
-
-        newAirlineBox
           .classList
           .add("hidden");
 
@@ -2433,21 +1951,90 @@
           ""
         );
 
+
+        aircraftEditor
+          .classList
+          .remove("hidden");
+
+
         updatePreview();
 
+        renderTable();
+
+
         updateStatus(
-          "Ready - create new aircraft record"
+          "Creating new aircraft record"
         );
 
-        renderTable();
+
+        airlineName.focus();
+
+
+        aircraftEditor.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
 
       }
 
 
-      function loadRecord(record) {
+      function hideAircraftForm() {
+
+        aircraftForm.reset();
+
+
+        originalAirlineIcao.value =
+          "";
+
+        originalAircraftCode.value =
+          "";
+
+        selectedRecordId =
+          null;
+
+
+        aircraftEditor
+          .classList
+          .add("hidden");
+
+
+        deleteAircraftBtn
+          .classList
+          .add("hidden");
+
+
+        setMessage(
+          "",
+          ""
+        );
+
+
+        updatePreview();
+
+        renderTable();
+
+
+        updateStatus(
+          "Ready"
+        );
+
+      }
+
+
+      function editAircraft(record) {
 
         selectedRecordId =
           record.id;
+
+
+        airlineName.value =
+          record.airlineName;
+
+        airlineIata.value =
+          record.iata;
+
+        airlineIcao.value =
+          record.icao;
 
 
         inputCode.value =
@@ -2466,63 +2053,35 @@
           record.name;
 
 
-        originalAircraftCode.value =
-          record.aircraftKey || "";
-
         originalAirlineIcao.value =
-          record.icao || "";
+          record.icao;
 
-        legacyRecordKey.value =
-          record.legacy
-            ? record.legacyKey
-            : "";
+        originalAircraftCode.value =
+          record.aircraftKey;
 
 
-        if (
-          record.legacy
-        ) {
-
-          airlineSelect.value =
-            "__new__";
-
-          airlineName.value =
-            "";
-
-          airlineIata.value =
-            "";
-
-          airlineIcao.value =
-            "";
-
-          setMessage(
-            "This older aircraft record does not have an airline. Assign an airline before saving.",
-            "warning"
-          );
-
-        }
-
-        else {
-
-          airlineSelect.value =
-            record.icao;
-
-          setMessage(
-            "",
-            ""
-          );
-
-        }
-
-
-        updateAirlineSection();
+        editorTitle.textContent =
+          "Edit Aircraft Type";
 
 
         saveAircraftBtn.textContent =
           "Save Changes";
 
+
         deleteAircraftBtn
           .classList
           .remove("hidden");
+
+
+        aircraftEditor
+          .classList
+          .remove("hidden");
+
+
+        setMessage(
+          "",
+          ""
+        );
 
 
         updatePreview();
@@ -2538,22 +2097,242 @@
         );
 
 
+        aircraftEditor.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      }
+
+
+      function parseDatabase() {
+
+        airlines = {};
+
+        aircraftRecords = [];
+
+
+        Object.entries(
+          rawDatabase || {}
+        )
+          .forEach(
+            function (
+              [
+                airlineKey,
+                airlineData
+              ]
+            ) {
+
+              if (
+                !airlineData ||
+                typeof airlineData !== "object"
+              ) {
+
+                return;
+
+              }
+
+
+              if (
+                !airlineData.aircraft
+              ) {
+
+                return;
+
+              }
+
+
+              const icao =
+                normaliseCode(
+                  airlineData.icaoCode ||
+                  airlineKey
+                );
+
+
+              const iata =
+                normaliseCode(
+                  airlineData.iataCode
+                );
+
+
+              const name =
+                String(
+                  airlineData.airlineName ||
+                  icao
+                ).trim();
+
+
+              airlines[icao] = {
+
+                name:
+                  name,
+
+                iata:
+                  iata,
+
+                icao:
+                  icao
+
+              };
+
+
+              Object.entries(
+                airlineData.aircraft
+              )
+                .forEach(
+                  function (
+                    [
+                      aircraftKey,
+                      aircraft
+                    ]
+                  ) {
+
+                    if (
+                      !aircraft ||
+                      typeof aircraft !== "object"
+                    ) {
+
+                      return;
+
+                    }
+
+
+                    aircraftRecords.push({
+
+                      id:
+                        icao +
+                        "::" +
+                        aircraftKey,
+
+                      airlineName:
+                        name,
+
+                      iata:
+                        iata,
+
+                      icao:
+                        icao,
+
+                      aircraftKey:
+                        aircraftKey,
+
+                      inputCode:
+                        normaliseCode(
+                          aircraft.inputCode ||
+                          aircraftKey
+                        ),
+
+                      scrCode:
+                        normaliseCode(
+                          aircraft.scrCode
+                        ),
+
+                      seats:
+                        formatSeats(
+                          aircraft.seats
+                        ),
+
+                      name:
+                        String(
+                          aircraft.name ||
+                          ""
+                        )
+
+                    });
+
+                  }
+                );
+
+            }
+          );
+
+
+        populateAirlineControls();
+
+      }
+
+
+      function populateAirlineControls() {
+
+        const currentFilter =
+          airlineFilter.value;
+
+
+        airlineNameSuggestions.innerHTML =
+          "";
+
+
+        airlineFilter.innerHTML = `
+          <option value="">
+            All Airlines
+          </option>
+        `;
+
+
+        Object.values(
+          airlines
+        )
+          .sort(
+            function (
+              a,
+              b
+            ) {
+
+              return a.name
+                .localeCompare(
+                  b.name
+                );
+
+            }
+          )
+          .forEach(
+            function (
+              airline
+            ) {
+
+              const suggestion =
+                document.createElement(
+                  "option"
+                );
+
+              suggestion.value =
+                airline.name;
+
+
+              airlineNameSuggestions
+                .appendChild(
+                  suggestion
+                );
+
+
+              const filterOption =
+                document.createElement(
+                  "option"
+                );
+
+              filterOption.value =
+                airline.icao;
+
+              filterOption.textContent =
+                airline.name;
+
+
+              airlineFilter
+                .appendChild(
+                  filterOption
+                );
+
+            }
+          );
+
+
         if (
-          window.innerWidth <
-          1100
+          currentFilter &&
+          airlines[currentFilter]
         ) {
 
-          document
-            .querySelector(
-              ".panel"
-            )
-            .scrollIntoView({
-              behavior:
-                "smooth",
-
-              block:
-                "start"
-            });
+          airlineFilter.value =
+            currentFilter;
 
         }
 
@@ -2567,20 +2346,24 @@
             .trim()
             .toUpperCase();
 
-        const airlineValue =
+
+        const selectedAirline =
           airlineFilter.value;
 
-        const sort =
+
+        const sortMode =
           sortSelect.value;
 
 
-        let records =
+        let filtered =
           aircraftRecords.filter(
             function (record) {
 
+
               if (
-                airlineValue &&
-                record.icao !== airlineValue
+                selectedAirline &&
+                record.icao !==
+                  selectedAirline
               ) {
 
                 return false;
@@ -2598,30 +2381,40 @@
 
 
               const searchable = [
+
                 record.airlineName,
                 record.iata,
                 record.icao,
+
                 record.inputCode,
                 record.scrCode,
                 record.seats,
+
                 record.name
+
               ]
                 .join(" ")
                 .toUpperCase();
 
 
               return searchable
-                .includes(search);
+                .includes(
+                  search
+                );
 
             }
           );
 
 
-        records.sort(
-          function (a, b) {
+        filtered.sort(
+          function (
+            a,
+            b
+          ) {
 
             if (
-              sort === "aircraft"
+              sortMode ===
+              "aircraft"
             ) {
 
               return a.inputCode
@@ -2637,7 +2430,8 @@
 
 
             if (
-              sort === "seats"
+              sortMode ===
+              "seats"
             ) {
 
               return (
@@ -2654,7 +2448,7 @@
             }
 
 
-            const airlineCompare =
+            const airlineSort =
               a.airlineName
                 .localeCompare(
                   b.airlineName
@@ -2662,10 +2456,10 @@
 
 
             if (
-              airlineCompare !== 0
+              airlineSort !== 0
             ) {
 
-              return airlineCompare;
+              return airlineSort;
 
             }
 
@@ -2693,12 +2487,13 @@
 
 
         if (
-          records.length === 0
+          filtered.length === 0
         ) {
 
           aircraftTableContainer
             .classList
             .add("hidden");
+
 
           emptyDatabase
             .classList
@@ -2708,9 +2503,9 @@
           emptyDatabaseText.textContent =
             (
               search ||
-              airlineValue
+              selectedAirline
             )
-              ? "No aircraft match the current search or airline filter."
+              ? "No aircraft match the current search."
               : "No aircraft types are currently available.";
 
 
@@ -2723,13 +2518,16 @@
           .classList
           .add("hidden");
 
+
         aircraftTableContainer
           .classList
           .remove("hidden");
 
 
-        records.forEach(
-          function (record) {
+        filtered.forEach(
+          function (
+            record
+          ) {
 
             const row =
               document.createElement(
@@ -2755,47 +2553,10 @@
               );
 
             airlineCell.className =
-              "airline-cell";
+              "airline-name-cell";
 
-
-            const airlineNameSpan =
-              document.createElement(
-                "span"
-              );
-
-            airlineNameSpan.className =
-              "airline-name";
-
-            airlineNameSpan.textContent =
+            airlineCell.textContent =
               record.airlineName;
-
-
-            airlineCell.appendChild(
-              airlineNameSpan
-            );
-
-
-            if (
-              record.legacy
-            ) {
-
-              const legacyBadge =
-                document.createElement(
-                  "span"
-                );
-
-              legacyBadge.className =
-                "legacy-badge";
-
-              legacyBadge.textContent =
-                "NEEDS AIRLINE";
-
-
-              airlineCell.appendChild(
-                legacyBadge
-              );
-
-            }
 
 
             const iataCell =
@@ -2803,8 +2564,11 @@
                 "td"
               );
 
+            iataCell.className =
+              "code-cell";
+
             iataCell.textContent =
-              record.iata || "—";
+              record.iata;
 
 
             const icaoCell =
@@ -2812,8 +2576,11 @@
                 "td"
               );
 
+            icaoCell.className =
+              "code-cell";
+
             icaoCell.textContent =
-              record.icao || "—";
+              record.icao;
 
 
             const aircraftCell =
@@ -2837,7 +2604,7 @@
               "code-cell";
 
             scrCell.textContent =
-              record.scrCode || "—";
+              record.scrCode;
 
 
             const seatsCell =
@@ -2846,7 +2613,7 @@
               );
 
             seatsCell.textContent =
-              record.seats || "—";
+              record.seats;
 
 
             const nameCell =
@@ -2854,9 +2621,11 @@
                 "td"
               );
 
+            nameCell.className =
+              "aircraft-name-cell";
+
             nameCell.textContent =
-              record.name ||
-              "Unnamed Aircraft";
+              record.name;
 
 
             const actionCell =
@@ -2882,11 +2651,14 @@
 
             editButton.addEventListener(
               "click",
-              function (event) {
+              function (
+                event
+              ) {
 
                 event.stopPropagation();
 
-                loadRecord(
+
+                editAircraft(
                   record
                 );
 
@@ -2933,10 +2705,10 @@
 
 
             row.addEventListener(
-              "click",
+              "dblclick",
               function () {
 
-                loadRecord(
+                editAircraft(
                   record
                 );
 
@@ -2955,7 +2727,9 @@
       }
 
 
-      async function cleanupAirline(icao) {
+      async function cleanupOldAirline(
+        icao
+      ) {
 
         if (
           !icao
@@ -2966,39 +2740,28 @@
         }
 
 
-        try {
+        const aircraftSnapshot =
+          await database
+            .ref(
+              "aircraftTypes/" +
+              icao +
+              "/aircraft"
+            )
+            .once(
+              "value"
+            );
 
-          const snapshot =
-            await database
-              .ref(
-                "aircraftTypes/" +
-                icao +
-                "/aircraft"
-              )
-              .once("value");
 
+        if (
+          !aircraftSnapshot.exists()
+        ) {
 
-          if (
-            !snapshot.exists()
-          ) {
-
-            await database
-              .ref(
-                "aircraftTypes/" +
-                icao
-              )
-              .remove();
-
-          }
-
-        }
-
-        catch (error) {
-
-          console.warn(
-            "Airline cleanup skipped:",
-            error
-          );
+          await database
+            .ref(
+              "aircraftTypes/" +
+              icao
+            )
+            .remove();
 
         }
 
@@ -3007,26 +2770,29 @@
 
       rootRef.on(
         "value",
-
-        function (snapshot) {
+        function (
+          snapshot
+        ) {
 
           rawDatabase =
             snapshot.val() || {};
 
+
           parseDatabase();
 
           renderTable();
+
 
           updateStatus(
             "Aircraft database loaded"
           );
 
         },
-
-        function (error) {
+        function (
+          error
+        ) {
 
           console.error(
-            "Aircraft database error:",
             error
           );
 
@@ -3035,13 +2801,15 @@
             .classList
             .add("hidden");
 
-          aircraftTableContainer
-            .classList
-            .add("hidden");
 
           emptyDatabase
             .classList
             .remove("hidden");
+
+
+          aircraftTableContainer
+            .classList
+            .add("hidden");
 
 
           emptyDatabaseText.textContent =
@@ -3049,42 +2817,30 @@
 
 
           updateStatus(
-            "Aircraft database error"
+            "Database error"
           );
 
         }
       );
 
 
-      airlineSelect.addEventListener(
-        "change",
-        function () {
-
-          if (
-            airlineSelect.value !== "__new__"
-          ) {
-
-            airlineName.value =
-              "";
-
-            airlineIata.value =
-              "";
-
-            airlineIcao.value =
-              "";
-
-          }
+      newAircraftBtn.addEventListener(
+        "click",
+        showNewAircraftForm
+      );
 
 
-          updateAirlineSection();
-
-        }
+      cancelEditBtn.addEventListener(
+        "click",
+        hideAircraftForm
       );
 
 
       aircraftForm.addEventListener(
         "submit",
-        async function (event) {
+        async function (
+          event
+        ) {
 
           event.preventDefault();
 
@@ -3095,20 +2851,56 @@
           );
 
 
-          const airline =
-            getSelectedAirline();
+          const newAirlineName =
+            airlineName.value
+              .trim();
+
+
+          const newIata =
+            normaliseCode(
+              airlineIata.value
+            );
+
+
+          const newIcao =
+            normaliseCode(
+              airlineIcao.value
+            );
+
+
+          const newAircraftCode =
+            normaliseCode(
+              inputCode.value
+            );
+
+
+          const newScrCode =
+            normaliseCode(
+              scrCode.value
+            );
+
+
+          const newSeats =
+            formatSeats(
+              seats.value
+            );
+
+
+          const newAircraftName =
+            aircraftName.value
+              .trim();
 
 
           if (
-            !airline
+            !newAirlineName
           ) {
 
             setMessage(
-              "Please select an airline.",
+              "Please enter the airline name.",
               "error"
             );
 
-            airlineSelect.focus();
+            airlineName.focus();
 
             return;
 
@@ -3116,157 +2908,52 @@
 
 
           if (
-            airline.isNew
+            !newIata ||
+            !validCode(
+              newIata
+            )
           ) {
 
-            if (
-              !airline.name
-            ) {
+            setMessage(
+              "Please enter a valid airline IATA code.",
+              "error"
+            );
 
-              setMessage(
-                "Please enter the airline name.",
-                "error"
-              );
+            airlineIata.focus();
 
-              airlineName.focus();
-
-              return;
-
-            }
-
-
-            if (
-              !airline.iata
-            ) {
-
-              setMessage(
-                "Please enter the airline IATA code.",
-                "error"
-              );
-
-              airlineIata.focus();
-
-              return;
-
-            }
-
-
-            if (
-              !airline.icao
-            ) {
-
-              setMessage(
-                "Please enter the airline ICAO code.",
-                "error"
-              );
-
-              airlineIcao.focus();
-
-              return;
-
-            }
-
-
-            if (
-              !validCode(
-                airline.iata
-              ) ||
-              !validCode(
-                airline.icao
-              )
-            ) {
-
-              setMessage(
-                "Airline codes may only contain letters, numbers and hyphens.",
-                "error"
-              );
-
-              return;
-
-            }
-
-
-            if (
-              airlines[
-                airline.icao
-              ]
-            ) {
-
-              setMessage(
-                "ICAO code " +
-                airline.icao +
-                " already exists. Select the existing airline from the list instead.",
-                "error"
-              );
-
-              return;
-
-            }
-
-
-            const duplicateIata =
-              Object.values(
-                airlines
-              )
-              .find(
-                function (
-                  existing
-                ) {
-
-                  return (
-                    existing.iata ===
-                    airline.iata
-                  );
-
-                }
-              );
-
-
-            if (
-              duplicateIata
-            ) {
-
-              setMessage(
-                "IATA code " +
-                airline.iata +
-                " is already assigned to " +
-                duplicateIata.name +
-                ".",
-                "error"
-              );
-
-              return;
-
-            }
+            return;
 
           }
 
 
-          const code =
-            normaliseCode(
-              inputCode.value
-            );
-
-          const outputCode =
-            normaliseCode(
-              scrCode.value
-            );
-
-          const seatCount =
-            formatSeats(
-              seats.value
-            );
-
-          const name =
-            aircraftName.value.trim();
-
-
           if (
-            !code
+            !newIcao ||
+            !validCode(
+              newIcao
+            )
           ) {
 
             setMessage(
-              "Please enter the aircraft input code.",
+              "Please enter a valid airline ICAO code.",
+              "error"
+            );
+
+            airlineIcao.focus();
+
+            return;
+
+          }
+
+
+          if (
+            !newAircraftCode ||
+            !validCode(
+              newAircraftCode
+            )
+          ) {
+
+            setMessage(
+              "Please enter a valid aircraft type.",
               "error"
             );
 
@@ -3278,27 +2965,14 @@
 
 
           if (
+            !newScrCode ||
             !validCode(
-              code
+              newScrCode
             )
           ) {
 
             setMessage(
-              "Invalid aircraft input code.",
-              "error"
-            );
-
-            return;
-
-          }
-
-
-          if (
-            !outputCode
-          ) {
-
-            setMessage(
-              "Please enter the SCR aircraft code.",
+              "Please enter a valid SCR aircraft code.",
               "error"
             );
 
@@ -3310,29 +2984,11 @@
 
 
           if (
-            !validCode(
-              outputCode
-            )
+            !newSeats
           ) {
 
             setMessage(
-              "Invalid SCR aircraft code.",
-              "error"
-            );
-
-            scrCode.focus();
-
-            return;
-
-          }
-
-
-          if (
-            !seatCount
-          ) {
-
-            setMessage(
-              "Please enter the total number of seats.",
+              "Please enter total seats.",
               "error"
             );
 
@@ -3344,7 +3000,7 @@
 
 
           if (
-            !name
+            !newAircraftName
           ) {
 
             setMessage(
@@ -3359,56 +3015,60 @@
           }
 
 
-          const originalIcao =
-            originalAirlineIcao.value;
-
-          const originalCode =
-            originalAircraftCode.value;
-
-          const legacyKey =
-            legacyRecordKey.value;
+          const oldIcao =
+            normaliseCode(
+              originalAirlineIcao.value
+            );
 
 
-          const existingTarget =
+          const oldAircraftCode =
+            normaliseCode(
+              originalAircraftCode.value
+            );
+
+
+          const isEditing =
+            Boolean(
+              oldIcao &&
+              oldAircraftCode
+            );
+
+
+          const duplicate =
             aircraftRecords.find(
-              function (record) {
+              function (
+                record
+              ) {
 
-                if (
-                  record.legacy
-                ) {
-
-                  return false;
-
-                }
+                const sameRecord =
+                  (
+                    record.icao ===
+                      oldIcao &&
+                    record.inputCode ===
+                      oldAircraftCode
+                  );
 
 
                 return (
-                  record.icao === airline.icao &&
-                  record.inputCode === code
+                  record.icao ===
+                    newIcao &&
+                  record.inputCode ===
+                    newAircraftCode &&
+                  !sameRecord
                 );
 
               }
             );
 
 
-          const sameOriginal =
-            (
-              originalIcao === airline.icao &&
-              normaliseCode(
-                originalCode
-              ) === code
-            );
-
-
           if (
-            existingTarget &&
-            !sameOriginal
+            duplicate
           ) {
 
             setMessage(
-              code +
+              newAircraftCode +
               " already exists for " +
-              airline.name +
+              duplicate.airlineName +
               ".",
               "error"
             );
@@ -3418,87 +3078,70 @@
           }
 
 
-          const aircraftRecord = {
-
-            inputCode:
-              code,
-
-            scrCode:
-              outputCode,
-
-            seats:
-              seatCount,
-
-            name:
-              name
-
-          };
-
-
           const updates = {};
 
 
           updates[
             "aircraftTypes/" +
-            airline.icao +
+            newIcao +
             "/airlineName"
           ] =
-            airline.name;
+            newAirlineName;
 
 
           updates[
             "aircraftTypes/" +
-            airline.icao +
+            newIcao +
             "/iataCode"
           ] =
-            airline.iata;
+            newIata;
 
 
           updates[
             "aircraftTypes/" +
-            airline.icao +
+            newIcao +
             "/icaoCode"
           ] =
-            airline.icao;
+            newIcao;
 
 
           updates[
             "aircraftTypes/" +
-            airline.icao +
+            newIcao +
             "/aircraft/" +
-            code
-          ] =
-            aircraftRecord;
+            newAircraftCode
+          ] = {
+
+            inputCode:
+              newAircraftCode,
+
+            scrCode:
+              newScrCode,
+
+            seats:
+              newSeats,
+
+            name:
+              newAircraftName
+
+          };
 
 
           if (
-            legacyKey
-          ) {
-
-            updates[
-              "aircraftTypes/" +
-              legacyKey
-            ] =
-              null;
-
-          }
-
-          else if (
-            originalIcao &&
-            originalCode &&
+            isEditing &&
             (
-              originalIcao !== airline.icao ||
-              normaliseCode(
-                originalCode
-              ) !== code
+              oldIcao !==
+                newIcao ||
+              oldAircraftCode !==
+                newAircraftCode
             )
           ) {
 
             updates[
               "aircraftTypes/" +
-              originalIcao +
+              oldIcao +
               "/aircraft/" +
-              originalCode
+              oldAircraftCode
             ] =
               null;
 
@@ -3507,6 +3150,7 @@
 
           saveAircraftBtn.disabled =
             true;
+
 
           saveAircraftBtn.textContent =
             "Saving...";
@@ -3527,35 +3171,39 @@
 
 
             if (
-              originalIcao &&
-              originalIcao !== airline.icao
+              isEditing &&
+              oldIcao !==
+                newIcao
             ) {
 
-              await cleanupAirline(
-                originalIcao
+              await cleanupOldAirline(
+                oldIcao
               );
 
             }
 
 
             originalAirlineIcao.value =
-              airline.icao;
+              newIcao;
+
 
             originalAircraftCode.value =
-              code;
-
-            legacyRecordKey.value =
-              "";
+              newAircraftCode;
 
 
             selectedRecordId =
-              airline.icao +
+              newIcao +
               "::" +
-              code;
+              newAircraftCode;
+
+
+            editorTitle.textContent =
+              "Edit Aircraft Type";
 
 
             saveAircraftBtn.textContent =
               "Save Changes";
+
 
             deleteAircraftBtn
               .classList
@@ -3563,21 +3211,25 @@
 
 
             setMessage(
-              "Aircraft type saved successfully.",
+              isEditing
+                ? "Aircraft type updated successfully."
+                : "Aircraft type added successfully.",
               "success"
             );
 
 
             updateStatus(
-              airline.name +
+              newAirlineName +
               " " +
-              code +
+              newAircraftCode +
               " saved"
             );
 
           }
 
-          catch (error) {
+          catch (
+            error
+          ) {
 
             console.error(
               "Aircraft save error:",
@@ -3602,10 +3254,11 @@
             saveAircraftBtn.disabled =
               false;
 
+
             saveAircraftBtn.textContent =
               originalAircraftCode.value
                 ? "Save Changes"
-                : "Add Aircraft";
+                : "Save Aircraft";
 
           }
 
@@ -3619,7 +3272,9 @@
 
           const record =
             aircraftRecords.find(
-              function (item) {
+              function (
+                item
+              ) {
 
                 return (
                   item.id ===
@@ -3642,10 +3297,7 @@
           deleteAircraftName.textContent =
             record.airlineName +
             " - " +
-            (
-              record.name ||
-              record.inputCode
-            ) +
+            record.name +
             " (" +
             record.inputCode +
             ")";
@@ -3663,18 +3315,31 @@
         "click",
         async function () {
 
-          const legacyKey =
-            legacyRecordKey.value;
-
           const icao =
-            originalAirlineIcao.value;
+            normaliseCode(
+              originalAirlineIcao.value
+            );
 
-          const code =
-            originalAircraftCode.value;
+
+          const aircraftCode =
+            normaliseCode(
+              originalAircraftCode.value
+            );
+
+
+          if (
+            !icao ||
+            !aircraftCode
+          ) {
+
+            return;
+
+          }
 
 
           confirmDeleteBtn.disabled =
             true;
+
 
           confirmDeleteBtn.textContent =
             "Deleting...";
@@ -3687,36 +3352,19 @@
 
           try {
 
-            if (
-              legacyKey
-            ) {
-
-              await database
-                .ref(
-                  "aircraftTypes/" +
-                  legacyKey
-                )
-                .remove();
-
-            }
-
-            else {
-
-              await database
-                .ref(
-                  "aircraftTypes/" +
-                  icao +
-                  "/aircraft/" +
-                  code
-                )
-                .remove();
+            await database
+              .ref(
+                "aircraftTypes/" +
+                icao +
+                "/aircraft/" +
+                aircraftCode
+              )
+              .remove();
 
 
-              await cleanupAirline(
-                icao
-              );
-
-            }
+            await cleanupOldAirline(
+              icao
+            );
 
 
             deleteModal
@@ -3724,13 +3372,7 @@
               .add("hidden");
 
 
-            clearForm();
-
-
-            setMessage(
-              "Aircraft deleted successfully.",
-              "success"
-            );
+            hideAircraftForm();
 
 
             updateStatus(
@@ -3739,16 +3381,17 @@
 
           }
 
-          catch (error) {
+          catch (
+            error
+          ) {
 
             console.error(
-              "Delete error:",
               error
             );
 
 
             setMessage(
-              "Unable to delete aircraft. Check the Firebase database rules.",
+              "Unable to delete aircraft. Check Firebase rules.",
               "error"
             );
 
@@ -3764,6 +3407,7 @@
             confirmDeleteBtn.disabled =
               false;
 
+
             confirmDeleteBtn.textContent =
               "Yes";
 
@@ -3773,7 +3417,7 @@
       );
 
 
-      function closeDeleteDialog() {
+      function closeDeleteModal() {
 
         deleteModal
           .classList
@@ -3784,48 +3428,32 @@
 
       cancelDeleteBtn.addEventListener(
         "click",
-        closeDeleteDialog
+        closeDeleteModal
       );
 
 
       modalCloseBtn.addEventListener(
         "click",
-        closeDeleteDialog
+        closeDeleteModal
       );
 
 
       deleteModal.addEventListener(
         "click",
-        function (event) {
+        function (
+          event
+        ) {
 
           if (
             event.target ===
             deleteModal
           ) {
 
-            closeDeleteDialog();
+            closeDeleteModal();
 
           }
 
         }
-      );
-
-
-      clearFormBtn.addEventListener(
-        "click",
-        clearForm
-      );
-
-
-      newAircraftBtn.addEventListener(
-        "click",
-        clearForm
-      );
-
-
-      newAircraftTopBtn.addEventListener(
-        "click",
-        clearForm
       );
 
 
@@ -3881,33 +3509,39 @@
       );
 
 
-      inputCode.addEventListener(
-        "input",
-        updatePreview
-      );
-
-
-      scrCode.addEventListener(
-        "input",
-        updatePreview
-      );
-
-
-      seats.addEventListener(
-        "input",
-        updatePreview
-      );
-
-
       document.addEventListener(
         "keydown",
-        function (event) {
+        function (
+          event
+        ) {
 
           if (
-            event.key === "Escape"
+            event.key ===
+            "Escape"
           ) {
 
-            closeDeleteDialog();
+            if (
+              !deleteModal
+                .classList
+                .contains("hidden")
+            ) {
+
+              closeDeleteModal();
+
+              return;
+
+            }
+
+
+            if (
+              !aircraftEditor
+                .classList
+                .contains("hidden")
+            ) {
+
+              hideAircraftForm();
+
+            }
 
           }
 
@@ -3916,13 +3550,18 @@
 
 
       database
-        .ref(".info/connected")
+        .ref(
+          ".info/connected"
+        )
         .on(
           "value",
-          function (snapshot) {
+          function (
+            snapshot
+          ) {
 
             const connected =
-              snapshot.val() === true;
+              snapshot.val() ===
+              true;
 
 
             connectionStatus
@@ -3939,7 +3578,10 @@
 
               connectionStatus
                 .classList
-                .add("connected");
+                .add(
+                  "connected"
+                );
+
 
               connectionText.textContent =
                 "Firebase Connected";
@@ -3950,7 +3592,10 @@
 
               connectionStatus
                 .classList
-                .add("disconnected");
+                .add(
+                  "disconnected"
+                );
+
 
               connectionText.textContent =
                 "Firebase Disconnected";
