@@ -16,8 +16,8 @@
       gap: 5px;
       padding: 3px 7px;
       background: #c0c0c0;
-      border-top: 2px solid #ffffff;
-      border-left: 2px solid #ffffff;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
       border-right: 2px solid #808080;
       border-bottom: 2px solid #808080;
       font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
@@ -47,10 +47,6 @@
       background: #e6b800;
     }
 
-    .connected-users-label {
-      font-weight: normal;
-    }
-
     #connectedUsersCount {
       min-width: 14px;
       text-align: center;
@@ -63,8 +59,6 @@
       position: fixed;
       z-index: 99999;
       inset: 0;
-      width: 100%;
-      height: 100%;
       background: rgba(0, 0, 0, 0.45);
       align-items: center;
       justify-content: center;
@@ -78,17 +72,17 @@
       width: 500px;
       max-width: calc(100% - 30px);
       background: #c0c0c0;
-      border-top: 2px solid #ffffff;
-      border-left: 2px solid #ffffff;
-      border-right: 2px solid #000000;
-      border-bottom: 2px solid #000000;
-      box-shadow: 2px 2px 0 #000000;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #000;
+      border-bottom: 2px solid #000;
+      box-shadow: 2px 2px 0 #000;
       font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
     }
 
     .aircraft-modal-title {
       background: linear-gradient(to right, #000080, #0000cd);
-      color: white;
+      color: #fff;
       font-size: 13px;
       font-weight: bold;
       padding: 3px 4px;
@@ -104,9 +98,9 @@
       margin: 0;
       line-height: 14px;
       background: #c0c0c0;
-      color: black;
-      border-top: 2px solid white;
-      border-left: 2px solid white;
+      color: #000;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
       border-right: 2px solid #000;
       border-bottom: 2px solid #000;
       cursor: pointer;
@@ -151,7 +145,7 @@
       padding: 5px;
       font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
       font-size: 12px;
-      background: white;
+      background: #fff;
       border: 2px inset #7d7d7d;
       text-transform: uppercase;
     }
@@ -170,26 +164,26 @@
       display: none;
       padding: 6px;
       margin-top: 10px;
-      border: 1px solid black;
+      border: 1px solid #000;
       font-size: 11px;
     }
 
     .aircraft-modal-status.error {
       display: block;
       background: #ff4c4c;
-      color: white;
+      color: #fff;
     }
 
     .aircraft-modal-status.success {
       display: block;
       background: #4caf50;
-      color: white;
+      color: #fff;
     }
 
     .aircraft-modal-status.info {
       display: block;
       background: #ffffe1;
-      color: black;
+      color: #000;
     }
 
     .aircraft-modal-buttons {
@@ -286,8 +280,8 @@
           class="connected-users-status connecting"
           title="Number of users currently connected to Runway Slots"
         >
-          <span class="connected-users-dot" aria-hidden="true"></span>
-          <span class="connected-users-label">Connected Users:</span>
+          <span class="connected-users-dot"></span>
+          <span>Connected Users:</span>
           <strong id="connectedUsersCount">--</strong>
         </div>
 
@@ -295,7 +289,11 @@
           class="auto-refresh"
           title="Automatically reload this page every 15 minutes"
         >
-          <input type="checkbox" id="autoRefreshToggle" checked>
+          <input
+            type="checkbox"
+            id="autoRefreshToggle"
+            checked
+          >
           <span>Auto-refresh (15 min)</span>
         </label>
 
@@ -304,7 +302,7 @@
           class="status-indicator"
           title="Firebase Realtime Database status"
         >
-          <span class="dot" aria-hidden="true"></span>
+          <span class="dot"></span>
           <span class="text">Database Not Connected</span>
         </div>
 
@@ -346,7 +344,7 @@
               id="regInput"
               placeholder="AUTO-DETECTED FROM FLIGHT INPUT"
               autocomplete="off"
-            />
+            >
 
             <div id="aircraftSelection" style="display:none;">
 
@@ -379,11 +377,17 @@
 
             <div>
 
-              <button id="formatBtn" type="button">
+              <button
+                id="formatBtn"
+                type="button"
+              >
                 Click Here To Generate SCR Messages
               </button>
 
-              <select id="slotType" title="Select Slot Type">
+              <select
+                id="slotType"
+                title="Select Slot Type"
+              >
                 <option value="NEW">NEW SLOT</option>
                 <option value="CANCEL">CANCEL SLOT</option>
                 <option value="CHANGE">CHANGE SCR</option>
@@ -421,13 +425,19 @@
             type="text"
             id="historySearch"
             placeholder="Search airport, flight, type..."
-          />
+          >
 
-          <button id="refreshHistoryBtn" type="button">
+          <button
+            id="refreshHistoryBtn"
+            type="button"
+          >
             Refresh
           </button>
 
-          <button id="clearHistoryBtn" type="button">
+          <button
+            id="clearHistoryBtn"
+            type="button"
+          >
             Clear All
           </button>
 
@@ -496,11 +506,17 @@
           gap:8px;
         "
       >
-        <button id="confirmClearAllBtn" type="button">
+        <button
+          id="confirmClearAllBtn"
+          type="button"
+        >
           Proceed
         </button>
 
-        <button id="cancelClearAllBtn" type="button">
+        <button
+          id="cancelClearAllBtn"
+          type="button"
+        >
           Cancel
         </button>
       </div>
@@ -571,8 +587,8 @@
 
           <br><br>
 
-          Enter the aircraft information below to add it to the airline's
-          Firebase aircraft database.
+          Complete the information below to add the aircraft type
+          to the Firebase Aircraft Type Database.
 
         </div>
 
@@ -634,7 +650,7 @@
           >
 
           <div class="aircraft-example">
-            Example: input code 738 can use SCR code 73H.
+            Example: 738 can use SCR code 73H.
           </div>
 
         </div>
@@ -665,8 +681,9 @@
         ></div>
 
         <div class="aircraft-db-info">
-          The new aircraft is saved inside the selected airline's
-          aircraft folder in Firebase.
+          The aircraft will be stored under the airline's existing
+          aircraft folder and will automatically appear in the
+          Aircraft Type Database.
         </div>
 
         <div class="aircraft-modal-buttons">
@@ -708,12 +725,17 @@
       const aircraftRecordsByAirline = new Map();
 
       let aircraftDatabaseReadyPromise = null;
-      let resolveAircraftDatabaseReady = null;
-      let rejectAircraftDatabaseReady = null;
+      let aircraftDatabaseReadyResolve = null;
+      let aircraftDatabaseReadyReject = null;
       let aircraftDatabaseInitialised = false;
+
       let pendingAircraftContext = null;
       let aircraftModalResolver = null;
       let generationInProgress = false;
+
+      let liveAircraftCheckTimer = null;
+      let liveAircraftCheckRunning = false;
+      let lastCancelledAircraftCheck = "";
 
       function cleanCode(value) {
         return String(value || "")
@@ -737,7 +759,133 @@
       }
 
       function aircraftKey(iataCode, aircraftCode) {
-        return `${cleanCode(iataCode)}::${cleanCode(aircraftCode)}`;
+        return (
+          cleanCode(iataCode) +
+          "::" +
+          cleanCode(aircraftCode)
+        );
+      }
+
+      function buildAircraftRecord(
+        airline,
+        databaseCode,
+        data
+      ) {
+        data = data || {};
+
+        const inputCode =
+          cleanCode(
+            data.inputCode ||
+            databaseCode
+          );
+
+        const scrCode =
+          cleanCode(
+            data.scrCode ||
+            inputCode
+          );
+
+        return {
+          airlineKey:
+            airline.key,
+
+          airlineName:
+            airline.airlineName,
+
+          iataCode:
+            airline.iataCode,
+
+          icaoCode:
+            airline.icaoCode,
+
+          inputCode:
+            inputCode,
+
+          scrCode:
+            scrCode,
+
+          seats:
+            formatSeats(
+              data.seats
+            ),
+
+          name:
+            String(
+              data.name ||
+              inputCode
+            ).trim()
+        };
+      }
+
+      function cacheAircraftRecord(record, databaseCode = "") {
+        if (
+          !record ||
+          !record.iataCode ||
+          !record.inputCode
+        ) {
+          return;
+        }
+
+        aircraftByCode.set(
+          aircraftKey(
+            record.iataCode,
+            record.inputCode
+          ),
+          record
+        );
+
+        if (databaseCode) {
+          aircraftByCode.set(
+            aircraftKey(
+              record.iataCode,
+              databaseCode
+            ),
+            record
+          );
+        }
+
+        aircraftByScrCode.set(
+          aircraftKey(
+            record.iataCode,
+            record.scrCode
+          ),
+          record
+        );
+
+        if (
+          !aircraftRecordsByAirline.has(
+            record.iataCode
+          )
+        ) {
+          aircraftRecordsByAirline.set(
+            record.iataCode,
+            []
+          );
+        }
+
+        const records =
+          aircraftRecordsByAirline.get(
+            record.iataCode
+          );
+
+        const existingIndex =
+          records.findIndex(
+            item =>
+              item.inputCode ===
+              record.inputCode
+          );
+
+        if (
+          existingIndex >= 0
+        ) {
+          records[existingIndex] =
+            record;
+
+        } else {
+          records.push(
+            record
+          );
+        }
       }
 
       function rebuildAircraftCache(snapshot) {
@@ -746,132 +894,82 @@
         aircraftByScrCode.clear();
         aircraftRecordsByAirline.clear();
 
-        snapshot.forEach(airlineChild => {
-          const airlineData =
-            airlineChild.val() || {};
+        snapshot.forEach(
+          airlineChild => {
+            const airlineData =
+              airlineChild.val() ||
+              {};
 
-          const airlineKey =
-            cleanCode(airlineChild.key);
+            const airline = {
+              key:
+                cleanCode(
+                  airlineChild.key
+                ),
 
-          const iataCode =
-            cleanCode(airlineData.iataCode);
+              airlineName:
+                String(
+                  airlineData.airlineName ||
+                  airlineChild.key
+                ).trim(),
 
-          const icaoCode =
-            cleanCode(
-              airlineData.icaoCode ||
-              airlineKey
+              iataCode:
+                cleanCode(
+                  airlineData.iataCode
+                ),
+
+              icaoCode:
+                cleanCode(
+                  airlineData.icaoCode ||
+                  airlineChild.key
+                )
+            };
+
+            if (
+              !airline.iataCode
+            ) {
+              return;
+            }
+
+            airlineByIata.set(
+              airline.iataCode,
+              airline
             );
 
-          const airlineName =
-            String(
-              airlineData.airlineName ||
-              airlineKey
-            ).trim();
+            const aircraft =
+              airlineData.aircraft ||
+              {};
 
-          if (!iataCode) {
-            return;
-          }
+            Object.keys(
+              aircraft
+            ).forEach(
+              databaseCode => {
+                const record =
+                  buildAircraftRecord(
+                    airline,
+                    databaseCode,
+                    aircraft[
+                      databaseCode
+                    ]
+                  );
 
-          const airlineRecord = {
-            key: airlineKey,
-            airlineName,
-            iataCode,
-            icaoCode
-          };
-
-          airlineByIata.set(
-            iataCode,
-            airlineRecord
-          );
-
-          const records = [];
-          const aircraft =
-            airlineData.aircraft || {};
-
-          Object.keys(aircraft)
-            .forEach(databaseCode => {
-              const data =
-                aircraft[databaseCode] || {};
-
-              const inputCode =
-                cleanCode(
-                  data.inputCode ||
+                cacheAircraftRecord(
+                  record,
                   databaseCode
                 );
-
-              const scrCode =
-                cleanCode(
-                  data.scrCode ||
-                  inputCode
-                );
-
-              if (
-                !inputCode ||
-                !scrCode
-              ) {
-                return;
               }
-
-              const record = {
-                airlineKey,
-                airlineName,
-                iataCode,
-                icaoCode,
-                inputCode,
-                scrCode,
-                seats:
-                  formatSeats(
-                    data.seats
-                  ),
-                name:
-                  String(
-                    data.name ||
-                    inputCode
-                  ).trim()
-              };
-
-              records.push(record);
-
-              aircraftByCode.set(
-                aircraftKey(
-                  iataCode,
-                  inputCode
-                ),
-                record
-              );
-
-              aircraftByCode.set(
-                aircraftKey(
-                  iataCode,
-                  databaseCode
-                ),
-                record
-              );
-
-              aircraftByScrCode.set(
-                aircraftKey(
-                  iataCode,
-                  scrCode
-                ),
-                record
-              );
-            });
-
-          aircraftRecordsByAirline.set(
-            iataCode,
-            records
-          );
-        });
+            );
+          }
+        );
       }
 
       function startAircraftDatabaseListener() {
         aircraftDatabaseReadyPromise =
           new Promise(
             (resolve, reject) => {
-              resolveAircraftDatabaseReady =
+              aircraftDatabaseReadyResolve =
                 resolve;
 
-              rejectAircraftDatabaseReady =
+              aircraftDatabaseReadyReject =
                 reject;
             }
           );
@@ -881,6 +979,7 @@
           .ref("aircraftTypes")
           .on(
             "value",
+
             snapshot => {
               rebuildAircraftCache(
                 snapshot
@@ -892,58 +991,50 @@
                 aircraftDatabaseInitialised =
                   true;
 
-                resolveAircraftDatabaseReady(
+                aircraftDatabaseReadyResolve(
                   true
                 );
               }
             },
+
             error => {
               console.error(
-                "Aircraft database listener failed:",
+                "Aircraft database error:",
                 error
               );
 
               if (
                 !aircraftDatabaseInitialised
               ) {
-                rejectAircraftDatabaseReady(
+                aircraftDatabaseReadyReject(
                   error
                 );
               }
 
               showError(
-                "Aircraft database could not be loaded."
+                "Aircraft Type Database could not be loaded."
               );
             }
           );
       }
 
-      async function getAirlineByIata(
-        iataCode
-      ) {
-        await aircraftDatabaseReadyPromise;
-
-        return (
-          airlineByIata.get(
-            cleanCode(iataCode)
-          ) ||
-          null
-        );
-      }
-
       function getAircraftFromCache(
         iataCode,
-        code
+        aircraftCode
       ) {
         const key =
           aircraftKey(
             iataCode,
-            code
+            aircraftCode
           );
 
         return (
-          aircraftByCode.get(key) ||
-          aircraftByScrCode.get(key) ||
+          aircraftByCode.get(
+            key
+          ) ||
+          aircraftByScrCode.get(
+            key
+          ) ||
           null
         );
       }
@@ -955,10 +1046,14 @@
         await aircraftDatabaseReadyPromise;
 
         const cleanIata =
-          cleanCode(iataCode);
+          cleanCode(
+            iataCode
+          );
 
         const cleanAircraft =
-          cleanCode(aircraftCode);
+          cleanCode(
+            aircraftCode
+          );
 
         const airline =
           airlineByIata.get(
@@ -967,9 +1062,15 @@
 
         if (!airline) {
           return {
-            airlineFound: false,
-            found: false,
-            iataCode: cleanIata,
+            airlineFound:
+              false,
+
+            found:
+              false,
+
+            iataCode:
+              cleanIata,
+
             aircraftCode:
               cleanAircraft
           };
@@ -983,14 +1084,21 @@
 
         if (cached) {
           return {
-            airlineFound: true,
-            found: true,
-            airline,
-            aircraft: cached
+            airlineFound:
+              true,
+
+            found:
+              true,
+
+            airline:
+              airline,
+
+            aircraft:
+              cached
           };
         }
 
-        const snapshot =
+        const directSnapshot =
           await firebase
             .database()
             .ref(
@@ -998,111 +1106,80 @@
             )
             .once("value");
 
-        if (!snapshot.exists()) {
+        if (
+          directSnapshot.exists()
+        ) {
+          const record =
+            buildAircraftRecord(
+              airline,
+              cleanAircraft,
+              directSnapshot.val()
+            );
+
+          cacheAircraftRecord(
+            record,
+            cleanAircraft
+          );
+
           return {
-            airlineFound: true,
-            found: false,
-            airline,
-            aircraftCode:
-              cleanAircraft
+            airlineFound:
+              true,
+
+            found:
+              true,
+
+            airline:
+              airline,
+
+            aircraft:
+              record
           };
         }
 
-        const data =
-          snapshot.val() || {};
-
-        const record = {
-          airlineKey:
-            airline.key,
-          airlineName:
-            airline.airlineName,
-          iataCode:
-            airline.iataCode,
-          icaoCode:
-            airline.icaoCode,
-          inputCode:
-            cleanCode(
-              data.inputCode ||
-              cleanAircraft
-            ),
-          scrCode:
-            cleanCode(
-              data.scrCode ||
-              cleanAircraft
-            ),
-          seats:
-            formatSeats(
-              data.seats
-            ),
-          name:
-            String(
-              data.name ||
-              cleanAircraft
-            ).trim()
-        };
-
-        aircraftByCode.set(
-          aircraftKey(
-            cleanIata,
-            record.inputCode
-          ),
-          record
-        );
-
-        aircraftByScrCode.set(
-          aircraftKey(
-            cleanIata,
-            record.scrCode
-          ),
-          record
-        );
-
-        if (
-          !aircraftRecordsByAirline.has(
-            cleanIata
-          )
-        ) {
-          aircraftRecordsByAirline.set(
-            cleanIata,
-            []
-          );
-        }
-
-        aircraftRecordsByAirline
-          .get(cleanIata)
-          .push(record);
-
         return {
-          airlineFound: true,
-          found: true,
-          airline,
-          aircraft: record
+          airlineFound:
+            true,
+
+          found:
+            false,
+
+          airline:
+            airline,
+
+          aircraftCode:
+            cleanAircraft
         };
       }
 
-      function parseAircraftToken(
-        token
-      ) {
-        const value =
-          String(token || "");
+      function parseAircraftToken(value) {
+        const token =
+          String(
+            value || ""
+          );
 
         const separator =
-          value.indexOf("::");
+          token.indexOf(
+            "::"
+          );
 
         if (
           separator === -1
         ) {
           return {
-            iataCode: "",
+            iataCode:
+              "",
+
             aircraftCode:
-              cleanCode(value)
+              cleanCode(
+                token
+              )
           };
         }
 
         return {
           iataCode:
             cleanCode(
-              value.substring(
+              token.substring(
                 0,
                 separator
               )
@@ -1110,7 +1187,7 @@
 
           aircraftCode:
             cleanCode(
-              value.substring(
+              token.substring(
                 separator + 2
               )
             )
@@ -1131,179 +1208,230 @@
         function(input) {
           const lines =
             input
-              ? input.trim().split("\n")
+              ? input
+                  .trim()
+                  .split("\n")
               : [];
 
-          const parsedEntries = [];
-          let hasError = false;
+          const parsedEntries =
+            [];
 
-          lines.forEach(line => {
-            line =
-              line.trim();
+          let hasError =
+            false;
 
-            if (!line) {
-              return;
-            }
+          lines.forEach(
+            line => {
+              line =
+                line.trim();
 
-            const parts =
-              line.split(/\s+/);
+              if (!line) {
+                return;
+              }
 
-            if (
-              parts.length < 7 ||
-              parts.length > 8
-            ) {
-              hasError =
-                true;
+              const parts =
+                line.split(
+                  /\s+/
+                );
 
-              return;
-            }
+              if (
+                parts.length < 7 ||
+                parts.length > 8
+              ) {
+                hasError =
+                  true;
 
-            const [
-              flightRaw,
-              fromRaw,
-              toRaw,
-              dateRaw,
-              departureTime,
-              arrivalTime,
-              registrationRaw
-            ] = parts;
+                return;
+              }
 
-            const airlineIata =
-              cleanCode(
-                flightRaw.slice(
-                  0,
-                  2
-                )
-              );
-
-            const originalAircraftType =
-              parts[7]
-                ? cleanCode(parts[7])
-                : "";
-
-            const aircraftToken =
-              `${airlineIata}::${originalAircraftType}`;
-
-            const from =
-              cleanCode(fromRaw);
-
-            const to =
-              cleanCode(toRaw);
-
-            const registration =
-              cleanCode(
+              const [
+                flightRaw,
+                fromRaw,
+                toRaw,
+                dateRaw,
+                departureTime,
+                arrivalTime,
                 registrationRaw
-              );
+              ] = parts;
 
-            const parsedDate =
-              parseDateString(
-                dateRaw
-              );
-
-            if (!parsedDate) {
-              hasError =
-                true;
-
-              return;
-            }
-
-            if (
-              !/^\d{4}$/.test(
-                departureTime
-              ) ||
-              !/^\d{4}$/.test(
-                arrivalTime
-              )
-            ) {
-              hasError =
-                true;
-
-              return;
-            }
-
-            const dayName =
-              parsedDate
-                .toLocaleDateString(
-                  "en-US",
-                  {
-                    weekday:
-                      "long",
-                    timeZone:
-                      "UTC"
-                  }
+              const airlineIata =
+                cleanCode(
+                  flightRaw.slice(
+                    0,
+                    2
+                  )
                 );
 
-            const dayOfOperation =
-              getDayOfOperation(
-                dayName
-              );
+              const originalAircraftType =
+                parts[7]
+                  ? cleanCode(
+                      parts[7]
+                    )
+                  : "";
 
-            const scrDate =
-              convertInputDateToSCR(
-                parsedDate
-                  .toISOString()
-                  .split("T")[0]
-              );
+              const aircraftToken =
+                `${airlineIata}::${originalAircraftType}`;
 
-            const prefix =
-              flightRaw
-                .slice(0, 2)
-                .toUpperCase();
+              const from =
+                cleanCode(
+                  fromRaw
+                );
 
-            let remainingFlight =
-              flightRaw.slice(2);
+              const to =
+                cleanCode(
+                  toRaw
+                );
 
-            const digits =
-              remainingFlight
-                .match(/\d+/)?.[0] ||
-              "";
+              const registration =
+                cleanCode(
+                  registrationRaw
+                );
 
-            let suffix =
-              remainingFlight
-                .replace(
-                  /\d+/g,
-                  ""
+              const parsedDate =
+                parseDateString(
+                  dateRaw
+                );
+
+              if (
+                !parsedDate
+              ) {
+                hasError =
+                  true;
+
+                return;
+              }
+
+              if (
+                !/^\d{4}$/.test(
+                  departureTime
+                ) ||
+                !/^\d{4}$/.test(
+                  arrivalTime
                 )
-                .toUpperCase();
+              ) {
+                hasError =
+                  true;
 
-            if (
-              suffix.endsWith("P")
-            ) {
-              suffix =
-                suffix.slice(
-                  0,
-                  -1
+                return;
+              }
+
+              const dayName =
+                parsedDate
+                  .toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday:
+                        "long",
+
+                      timeZone:
+                        "UTC"
+                    }
+                  );
+
+              const dayOfOperation =
+                getDayOfOperation(
+                  dayName
                 );
+
+              const scrDate =
+                convertInputDateToSCR(
+                  parsedDate
+                    .toISOString()
+                    .split("T")[0]
+                );
+
+              const prefix =
+                flightRaw
+                  .slice(
+                    0,
+                    2
+                  )
+                  .toUpperCase();
+
+              const remainingFlight =
+                flightRaw.slice(
+                  2
+                );
+
+              const digits =
+                remainingFlight
+                  .match(
+                    /\d+/
+                  )?.[0] ||
+                "";
+
+              let suffix =
+                remainingFlight
+                  .replace(
+                    /\d+/g,
+                    ""
+                  )
+                  .toUpperCase();
+
+              if (
+                suffix.endsWith(
+                  "P"
+                )
+              ) {
+                suffix =
+                  suffix.slice(
+                    0,
+                    -1
+                  );
+              }
+
+              const flight =
+                `${prefix}${digits.padStart(3, "0")}${suffix}`;
+
+              parsedEntries.push({
+                flight:
+                  flight,
+
+                airlineIata:
+                  airlineIata,
+
+                from:
+                  from,
+
+                to:
+                  to,
+
+                date:
+                  scrDate,
+
+                fullDate:
+                  parsedDate,
+
+                departureTime:
+                  departureTime,
+
+                arrivalTime:
+                  arrivalTime,
+
+                registration:
+                  registration,
+
+                serviceTypeInput:
+                  registration,
+
+                dayOfOperation:
+                  dayOfOperation,
+
+                aircraftTypeInput:
+                  aircraftToken,
+
+                originalAircraftType:
+                  originalAircraftType,
+
+                originalLine:
+                  line
+              });
             }
-
-            const flight =
-              `${prefix}${digits.padStart(3, "0")}${suffix}`;
-
-            parsedEntries.push({
-              flight,
-              airlineIata,
-              from,
-              to,
-              date:
-                scrDate,
-              fullDate:
-                parsedDate,
-              departureTime,
-              arrivalTime,
-              registration,
-              serviceTypeInput:
-                registration,
-              dayOfOperation,
-              aircraftTypeInput:
-                aircraftToken,
-              originalAircraftType,
-              originalLine:
-                line
-            });
-          });
+          );
 
           return {
-            parsedEntries,
+            parsedEntries:
+              parsedEntries,
+
             errors:
               hasError
           };
@@ -1351,7 +1479,7 @@
 
           if (!aircraft) {
             throw new Error(
-              `Aircraft ${aircraftCode || "UNKNOWN"} is not available for airline ${iataCode}.`
+              `Aircraft ${aircraftCode || "UNKNOWN"} is not configured for airline ${iataCode}.`
             );
           }
 
@@ -1375,9 +1503,6 @@
         iataCode,
         combinedCode
       ) {
-        const cleanIata =
-          cleanCode(iataCode);
-
         const combined =
           cleanCode(
             combinedCode
@@ -1386,7 +1511,9 @@
         const records =
           (
             aircraftRecordsByAirline.get(
-              cleanIata
+              cleanCode(
+                iataCode
+              )
             ) ||
             []
           )
@@ -1426,26 +1553,28 @@
           rowDiv.dataset.rowId =
             rowData.id;
 
-          const createField = (
+          function createField(
             labelText,
             inputType,
             className,
             value,
             disabled = false,
             options = null
-          ) => {
+          ) {
             const label =
               document.createElement(
                 "label"
               );
 
             label.textContent =
-              labelText + ": ";
+              labelText +
+              ": ";
 
             let input;
 
             if (
-              inputType === "select"
+              inputType ===
+              "select"
             ) {
               input =
                 document.createElement(
@@ -1504,28 +1633,18 @@
             input.disabled =
               disabled;
 
-            if (
-              inputType === "text" &&
-              (
-                className ===
-                  "r-airport" ||
-                className ===
-                  "r-combined-code"
-              )
-            ) {
-              input.style.textTransform =
-                "uppercase";
-            }
-
             label.appendChild(
               input
             );
 
             return {
-              label,
-              input
+              label:
+                label,
+
+              input:
+                input
             };
-          };
+          }
 
           const flightField =
             createField(
@@ -1630,10 +1749,13 @@
           const iataCode =
             cleanCode(
               rowData.flight
-                .slice(0, 2)
+                .slice(
+                  0,
+                  2
+                )
             );
 
-          function recalculateCombinedCode() {
+          function recalculateCode() {
             const service =
               cleanCode(
                 serviceField
@@ -1670,27 +1792,21 @@
               return;
             }
 
-            if (
-              service === "J" ||
-              service === "D"
-            ) {
-              combinedCodeField
-                .input
-                .value =
-                  aircraft.seats +
-                  aircraft.scrCode;
-
-            } else {
-              combinedCodeField
-                .input
-                .value =
-                  "000" +
-                  aircraft.scrCode;
-            }
+            combinedCodeField
+              .input
+              .value =
+                (
+                  service === "J" ||
+                  service === "D"
+                )
+                  ? aircraft.seats +
+                    aircraft.scrCode
+                  : "000" +
+                    aircraft.scrCode;
 
             if (
               typeof updateRowChangeHighlight ===
-                "function"
+              "function"
             ) {
               updateRowChangeHighlight(
                 rowDiv
@@ -1698,116 +1814,42 @@
             }
           }
 
-          function normalizeTimeInput(
-            value
-          ) {
-            let normalized =
-              String(value || "")
-                .trim()
-                .replace(
-                  /[^\d:]/g,
-                  ""
-                );
-
-            if (
-              /^\d{4}$/.test(
-                normalized
-              )
-            ) {
-              normalized =
-                normalized.slice(
-                  0,
-                  2
-                ) +
-                ":" +
-                normalized.slice(2);
-            }
-
-            return normalized;
-          }
-
-          function validateTimeField() {
-            const normalized =
-              normalizeTimeInput(
-                timeField
-                  .input
-                  .value
-              );
-
-            timeField.input.value =
-              normalized;
-
-            const valid =
-              /^([01]\d|2[0-3]):([0-5]\d)$/
-                .test(
-                  normalized
-                );
-
-            timeField
-              .input
-              .style
-              .borderColor =
-                valid ||
-                !normalized
-                  ? ""
-                  : "#cc0000";
-
-            return valid;
-          }
-
-          dateField
-            .input
+          dateField.input
             .addEventListener(
               "change",
               event => {
-                try {
-                  const selectedDate =
-                    new Date(
-                      event.target.value +
-                      "T00:00:00Z"
+                const date =
+                  new Date(
+                    event.target.value +
+                    "T00:00:00Z"
+                  );
+
+                if (
+                  !isNaN(
+                    date.getTime()
+                  )
+                ) {
+                  const weekday =
+                    date.toLocaleDateString(
+                      "en-US",
+                      {
+                        weekday:
+                          "long",
+
+                        timeZone:
+                          "UTC"
+                      }
                     );
 
-                  if (
-                    !isNaN(
-                      selectedDate.getTime()
-                    )
-                  ) {
-                    const weekday =
-                      selectedDate
-                        .toLocaleDateString(
-                          "en-US",
-                          {
-                            weekday:
-                              "long",
-                            timeZone:
-                              "UTC"
-                          }
-                        );
-
-                    dayField
-                      .input
-                      .value =
-                        getDayOfOperation(
-                          weekday
-                        );
-
-                  } else {
-                    dayField
-                      .input
-                      .value =
-                        "INVALID";
-                  }
-
-                } catch (error) {
-                  dayField
-                    .input
-                    .value =
-                      "ERROR";
+                  dayField.input.value =
+                    getDayOfOperation(
+                      weekday
+                    );
                 }
 
                 if (
                   typeof updateRowChangeHighlight ===
-                    "function"
+                  "function"
                 ) {
                   updateRowChangeHighlight(
                     rowDiv
@@ -1816,145 +1858,77 @@
               }
             );
 
-          timeField
-            .input
+          timeField.input
             .addEventListener(
               "blur",
               () => {
-                validateTimeField();
+                let value =
+                  String(
+                    timeField
+                      .input
+                      .value ||
+                    ""
+                  )
+                    .replace(
+                      /[^\d:]/g,
+                      ""
+                    );
 
                 if (
-                  typeof updateRowChangeHighlight ===
-                    "function"
+                  /^\d{4}$/
+                    .test(
+                      value
+                    )
                 ) {
-                  updateRowChangeHighlight(
-                    rowDiv
-                  );
+                  value =
+                    value.slice(
+                      0,
+                      2
+                    ) +
+                    ":" +
+                    value.slice(
+                      2
+                    );
                 }
+
+                timeField.input.value =
+                  value;
+
+                const valid =
+                  /^([01]\d|2[0-3]):([0-5]\d)$/
+                    .test(
+                      value
+                    );
+
+                timeField.input.style.borderColor =
+                  valid ||
+                  !value
+                    ? ""
+                    : "#cc0000";
               }
             );
 
-          serviceField
-            .input
+          serviceField.input
             .addEventListener(
               "change",
-              recalculateCombinedCode
+              recalculateCode
             );
 
           if (
             typeof attachRowChangeTracking ===
-              "function"
+            "function"
           ) {
             attachRowChangeTracking(
               rowDiv
             );
           }
 
-          validateTimeField();
-
           return rowDiv;
         };
 
-      function getRegistrationsFromInput() {
-        const input =
-          document.getElementById(
-            "userInput"
-          );
-
+      function updateRegistrationFromInput() {
         const registrations =
           new Set();
-
-        input.value
-          .split("\n")
-          .map(
-            line =>
-              line.trim()
-          )
-          .filter(Boolean)
-          .forEach(line => {
-            const parts =
-              line.split(/\s+/);
-
-            if (
-              parts.length >= 7
-            ) {
-              const registration =
-                cleanCode(
-                  parts[6]
-                );
-
-              if (
-                registration &&
-                /^[A-Z0-9-]+$/
-                  .test(
-                    registration
-                  )
-              ) {
-                registrations.add(
-                  registration
-                );
-              }
-            }
-          });
-
-        return Array.from(
-          registrations
-        );
-      }
-
-      function updateRegistrationFromInput() {
-        const regInput =
-          document.getElementById(
-            "regInput"
-          );
-
-        const registrations =
-          getRegistrationsFromInput();
-
-        if (
-          registrations.length
-        ) {
-          regInput.value =
-            registrations.join(
-              ", "
-            );
-
-          regInput.classList.add(
-            "reg-detected"
-          );
-
-          regInput.dataset.autoDetected =
-            "true";
-
-          return;
-        }
-
-        if (
-          regInput.dataset.autoDetected ===
-          "true"
-        ) {
-          regInput.value =
-            "";
-        }
-
-        regInput.classList.remove(
-          "reg-detected"
-        );
-      }
-
-      function getAircraftRequestsFromInput() {
-        const serviceType =
-          cleanCode(
-            document
-              .getElementById(
-                "dropdownMenu"
-              )
-              .value
-              .charAt(0)
-          );
-
-        const requests =
-          new Map();
 
         document
           .getElementById(
@@ -1967,59 +1941,69 @@
               line.trim()
           )
           .filter(Boolean)
-          .forEach(line => {
-            const parts =
-              line.split(/\s+/);
+          .forEach(
+            line => {
+              const parts =
+                line.split(
+                  /\s+/
+                );
 
-            if (
-              parts.length < 7
-            ) {
-              return;
-            }
+              if (
+                parts.length >= 7
+              ) {
+                const registration =
+                  cleanCode(
+                    parts[6]
+                  );
 
-            const iataCode =
-              cleanCode(
-                parts[0]
-                  .slice(0, 2)
-              );
-
-            let aircraftCode;
-
-            if (
-              serviceType === "D"
-            ) {
-              aircraftCode =
-                getSelectedDAircraftCode();
-
-            } else {
-              aircraftCode =
-                parts[7]
-                  ? cleanCode(
-                      parts[7]
+                if (
+                  registration &&
+                  /^[A-Z0-9-]+$/
+                    .test(
+                      registration
                     )
-                  : "";
-            }
-
-            const key =
-              aircraftKey(
-                iataCode,
-                aircraftCode
-              );
-
-            requests.set(
-              key,
-              {
-                iataCode,
-                aircraftCode,
-                originalLine:
-                  line
+                ) {
+                  registrations.add(
+                    registration
+                  );
+                }
               }
-            );
-          });
+            }
+          );
 
-        return Array.from(
-          requests.values()
-        );
+        const regInput =
+          document.getElementById(
+            "regInput"
+          );
+
+        if (
+          registrations.size
+        ) {
+          regInput.value =
+            Array.from(
+              registrations
+            ).join(
+              ", "
+            );
+
+          regInput.classList.add(
+            "reg-detected"
+          );
+
+          regInput.dataset.autoDetected =
+            "true";
+
+        } else if (
+          regInput.dataset.autoDetected ===
+          "true"
+        ) {
+          regInput.value =
+            "";
+
+          regInput.classList.remove(
+            "reg-detected"
+          );
+        }
       }
 
       function setAircraftModalStatus(
@@ -2056,12 +2040,16 @@
         pendingAircraftContext = {
           airlineKey:
             airline.key,
+
           airlineName:
             airline.airlineName,
+
           iataCode:
             airline.iataCode,
+
           icaoCode:
             airline.icaoCode,
+
           aircraftCode:
             cleanCode(
               aircraftCode
@@ -2163,6 +2151,14 @@
         airline,
         aircraftCode
       ) {
+        if (
+          pendingAircraftContext
+        ) {
+          return Promise.resolve(
+            false
+          );
+        }
+
         return new Promise(
           resolve => {
             aircraftModalResolver =
@@ -2208,13 +2204,15 @@
               .value
           );
 
-        const seatsRaw =
-          document
-            .getElementById(
-              "newAircraftSeats"
-            )
-            .value
-            .trim();
+        const seats =
+          parseInt(
+            document
+              .getElementById(
+                "newAircraftSeats"
+              )
+              .value,
+            10
+          );
 
         if (!name) {
           setAircraftModalStatus(
@@ -2227,7 +2225,9 @@
 
         if (
           !/^[A-Z0-9]{2,6}$/
-            .test(inputCode)
+            .test(
+              inputCode
+            )
         ) {
           setAircraftModalStatus(
             "Aircraft input code is invalid.",
@@ -2239,7 +2239,9 @@
 
         if (
           !/^[A-Z0-9]{2,6}$/
-            .test(scrCode)
+            .test(
+              scrCode
+            )
         ) {
           setAircraftModalStatus(
             "SCR aircraft code is invalid.",
@@ -2249,14 +2251,10 @@
           return;
         }
 
-        const seats =
-          parseInt(
-            seatsRaw,
-            10
-          );
-
         if (
-          Number.isNaN(seats) ||
+          Number.isNaN(
+            seats
+          ) ||
           seats < 0 ||
           seats > 999
         ) {
@@ -2267,21 +2265,6 @@
 
           return;
         }
-
-        const record = {
-          inputCode,
-          scrCode,
-          seats:
-            formatSeats(
-              seats
-            ),
-          name,
-          createdAt:
-            firebase
-              .database
-              .ServerValue
-              .TIMESTAMP
-        };
 
         const button =
           document.getElementById(
@@ -2307,60 +2290,30 @@
           if (
             existing.exists()
           ) {
+            const airline =
+              airlineByIata.get(
+                context.iataCode
+              );
+
+            const record =
+              buildAircraftRecord(
+                airline,
+                inputCode,
+                existing.val()
+              );
+
+            cacheAircraftRecord(
+              record,
+              inputCode
+            );
+
             setAircraftModalStatus(
-              "This aircraft already exists. The existing Firebase record will be used.",
+              "Aircraft already exists. The existing record will be used.",
               "success"
             );
 
-            const data =
-              existing.val() ||
-              {};
-
-            const cachedRecord = {
-              airlineKey:
-                context.airlineKey,
-              airlineName:
-                context.airlineName,
-              iataCode:
-                context.iataCode,
-              icaoCode:
-                context.icaoCode,
-              inputCode:
-                cleanCode(
-                  data.inputCode ||
-                  inputCode
-                ),
-              scrCode:
-                cleanCode(
-                  data.scrCode ||
-                  inputCode
-                ),
-              seats:
-                formatSeats(
-                  data.seats
-                ),
-              name:
-                String(
-                  data.name ||
-                  inputCode
-                ).trim()
-            };
-
-            aircraftByCode.set(
-              aircraftKey(
-                context.iataCode,
-                cachedRecord.inputCode
-              ),
-              cachedRecord
-            );
-
-            aircraftByScrCode.set(
-              aircraftKey(
-                context.iataCode,
-                cachedRecord.scrCode
-              ),
-              cachedRecord
-            );
+            lastCancelledAircraftCheck =
+              "";
 
             setTimeout(
               () => {
@@ -2379,62 +2332,59 @@
             "info"
           );
 
-          await ref.set(
-            record
-          );
+          await ref.set({
+            inputCode:
+              inputCode,
 
-          const cachedRecord = {
-            airlineKey:
-              context.airlineKey,
-            airlineName:
-              context.airlineName,
-            iataCode:
-              context.iataCode,
-            icaoCode:
-              context.icaoCode,
-            inputCode,
-            scrCode,
+            scrCode:
+              scrCode,
+
             seats:
               formatSeats(
                 seats
               ),
-            name
-          };
 
-          aircraftByCode.set(
-            aircraftKey(
-              context.iataCode,
-              inputCode
-            ),
-            cachedRecord
+            name:
+              name,
+
+            createdAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP
+          });
+
+          const airline =
+            airlineByIata.get(
+              context.iataCode
+            );
+
+          const record =
+            buildAircraftRecord(
+              airline,
+              inputCode,
+              {
+                inputCode:
+                  inputCode,
+
+                scrCode:
+                  scrCode,
+
+                seats:
+                  seats,
+
+                name:
+                  name
+              }
+            );
+
+          cacheAircraftRecord(
+            record,
+            inputCode
           );
 
-          aircraftByScrCode.set(
-            aircraftKey(
-              context.iataCode,
-              scrCode
-            ),
-            cachedRecord
-          );
-
-          if (
-            !aircraftRecordsByAirline.has(
-              context.iataCode
-            )
-          ) {
-            aircraftRecordsByAirline.set(
-              context.iataCode,
-              []
-            );
-          }
-
-          aircraftRecordsByAirline
-            .get(
-              context.iataCode
-            )
-            .push(
-              cachedRecord
-            );
+          lastCancelledAircraftCheck =
+            "";
 
           setAircraftModalStatus(
             `${inputCode} added to ${context.airlineName}.`,
@@ -2467,18 +2417,15 @@
         }
       }
 
-      async function verifyAircraftBeforeGeneration() {
-        const serviceType =
-          cleanCode(
-            document
-              .getElementById(
-                "dropdownMenu"
-              )
-              .value
-              .charAt(0)
-          );
+      async function checkAircraftInputAutomatically() {
+        if (
+          liveAircraftCheckRunning ||
+          pendingAircraftContext
+        ) {
+          return;
+        }
 
-        const inputLines =
+        const lines =
           document
             .getElementById(
               "userInput"
@@ -2492,7 +2439,168 @@
             .filter(Boolean);
 
         if (
-          !inputLines.length
+          !lines.length
+        ) {
+          return;
+        }
+
+        liveAircraftCheckRunning =
+          true;
+
+        try {
+          await aircraftDatabaseReadyPromise;
+
+          for (
+            const line
+            of lines
+          ) {
+            const parts =
+              line.split(
+                /\s+/
+              );
+
+            if (
+              parts.length !== 8
+            ) {
+              continue;
+            }
+
+            const flight =
+              cleanCode(
+                parts[0]
+              );
+
+            const airlineIata =
+              cleanCode(
+                flight.slice(
+                  0,
+                  2
+                )
+              );
+
+            const aircraftCode =
+              cleanCode(
+                parts[7]
+              );
+
+            if (
+              !airlineIata ||
+              airlineIata.length !== 2 ||
+              !aircraftCode ||
+              aircraftCode.length < 2
+            ) {
+              continue;
+            }
+
+            const checkKey =
+              aircraftKey(
+                airlineIata,
+                aircraftCode
+              );
+
+            const result =
+              await findAircraftType(
+                airlineIata,
+                aircraftCode
+              );
+
+            if (
+              !result.airlineFound
+            ) {
+              continue;
+            }
+
+            if (
+              result.found
+            ) {
+              if (
+                lastCancelledAircraftCheck ===
+                checkKey
+              ) {
+                lastCancelledAircraftCheck =
+                  "";
+              }
+
+              continue;
+            }
+
+            if (
+              lastCancelledAircraftCheck ===
+              checkKey
+            ) {
+              continue;
+            }
+
+            const added =
+              await requestAircraftDefinition(
+                result.airline,
+                aircraftCode
+              );
+
+            if (!added) {
+              lastCancelledAircraftCheck =
+                checkKey;
+
+              return;
+            }
+          }
+
+        } catch (error) {
+          console.error(
+            "Automatic aircraft check failed:",
+            error
+          );
+
+        } finally {
+          liveAircraftCheckRunning =
+            false;
+        }
+      }
+
+      function scheduleAutomaticAircraftCheck() {
+        if (
+          liveAircraftCheckTimer
+        ) {
+          clearTimeout(
+            liveAircraftCheckTimer
+          );
+        }
+
+        liveAircraftCheckTimer =
+          setTimeout(
+            () => {
+              checkAircraftInputAutomatically();
+            },
+            600
+          );
+      }
+
+      async function verifyAircraftBeforeGeneration() {
+        const serviceType =
+          cleanCode(
+            document
+              .getElementById(
+                "dropdownMenu"
+              )
+              .value
+              .charAt(0)
+          );
+
+        const lines =
+          document
+            .getElementById(
+              "userInput"
+            )
+            .value
+            .split("\n")
+            .map(
+              line =>
+                line.trim()
+            )
+            .filter(Boolean);
+
+        if (
+          !lines.length
         ) {
           showError(
             "No flight input entered."
@@ -2501,47 +2609,67 @@
           return false;
         }
 
-        if (
-          serviceType !== "D"
+        for (
+          const line
+          of lines
         ) {
-          for (
-            const line
-            of inputLines
-          ) {
-            const parts =
-              line.split(/\s+/);
+          const parts =
+            line.split(
+              /\s+/
+            );
 
-            if (
+          if (
+            parts.length < 7 ||
+            parts.length > 8
+          ) {
+            showError(
+              `Invalid flight input: ${line}`
+            );
+
+            return false;
+          }
+
+          if (
+            serviceType !== "D" &&
+            (
               parts.length < 8 ||
               !parts[7]
-            ) {
-              showError(
-                `Aircraft type is missing: ${line}`
-              );
+            )
+          ) {
+            showError(
+              `Aircraft type is missing: ${line}`
+            );
 
-              return false;
-            }
+            return false;
           }
-        }
 
-        const requests =
-          getAircraftRequestsFromInput();
+          const airlineIata =
+            cleanCode(
+              parts[0]
+                .slice(
+                  0,
+                  2
+                )
+            );
 
-        for (
-          const request
-          of requests
-        ) {
+          const aircraftCode =
+            serviceType === "D"
+              ? getSelectedDAircraftCode()
+              : cleanCode(
+                  parts[7]
+                );
+
           const result =
             await findAircraftType(
-              request.iataCode,
-              request.aircraftCode
+              airlineIata,
+              aircraftCode
             );
 
           if (
             !result.airlineFound
           ) {
             showError(
-              `Airline ${request.iataCode} is not in the aircraft database. Add the airline to Aircraft Types first.`
+              `Airline ${airlineIata} is not available in the Aircraft Type Database.`
             );
 
             return false;
@@ -2556,25 +2684,28 @@
           const added =
             await requestAircraftDefinition(
               result.airline,
-              request.aircraftCode
+              aircraftCode
             );
 
           if (!added) {
             showError(
-              `SCR generation cancelled because aircraft ${request.aircraftCode} is not configured for ${result.airline.airlineName}.`
+              `SCR generation cancelled because aircraft ${aircraftCode} is not configured for ${result.airline.airlineName}.`
             );
 
             return false;
           }
 
+          const savedAircraft =
+            getAircraftFromCache(
+              airlineIata,
+              aircraftCode
+            );
+
           if (
-            !getAircraftFromCache(
-              request.iataCode,
-              request.aircraftCode
-            )
+            !savedAircraft
           ) {
             showError(
-              `Aircraft ${request.aircraftCode} could not be loaded after saving.`
+              `Aircraft ${aircraftCode} could not be loaded after saving.`
             );
 
             return false;
@@ -2601,14 +2732,28 @@
 
           userInput.addEventListener(
             "input",
-            updateRegistrationFromInput
+            () => {
+              updateRegistrationFromInput();
+
+              lastCancelledAircraftCheck =
+                "";
+
+              scheduleAutomaticAircraftCheck();
+            }
           );
 
           userInput.addEventListener(
             "paste",
             () => {
               setTimeout(
-                updateRegistrationFromInput,
+                () => {
+                  updateRegistrationFromInput();
+
+                  lastCancelledAircraftCheck =
+                    "";
+
+                  scheduleAutomaticAircraftCheck();
+                },
                 0
               );
             }
@@ -2628,6 +2773,39 @@
 
           document
             .getElementById(
+              "dropdownMenu"
+            )
+            .addEventListener(
+              "change",
+              () => {
+                scheduleAutomaticAircraftCheck();
+              }
+            );
+
+          document
+            .getElementById(
+              "learjetCheckbox"
+            )
+            .addEventListener(
+              "change",
+              () => {
+                scheduleAutomaticAircraftCheck();
+              }
+            );
+
+          document
+            .getElementById(
+              "bombardierCheckbox"
+            )
+            .addEventListener(
+              "change",
+              () => {
+                scheduleAutomaticAircraftCheck();
+              }
+            );
+
+          document
+            .getElementById(
               "saveAircraftTypeBtn"
             )
             .addEventListener(
@@ -2642,6 +2820,16 @@
             .addEventListener(
               "click",
               () => {
+                if (
+                  pendingAircraftContext
+                ) {
+                  lastCancelledAircraftCheck =
+                    aircraftKey(
+                      pendingAircraftContext.iataCode,
+                      pendingAircraftContext.aircraftCode
+                    );
+                }
+
                 closeAircraftModal(
                   false
                 );
@@ -2655,6 +2843,16 @@
             .addEventListener(
               "click",
               () => {
+                if (
+                  pendingAircraftContext
+                ) {
+                  lastCancelledAircraftCheck =
+                    aircraftKey(
+                      pendingAircraftContext.iataCode,
+                      pendingAircraftContext.aircraftCode
+                    );
+                }
+
                 closeAircraftModal(
                   false
                 );
@@ -2685,6 +2883,7 @@
             )
             .addEventListener(
               "click",
+
               async event => {
                 event.preventDefault();
                 event.stopImmediatePropagation();
@@ -2720,7 +2919,8 @@
                       .value;
 
                   if (
-                    slotType === "CHANGE"
+                    slotType ===
+                    "CHANGE"
                   ) {
                     formatChangeSCRMessages();
 
@@ -2744,6 +2944,7 @@
                     false;
                 }
               },
+
               true
             );
 
@@ -2765,8 +2966,18 @@
               "show"
             ) &&
             event.target ===
-              modal
+            modal
           ) {
+            if (
+              pendingAircraftContext
+            ) {
+              lastCancelledAircraftCheck =
+                aircraftKey(
+                  pendingAircraftContext.iataCode,
+                  pendingAircraftContext.aircraftCode
+                );
+            }
+
             closeAircraftModal(
               false
             );
@@ -2877,9 +3088,6 @@
           number.textContent =
             "--";
 
-          container.title =
-            "Connected users unavailable because Firebase is offline.";
-
           return;
         }
 
@@ -2889,17 +3097,13 @@
           number.textContent =
             "--";
 
-          container.title =
-            "Connecting to realtime user counter...";
-
           return;
         }
 
         number.textContent =
-          String(count);
-
-        container.title =
-          `${count} connected user${count === 1 ? "" : "s"} currently using Runway Slots`;
+          String(
+            count
+          );
       }
 
       function broadcast(type) {
@@ -2909,11 +3113,15 @@
 
         try {
           channel.postMessage({
-            type,
+            type:
+              type,
+
             tabId:
               thisTabId,
+
             startedAt:
               thisTabStartedAt,
+
             timestamp:
               Date.now()
           });
@@ -2926,14 +3134,12 @@
         }
       }
 
-      function rememberPeer(
-        data
-      ) {
+      function rememberPeer(data) {
         if (
           !data ||
           !data.tabId ||
           data.tabId ===
-            thisTabId
+          thisTabId
         ) {
           return;
         }
@@ -2943,11 +3149,13 @@
           {
             tabId:
               data.tabId,
+
             startedAt:
               Number(
                 data.startedAt
               ) ||
               Date.now(),
+
             lastSeen:
               Date.now()
           }
@@ -2963,10 +3171,13 @@
           of peers
         ) {
           if (
-            now - peer.lastSeen >
+            now -
+            peer.lastSeen >
             PEER_TIMEOUT
           ) {
-            peers.delete(id);
+            peers.delete(
+              id
+            );
           }
         }
 
@@ -2978,6 +3189,7 @@
           {
             tabId:
               thisTabId,
+
             startedAt:
               thisTabStartedAt
           }
@@ -2989,12 +3201,14 @@
         peers.forEach(
           peer => {
             if (
-              now - peer.lastSeen <=
+              now -
+              peer.lastSeen <=
               PEER_TIMEOUT
             ) {
               candidates.push({
                 tabId:
                   peer.tabId,
+
                 startedAt:
                   peer.startedAt
               });
@@ -3014,9 +3228,10 @@
               );
             }
 
-            return a.tabId.localeCompare(
-              b.tabId
-            );
+            return a.tabId
+              .localeCompare(
+                b.tabId
+              );
           }
         );
 
@@ -3027,7 +3242,9 @@
       }
 
       async function removePresence() {
-        if (!presenceRef) {
+        if (
+          !presenceRef
+        ) {
           return;
         }
 
@@ -3073,7 +3290,7 @@
             !isLeader ||
             !firebaseConnected ||
             presenceRef !==
-              newRef
+            newRef
           ) {
             try {
               await newRef.remove();
@@ -3085,10 +3302,13 @@
           await newRef.set({
             page:
               window.location.pathname,
+
             pageName:
               document.title,
+
             presenceType:
               "temporary",
+
             connectedAt:
               firebase
                 .database
@@ -3132,7 +3352,9 @@
         isLeader =
           shouldLead;
 
-        if (shouldLead) {
+        if (
+          shouldLead
+        ) {
           await registerPresence();
 
         } else {
@@ -3161,9 +3383,7 @@
         );
       }
 
-      function handleMessage(
-        event
-      ) {
+      function handleMessage(event) {
         const data =
           event.data;
 
@@ -3172,7 +3392,7 @@
           !data.type ||
           !data.tabId ||
           data.tabId ===
-            thisTabId
+          thisTabId
         ) {
           return;
         }
@@ -3370,7 +3590,8 @@
 
           snapshot => {
             lastCount =
-              snapshot.numChildren();
+              snapshot
+                .numChildren();
 
             if (
               firebaseConnected
