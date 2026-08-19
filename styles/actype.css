@@ -1,0 +1,835 @@
+* {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --desktop: #008080;
+
+      --win-grey: #c0c0c0;
+      --win-light: #ffffff;
+      --win-mid: #dfdfdf;
+      --win-dark: #808080;
+      --win-darker: #404040;
+
+      --win-blue: #000080;
+      --win-blue-light: #1084d0;
+
+      --font:
+        "MS Sans Serif",
+        Tahoma,
+        Arial,
+        sans-serif;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+
+      background: var(--desktop);
+      color: #000;
+
+      font-family: var(--font);
+      font-size: 12px;
+    }
+
+    button,
+    input,
+    select {
+      font-family: var(--font);
+      font-size: 12px;
+    }
+
+    .page-shell {
+      width: 100%;
+      max-width: 1500px;
+
+      margin: 0 auto;
+
+      padding: 22px 18px 45px;
+    }
+
+    .window {
+      background: var(--win-grey);
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    .window-titlebar {
+      min-height: 28px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 3px 4px 3px 6px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #000080,
+          #1084d0
+        );
+
+      color: #fff;
+
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .window-title-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .window-icon {
+      width: 17px;
+      height: 17px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid #000;
+
+      background: #fff;
+      color: #000080;
+
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 2px;
+    }
+
+    .window-control {
+      width: 20px;
+      height: 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 0;
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+
+      background: #c0c0c0;
+      color: #000;
+
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .window-body {
+      padding: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 10px;
+
+      margin-bottom: 10px;
+
+      padding: 7px 8px;
+
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 1px solid #808080;
+
+      background: #c0c0c0;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      gap: 8px;
+    }
+
+    .toolbar-description {
+      font-size: 11px;
+    }
+
+    .connection-status {
+      display: inline-flex;
+      align-items: center;
+
+      gap: 6px;
+
+      padding: 4px 7px;
+
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 1px solid #808080;
+
+      background: #c0c0c0;
+
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+
+      border: 1px solid #000;
+      border-radius: 50%;
+
+      background: #ffff00;
+    }
+
+    .connection-status.connected .status-dot {
+      background: #00c000;
+    }
+
+    .connection-status.disconnected .status-dot {
+      background: #ff0000;
+    }
+
+    .panel {
+      background: #c0c0c0;
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+    }
+
+    .panel-title {
+      min-height: 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 8px;
+
+      padding: 3px 5px;
+
+      background: #000080;
+      color: #fff;
+
+      font-weight: bold;
+    }
+
+    .panel-body {
+      padding: 9px;
+    }
+
+    .editor-panel {
+      margin-bottom: 10px;
+    }
+
+    .group-box {
+      position: relative;
+
+      margin-top: 12px;
+
+      padding:
+        15px
+        9px
+        10px;
+
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+    }
+
+    .group-title {
+      position: absolute;
+
+      top: -7px;
+      left: 8px;
+
+      padding: 0 5px;
+
+      background: #c0c0c0;
+
+      font-weight: bold;
+    }
+
+    .form-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 9px 12px;
+    }
+
+    .airline-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(200px, 1.5fr)
+        minmax(100px, 0.5fr)
+        minmax(100px, 0.5fr);
+
+      gap: 9px 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+
+      gap: 4px;
+    }
+
+    .field label {
+      font-weight: normal;
+    }
+
+    .required {
+      color: #c00000;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 25px;
+
+      padding: 2px 4px;
+
+      outline: none;
+
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+
+      background: #fff;
+      color: #000;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 1px dotted #000;
+      outline-offset: -4px;
+    }
+
+    .field-help {
+      min-height: 12px;
+
+      color: #404040;
+
+      font-size: 10px;
+      line-height: 1.25;
+    }
+
+    .preview-box {
+      margin-top: 9px;
+
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+
+      background: #fff;
+    }
+
+    .preview-title {
+      padding: 4px 6px;
+
+      border-bottom: 1px solid #808080;
+
+      background: #dfdfdf;
+
+      font-weight: bold;
+    }
+
+    .preview-body {
+      min-height: 46px;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      padding: 7px;
+    }
+
+    .preview-item {
+      display: flex;
+      flex-direction: column;
+
+      gap: 2px;
+    }
+
+    .preview-label {
+      color: #404040;
+      font-size: 9px;
+    }
+
+    .preview-value {
+      font-family:
+        "Courier New",
+        monospace;
+
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .preview-arrow {
+      font-size: 17px;
+    }
+
+    .preview-seats {
+      margin-left: auto;
+    }
+
+    .button-bar {
+      display: flex;
+      flex-wrap: wrap;
+
+      gap: 6px;
+
+      margin-top: 10px;
+    }
+
+    .win-button {
+      min-width: 78px;
+      height: 26px;
+
+      padding: 2px 9px;
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+
+      background: #c0c0c0;
+      color: #000;
+
+      cursor: pointer;
+    }
+
+    .win-button:hover {
+      background: #d2d2d2;
+    }
+
+    .win-button:active {
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .win-button:disabled {
+      color: #808080;
+      cursor: default;
+    }
+
+    .danger-button {
+      color: #900000;
+      font-weight: bold;
+    }
+
+    .form-message {
+      display: none;
+
+      margin-top: 8px;
+      padding: 6px 7px;
+
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+
+      background: #fff;
+    }
+
+    .form-message.success,
+    .form-message.error,
+    .form-message.warning {
+      display: block;
+    }
+
+    .form-message.success {
+      color: #006000;
+    }
+
+    .form-message.error {
+      color: #a00000;
+    }
+
+    .form-message.warning {
+      color: #805000;
+    }
+
+    .database-tools {
+      padding: 8px;
+
+      border-bottom: 1px solid #808080;
+    }
+
+    .search-row {
+      display: grid;
+
+      grid-template-columns:
+        minmax(260px, 1fr)
+        180px
+        140px;
+
+      gap: 7px;
+    }
+
+    .search-field {
+      position: relative;
+    }
+
+    .search-field input {
+      padding-right: 25px;
+    }
+
+    .clear-search {
+      position: absolute;
+
+      top: 3px;
+      right: 3px;
+
+      width: 18px;
+      height: 18px;
+
+      padding: 0;
+
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #404040;
+      border-bottom: 1px solid #404040;
+
+      background: #c0c0c0;
+
+      cursor: pointer;
+
+      font-weight: bold;
+    }
+
+    .table-frame {
+      max-height: 610px;
+
+      overflow: auto;
+
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+
+      border-collapse: collapse;
+
+      background: #fff;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th {
+      padding: 5px 6px;
+
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 2px solid #808080;
+
+      background: #c0c0c0;
+
+      font-weight: normal;
+      text-align: left;
+
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 5px 6px;
+
+      border-right: 1px solid #d0d0d0;
+      border-bottom: 1px solid #d0d0d0;
+
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: #e5e5e5;
+    }
+
+    tbody tr.selected {
+      background: #000080;
+      color: #fff;
+    }
+
+    .airline-name-cell {
+      min-width: 160px;
+      font-weight: bold;
+    }
+
+    .code-cell {
+      font-family:
+        "Courier New",
+        monospace;
+
+      font-weight: bold;
+    }
+
+    .aircraft-name-cell {
+      min-width: 180px;
+    }
+
+    .edit-button {
+      min-width: 50px;
+      height: 22px;
+
+      padding: 1px 6px;
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+
+      background: #c0c0c0;
+
+      cursor: pointer;
+    }
+
+    .edit-button:active {
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .loading-state,
+    .empty-state {
+      padding: 38px 16px;
+
+      background: #fff;
+
+      text-align: center;
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 8px;
+    }
+
+    .progress-icon {
+      width: 18px;
+      height: 18px;
+
+      border: 2px solid #808080;
+      border-top-color: #000080;
+
+      animation:
+        spin
+        0.8s
+        linear
+        infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .empty-icon {
+      margin-bottom: 6px;
+
+      font-size: 26px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 5px;
+
+      font-size: 13px;
+    }
+
+    .empty-state p {
+      margin: 0;
+
+      color: #404040;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+
+      gap: 4px;
+
+      margin-top: 8px;
+    }
+
+    .status-section {
+      min-height: 22px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 3px 6px;
+
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+
+      background: #c0c0c0;
+    }
+
+    .status-section:first-child {
+      flex: 1;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+
+      z-index: 10000;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 15px;
+
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .dialog-window {
+      width: 100%;
+      max-width: 430px;
+
+      background: #c0c0c0;
+
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    .dialog-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 3px 4px 3px 6px;
+
+      background: #000080;
+      color: #fff;
+
+      font-weight: bold;
+    }
+
+    .dialog-body {
+      display: flex;
+
+      gap: 12px;
+
+      padding: 16px 14px;
+    }
+
+    .warning-icon {
+      flex: 0 0 36px;
+
+      width: 36px;
+      height: 36px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 2px solid #000;
+
+      background: #ffff00;
+
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .dialog-text {
+      line-height: 1.5;
+    }
+
+    .dialog-text p {
+      margin: 0 0 8px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: center;
+
+      gap: 7px;
+
+      padding: 0 14px 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 850px) {
+
+      .airline-grid,
+      .form-grid,
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-body {
+        flex-wrap: wrap;
+      }
+
+      .preview-seats {
+        margin-left: 0;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      .page-shell {
+        padding: 8px;
+      }
+
+    }
