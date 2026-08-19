@@ -3,17 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-
   <title>Multi Flight Formatter</title>
 
   <link rel="stylesheet" href="styles/multiflight.css">
   <link rel="stylesheet" href="styles/navi-ui.css">
   <link rel="stylesheet" href="styles/infobar.css">
 
-  <!-- =========================================================
-       UNKNOWN AIRCRAFT TYPE MODAL
-       ========================================================= -->
   <style>
+    .connected-users-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 7px;
+      background: #c0c0c0;
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
+      font-size: 11px;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    .connected-users-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #808080;
+      border: 1px solid #404040;
+      flex-shrink: 0;
+    }
+
+    .connected-users-status.online .connected-users-dot {
+      background: #00a000;
+    }
+
+    .connected-users-status.offline .connected-users-dot {
+      background: #cc0000;
+    }
+
+    .connected-users-status.connecting .connected-users-dot {
+      background: #e6b800;
+    }
+
+    .connected-users-label {
+      font-weight: normal;
+    }
+
+    #connectedUsersCount {
+      min-width: 14px;
+      text-align: center;
+      font-weight: bold;
+      color: #000080;
+    }
+
     #aircraftTypeModal {
       display: none;
       position: fixed;
@@ -174,6 +218,16 @@
       color: #444;
     }
 
+    @media (max-width: 800px) {
+      .right-tools {
+        flex-wrap: wrap;
+      }
+
+      .connected-users-status {
+        font-size: 10px;
+      }
+    }
+
     @media (max-width: 520px) {
       .aircraft-modal-buttons {
         flex-direction: column;
@@ -186,14 +240,9 @@
   </style>
 </head>
 
-
 <body>
 
   <div id="mainApp">
-
-    <!-- =========================================================
-         NAVIGATION
-         ========================================================= -->
     <nav>
       <ul>
         <li><a href="index.html">Home</a></li>
@@ -206,7 +255,6 @@
         <li><a href="analytics.html">Analytics</a></li>
         <li><a href="experimental.html">EXPERIMENTAL</a></li>
         <li><a href="updates.html">SYSTEM UPDATES</a></li>
-
         <li>
           <a
             href="https://forms.gle/Q4T4TbhEU9Sa7jbg7"
@@ -221,89 +269,60 @@
       <div style="display:flex; align-items:center; gap:6px;"></div>
     </nav>
 
-
-    <!-- =========================================================
-         INFORMATION BAR
-         ========================================================= -->
     <div class="info-bar">
-
       <div class="left-tools">
-        <div
-          id="utcTopClock"
-          class="utc-clock"
-          aria-live="polite"
-        >
+        <div id="utcTopClock" class="utc-clock" aria-live="polite">
           UTC: --:--:-- • --MON----
         </div>
       </div>
 
       <div class="right-tools">
 
+        <div
+          id="connectedUsersStatus"
+          class="connected-users-status connecting"
+          title="Number of users currently connected to Runway Slots"
+        >
+          <span class="connected-users-dot" aria-hidden="true"></span>
+          <span class="connected-users-label">Connected Users:</span>
+          <strong id="connectedUsersCount">--</strong>
+        </div>
+
         <label
           class="auto-refresh"
           title="Automatically reload this page every 15 minutes"
         >
-          <input
-            type="checkbox"
-            id="autoRefreshToggle"
-            checked
-          >
-
+          <input type="checkbox" id="autoRefreshToggle" checked>
           <span>Auto-refresh (15 min)</span>
         </label>
-
 
         <div
           id="fbStatus"
           class="status-indicator"
           title="Firebase Realtime Database status"
         >
-          <span
-            class="dot"
-            aria-hidden="true"
-          ></span>
-
-          <span class="text">
-            Database Not Connected
-          </span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="text">Database Not Connected</span>
         </div>
 
       </div>
-
     </div>
 
-
-    <!-- =========================================================
-         APPLICATION
-         ========================================================= -->
     <div class="app-shell">
 
-      <!-- MAIN PANEL -->
       <div class="main-panel">
-
         <div class="container">
 
           <div class="title-bar">
-            <span>
-              Multi Flight Formatter - Current Season S26
-            </span>
+            <span>EXPERIMENTAL MODE - Multi Flight Formatter - Current Season S26</span>
           </div>
-
 
           <div class="window-content">
 
-            <h1>Multi Flight Formatter</h1>
+            <h1>EXPERIMENTAL MODE - Multi Flight Formatter</h1>
 
-            <div
-              id="errorMessage"
-              class="error"
-            ></div>
-
-            <div
-              id="successMessage"
-              class="success"
-            ></div>
-
+            <div id="errorMessage" class="error"></div>
+            <div id="successMessage" class="success"></div>
 
             <label for="userInput">
               Flight Information (One per line):
@@ -313,7 +332,6 @@
               id="userInput"
               placeholder="FR877P LPL NCL 15FEB2025 1430 1515 EIIHG 7M8"
             ></textarea>
-
 
             <label for="regInput">
               Type Learjet/Challenger Aircraft Reg:
@@ -325,12 +343,8 @@
               placeholder="ENTER REGISTRATION"
             />
 
+            <div id="aircraftSelection" style="display:none;">
 
-            <!-- GENERAL AVIATION AIRCRAFT -->
-            <div
-              id="aircraftSelection"
-              style="display: none;"
-            >
               <span>
                 Select Aircraft Type for 'D' Service:
               </span>
@@ -344,7 +358,6 @@
                   name="aircraftType"
                   checked
                 >
-
                 Learjet (L45)
               </label>
 
@@ -354,93 +367,48 @@
                   id="bombardierCheckbox"
                   name="aircraftType"
                 >
-
                 Bombardier (CL5)
               </label>
+
             </div>
 
-
-            <!-- CONTROLS -->
             <div>
 
-              <button id="formatBtn">
+              <button id="formatBtn" type="button">
                 Click Here To Generate SCR Messages
               </button>
 
-
-              <select
-                id="slotType"
-                title="Select Slot Type"
-              >
-                <option value="NEW">
-                  NEW SLOT
-                </option>
-
-                <option value="CANCEL">
-                  CANCEL SLOT
-                </option>
-
-                <option value="CHANGE">
-                  CHANGE SCR
-                </option>
+              <select id="slotType" title="Select Slot Type">
+                <option value="NEW">NEW SLOT</option>
+                <option value="CANCEL">CANCEL SLOT</option>
+                <option value="CHANGE">CHANGE SCR</option>
               </select>
-
 
               <select
                 id="dropdownMenu"
                 title="Select Flight Service Type"
               >
-
-                <option value="P">
-                  P - Positioner
-                </option>
-
-                <option value="D">
-                  D - General Aviation
-                </option>
-
-                <option value="K">
-                  K - Training
-                </option>
-
-                <option value="T">
-                  T - Technical Test
-                </option>
-
-                <option value="J">
-                  J - Passenger Schedule
-                </option>
-
-                <option value="X">
-                  X - Technical Stop
-                </option>
-
+                <option value="P">P - Positioner</option>
+                <option value="D">D - General Aviation</option>
+                <option value="K">K - Training</option>
+                <option value="T">T - Technical Test</option>
+                <option value="J">J - Passenger Schedule</option>
+                <option value="X">X - Technical Stop</option>
               </select>
 
             </div>
 
-
-            <!-- GENERATED SCR -->
             <div id="outputList"></div>
 
           </div>
-
         </div>
-
       </div>
 
-
-      <!-- =======================================================
-           SHARED HISTORY
-           ======================================================= -->
       <aside class="history-panel">
 
         <div class="title-bar">
-          <span>
-            SCR History [SHARED HISTORY DATABASE]
-          </span>
+          <span>SCR History [SHARED HISTORY DATABASE]</span>
         </div>
-
 
         <div class="history-toolbar">
 
@@ -450,22 +418,15 @@
             placeholder="Search airport, flight, type..."
           />
 
-          <button
-            id="refreshHistoryBtn"
-            type="button"
-          >
+          <button id="refreshHistoryBtn" type="button">
             Refresh
           </button>
 
-          <button
-            id="clearHistoryBtn"
-            type="button"
-          >
+          <button id="clearHistoryBtn" type="button">
             Clear All
           </button>
 
         </div>
-
 
         <div
           class="history-list"
@@ -476,17 +437,12 @@
 
     </div>
 
-
-    <!-- =========================================================
-         FOOTERS
-         ========================================================= -->
     <footer>
       Created By: ArtemisByte/KunchackoBoben 2026
     </footer>
 
     <footer>
-      Disclaimer:
-      Use of this Service is at your own risk.
+      Disclaimer: Use of this Service is at your own risk.
       The creator provides this Service "as is" without any warranties
       and is not liable for any damages or losses resulting from its use.
       You assume all responsibility.
@@ -494,14 +450,7 @@
 
   </div>
 
-
-  <!-- ===========================================================
-       CLEAR ALL HISTORY MODAL
-       =========================================================== -->
-  <div
-    id="clearAllModal"
-    class="modal"
-  >
+  <div id="clearAllModal" class="modal">
 
     <div
       class="modal-content"
@@ -519,7 +468,6 @@
         <span>Warning</span>
       </div>
 
-
       <div
         style="
           font-size:13px;
@@ -535,7 +483,6 @@
 
         Are you sure you want to proceed?
       </div>
-
 
       <div
         style="
@@ -560,19 +507,10 @@
         </button>
 
       </div>
-
     </div>
-
   </div>
 
-
-  <!-- ===========================================================
-       SCR PREVIEW MODAL
-       =========================================================== -->
-  <div
-    id="scrModal"
-    class="modal"
-  >
+  <div id="scrModal" class="modal">
 
     <div class="modal-content">
 
@@ -586,13 +524,8 @@
       <pre id="scrModalText"></pre>
 
     </div>
-
   </div>
 
-
-  <!-- ===========================================================
-       UNKNOWN AIRCRAFT TYPE MODAL
-       =========================================================== -->
   <div
     id="aircraftTypeModal"
     role="dialog"
@@ -602,7 +535,6 @@
 
     <div class="aircraft-modal-window">
 
-      <!-- TITLE BAR -->
       <div class="aircraft-modal-title">
 
         <span id="aircraftModalTitle">
@@ -620,13 +552,11 @@
 
       </div>
 
-
-      <!-- BODY -->
       <div class="aircraft-modal-body">
 
         <div class="aircraft-warning-box">
 
-          The aircraft type
+          Aircraft type
 
           <span
             id="unknownAircraftCode"
@@ -644,8 +574,6 @@
 
         </div>
 
-
-        <!-- ORIGINAL CODE -->
         <div class="aircraft-form-row">
 
           <label for="newAircraftInputCode">
@@ -659,13 +587,11 @@
           >
 
           <div class="aircraft-example">
-            The aircraft code detected from the flight input.
+            Aircraft code detected from the flight input.
           </div>
 
         </div>
 
-
-        <!-- AIRCRAFT NAME -->
         <div class="aircraft-form-row">
 
           <label for="newAircraftName">
@@ -685,12 +611,10 @@
 
         </div>
 
-
-        <!-- SCR CODE -->
         <div class="aircraft-form-row">
 
           <label for="newAircraftScrCode">
-            SCR / Aircraft Code
+            SCR Aircraft Code
           </label>
 
           <input
@@ -702,13 +626,11 @@
           >
 
           <div class="aircraft-example">
-            This is the aircraft code that will appear in the SCR.
+            Aircraft code used inside the SCR message.
           </div>
 
         </div>
 
-
-        <!-- SEATS -->
         <div class="aircraft-form-row">
 
           <label for="newAircraftSeats">
@@ -724,27 +646,21 @@
           >
 
           <div class="aircraft-example">
-            Passenger services use this value.
-            Example: 239 + 32Q = 23932Q.
+            Passenger service example: 239 + 32Q = 23932Q
           </div>
 
         </div>
 
-
-        <!-- STATUS -->
         <div
           id="aircraftModalStatus"
           class="aircraft-modal-status"
         ></div>
 
-
         <div class="aircraft-db-info">
-          Once saved, this aircraft type becomes available to other
-          users connected to the same Firebase database.
+          Once saved, the aircraft becomes available to all users
+          using the same Firebase database.
         </div>
 
-
-        <!-- BUTTONS -->
         <div class="aircraft-modal-buttons">
 
           <button
@@ -764,1441 +680,1508 @@
         </div>
 
       </div>
-
     </div>
-
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <!-- ===========================================================
-       FIREBASE
-       =========================================================== -->
-  <script
-    src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js">
-  </script>
-
-  <script
-    src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js">
-  </script>
-
-
-  <!-- EXISTING PROJECT SCRIPTS -->
   <script src="scripts/testfirebase.js"></script>
   <script src="scripts/multiflight.js"></script>
   <script src="scripts/infobar.js"></script>
+
   <script>
+    (() => {
+      "use strict";
 
-    /* ============================================================
-       AIRCRAFT DATABASE CACHE
-       ============================================================ */
+      const aircraftTypeCache = new Map();
 
-    const aircraftTypeCache = new Map();
+      let aircraftDatabaseReadyPromise = null;
+      let pendingAircraftCode = null;
+      let aircraftModalResolver = null;
+      let generationInProgress = false;
 
-    let aircraftDatabaseReadyPromise = null;
-    let pendingAircraftCode = null;
-    let aircraftModalResolver = null;
-    let generationInProgress = false;
-
-
-    /* ============================================================
-       NORMALISATION
-       ============================================================ */
-
-    function normalizeAircraftDatabaseCode(value) {
-      return String(value || "")
-        .trim()
-        .toUpperCase();
-    }
-
-
-    function formatAircraftSeatCount(value) {
-
-      const numericValue =
-        parseInt(value, 10);
-
-      if (
-        Number.isNaN(numericValue) ||
-        numericValue < 0
-      ) {
-        return "000";
+      function normalizeAircraftDatabaseCode(value) {
+        return String(value || "")
+          .trim()
+          .toUpperCase();
       }
 
-      return String(
-        Math.min(numericValue, 999)
-      ).padStart(3, "0");
-    }
+      function formatAircraftSeatCount(value) {
+        const numericValue = parseInt(value, 10);
 
-
-    /* ============================================================
-       CACHE AIRCRAFT RECORD
-       ============================================================ */
-
-    function cacheAircraftRecord(key, data) {
-
-      if (!data) return;
-
-
-      const inputCode =
-        normalizeAircraftDatabaseCode(
-          data.inputCode || key
-        );
-
-
-      const scrCode =
-        normalizeAircraftDatabaseCode(
-          data.scrCode || inputCode
-        );
-
-
-      if (!inputCode || !scrCode) {
-        return;
-      }
-
-
-      const record = {
-
-        inputCode: inputCode,
-
-        scrCode: scrCode,
-
-        seats:
-          formatAircraftSeatCount(
-            data.seats
-          ),
-
-        name:
-          String(
-            data.name || inputCode
-          ).trim()
-
-      };
-
-
-      /*
-       * Cache using the Firebase key.
-       */
-      aircraftTypeCache.set(
-        normalizeAircraftDatabaseCode(key),
-        record
-      );
-
-
-      /*
-       * Cache using input code.
-       */
-      aircraftTypeCache.set(
-        inputCode,
-        record
-      );
-
-
-      /*
-       * Also cache using SCR code.
-       *
-       * This is important because your existing
-       * parseInput() converts:
-       *
-       * 738 -> 73H
-       * 73M -> 7M8
-       */
-      aircraftTypeCache.set(
-        scrCode,
-        record
-      );
-    }
-
-
-    /* ============================================================
-       EXISTING AIRCRAFT
-
-       These remain available even before Firebase has been
-       populated.
-
-       Firebase records can replace/override these mappings.
-       ============================================================ */
-
-    function seedExistingAircraftTypes() {
-
-      const defaults = [
-
-        {
-          inputCode: "738",
-          scrCode: "73H",
-          seats: "189",
-          name: "Boeing 737-800"
-        },
-
-        {
-          inputCode: "73H",
-          scrCode: "73H",
-          seats: "189",
-          name: "Boeing 737-800"
-        },
-
-        {
-          inputCode: "73M",
-          scrCode: "7M8",
-          seats: "197",
-          name: "Boeing 737 MAX 8-200"
-        },
-
-        {
-          inputCode: "197",
-          scrCode: "7M8",
-          seats: "197",
-          name: "Boeing 737 MAX 8-200"
-        },
-
-        {
-          inputCode: "7M8",
-          scrCode: "7M8",
-          seats: "197",
-          name: "Boeing 737 MAX 8-200"
-        },
-
-        {
-          inputCode: "320",
-          scrCode: "320",
-          seats: "180",
-          name: "Airbus A320"
-        },
-
-        {
-          inputCode: "7MJ",
-          scrCode: "7MJ",
-          seats: "228",
-          name: "Boeing 737 MAX"
-        },
-
-        {
-          inputCode: "L45",
-          scrCode: "L45",
-          seats: "008",
-          name: "Learjet 45"
-        },
-
-        {
-          inputCode: "CL5",
-          scrCode: "CL5",
-          seats: "009",
-          name: "Bombardier Challenger"
+        if (
+          Number.isNaN(numericValue) ||
+          numericValue < 0
+        ) {
+          return "000";
         }
 
-      ];
+        return String(
+          Math.min(numericValue, 999)
+        ).padStart(3, "0");
+      }
 
+      function cacheAircraftRecord(key, data) {
+        if (!data) return;
 
-      defaults.forEach(record => {
+        const inputCode =
+          normalizeAircraftDatabaseCode(
+            data.inputCode || key
+          );
 
-        cacheAircraftRecord(
-          record.inputCode,
+        const scrCode =
+          normalizeAircraftDatabaseCode(
+            data.scrCode || inputCode
+          );
+
+        if (!inputCode || !scrCode) {
+          return;
+        }
+
+        const record = {
+          inputCode: inputCode,
+          scrCode: scrCode,
+          seats: formatAircraftSeatCount(data.seats),
+          name: String(data.name || inputCode).trim()
+        };
+
+        aircraftTypeCache.set(
+          normalizeAircraftDatabaseCode(key),
           record
         );
 
-      });
+        aircraftTypeCache.set(
+          inputCode,
+          record
+        );
 
-    }
-
-
-    seedExistingAircraftTypes();
-
-
-    /* ============================================================
-       LOAD ALL FIREBASE AIRCRAFT TYPES
-       ============================================================ */
-
-    async function loadAircraftDatabase() {
-
-      if (
-        typeof firebase === "undefined" ||
-        typeof firebase.database !== "function"
-      ) {
-        throw new Error(
-          "Firebase database is not available."
+        aircraftTypeCache.set(
+          scrCode,
+          record
         );
       }
 
+      function seedExistingAircraftTypes() {
+        const defaults = [
+          {
+            inputCode: "738",
+            scrCode: "73H",
+            seats: "189",
+            name: "Boeing 737-800"
+          },
+          {
+            inputCode: "73H",
+            scrCode: "73H",
+            seats: "189",
+            name: "Boeing 737-800"
+          },
+          {
+            inputCode: "73M",
+            scrCode: "7M8",
+            seats: "197",
+            name: "Boeing 737 MAX 8-200"
+          },
+          {
+            inputCode: "197",
+            scrCode: "7M8",
+            seats: "197",
+            name: "Boeing 737 MAX 8-200"
+          },
+          {
+            inputCode: "7M8",
+            scrCode: "7M8",
+            seats: "197",
+            name: "Boeing 737 MAX 8-200"
+          },
+          {
+            inputCode: "320",
+            scrCode: "320",
+            seats: "180",
+            name: "Airbus A320"
+          },
+          {
+            inputCode: "7MJ",
+            scrCode: "7MJ",
+            seats: "228",
+            name: "Boeing 737 MAX"
+          },
+          {
+            inputCode: "L45",
+            scrCode: "L45",
+            seats: "008",
+            name: "Learjet 45"
+          },
+          {
+            inputCode: "CL5",
+            scrCode: "CL5",
+            seats: "009",
+            name: "Bombardier Challenger"
+          }
+        ];
 
-      const snapshot =
-        await firebase
-          .database()
-          .ref("aircraftTypes")
-          .once("value");
-
-
-      snapshot.forEach(child => {
-
-        cacheAircraftRecord(
-          child.key,
-          child.val()
-        );
-
-      });
-
-
-      return true;
-    }
-
-
-    /* ============================================================
-       FIND AIRCRAFT
-       ============================================================ */
-
-    async function findAircraftType(code) {
-
-      const aircraftCode =
-        normalizeAircraftDatabaseCode(code);
-
-
-      if (!aircraftCode) {
-        return null;
+        defaults.forEach(record => {
+          cacheAircraftRecord(
+            record.inputCode,
+            record
+          );
+        });
       }
 
+      seedExistingAircraftTypes();
 
-      /*
-       * First check local cache.
-       */
-      if (
-        aircraftTypeCache.has(
-          aircraftCode
-        )
-      ) {
-        return aircraftTypeCache.get(
-          aircraftCode
-        );
-      }
-
-
-      /*
-       * Wait for initial Firebase load.
-       */
-      if (aircraftDatabaseReadyPromise) {
-
-        try {
-          await aircraftDatabaseReadyPromise;
-        } catch (error) {
-          console.warn(
-            "Initial aircraft database load failed:",
-            error
+      async function loadAircraftDatabase() {
+        if (
+          typeof firebase === "undefined" ||
+          typeof firebase.database !== "function"
+        ) {
+          throw new Error(
+            "Firebase database is not available."
           );
         }
 
+        const snapshot =
+          await firebase
+            .database()
+            .ref("aircraftTypes")
+            .once("value");
+
+        snapshot.forEach(child => {
+          cacheAircraftRecord(
+            child.key,
+            child.val()
+          );
+        });
+
+        return true;
       }
 
+      async function findAircraftType(code) {
+        const aircraftCode =
+          normalizeAircraftDatabaseCode(code);
 
-      /*
-       * Check again after full Firebase database load.
-       */
-      if (
-        aircraftTypeCache.has(
-          aircraftCode
-        )
-      ) {
-        return aircraftTypeCache.get(
-          aircraftCode
-        );
-      }
-
-
-      /*
-       * Perform a direct Firebase lookup.
-       */
-      const snapshot =
-        await firebase
-          .database()
-          .ref(
-            "aircraftTypes/" +
-            aircraftCode
-          )
-          .once("value");
-
-
-      if (!snapshot.exists()) {
-        return null;
-      }
-
-
-      const data =
-        snapshot.val();
-
-
-      cacheAircraftRecord(
-        aircraftCode,
-        data
-      );
-
-
-      return aircraftTypeCache.get(
-        aircraftCode
-      ) || null;
-    }
-
-
-    /* ============================================================
-       GET CACHED RECORD
-       ============================================================ */
-
-    function getCachedAircraftType(code) {
-
-      const aircraftCode =
-        normalizeAircraftDatabaseCode(code);
-
-
-      if (!aircraftCode) {
-        return null;
-      }
-
-
-      return (
-        aircraftTypeCache.get(
-          aircraftCode
-        ) || null
-      );
-    }
-
-
-    /* ============================================================
-       FIND AIRCRAFT FROM A COMBINED SCR CODE
-
-       Example:
-       23932Q -> 32Q
-       18973H -> 73H
-       1977M8 -> 7M8
-       ============================================================ */
-
-    function findAircraftFromCombinedCode(
-      combinedCode
-    ) {
-
-      const upper =
-        normalizeAircraftDatabaseCode(
-          combinedCode
-        );
-
-
-      if (!upper) {
-        return null;
-      }
-
-
-      const uniqueRecords =
-        Array.from(
-          new Set(
-            aircraftTypeCache.values()
-          )
-        );
-
-
-      /*
-       * Longest SCR codes first.
-       */
-      uniqueRecords.sort(
-        (a, b) =>
-          b.scrCode.length -
-          a.scrCode.length
-      );
-
-
-      for (const record of uniqueRecords) {
+        if (!aircraftCode) {
+          return null;
+        }
 
         if (
-          upper.endsWith(
-            record.scrCode
-          )
+          aircraftTypeCache.has(aircraftCode)
         ) {
-          return record;
+          return aircraftTypeCache.get(
+            aircraftCode
+          );
         }
 
-      }
-
-
-      return null;
-    }
-
-
-    /* ============================================================
-       EXTRACT AIRCRAFT CODES FROM CURRENT INPUT
-       ============================================================ */
-
-    function getAircraftCodesFromFlightInput() {
-
-      const inputElement =
-        document.getElementById(
-          "userInput"
-        );
-
-
-      if (!inputElement) {
-        return [];
-      }
-
-
-      /*
-       * D service uses the existing
-       * Learjet / Challenger selection.
-       */
-      const selectedService =
-        document.getElementById(
-          "dropdownMenu"
-        )?.value
-          ?.charAt(0)
-          ?.toUpperCase();
-
-
-      if (selectedService === "D") {
-        return [];
-      }
-
-
-      const lines =
-        inputElement.value
-          .split("\n")
-          .map(line => line.trim())
-          .filter(Boolean);
-
-
-      const codes =
-        new Set();
-
-
-      lines.forEach(line => {
-
-        const parts =
-          line.split(/\s+/);
-
-
-        /*
-         * Existing format:
-         *
-         * FR877P
-         * LPL
-         * NCL
-         * 15FEB2025
-         * 1430
-         * 1515
-         * EIIHG
-         * 7M8
-         */
-        if (parts.length >= 8) {
-
-          const aircraftCode =
-            normalizeAircraftDatabaseCode(
-              parts[7]
-            );
-
-
-          if (aircraftCode) {
-            codes.add(
-              aircraftCode
+        if (aircraftDatabaseReadyPromise) {
+          try {
+            await aircraftDatabaseReadyPromise;
+          } catch (error) {
+            console.warn(
+              "Aircraft preload failed:",
+              error
             );
           }
-
         }
 
-      });
-
-
-      return Array.from(codes);
-    }
-
-
-    /* ============================================================
-       AIRCRAFT MODAL
-       ============================================================ */
-
-    function setAircraftModalStatus(
-      message,
-      type = "info"
-    ) {
-
-      const status =
-        document.getElementById(
-          "aircraftModalStatus"
-        );
-
-
-      if (!status) return;
-
-
-      if (!message) {
-
-        status.textContent = "";
-
-        status.className =
-          "aircraft-modal-status";
-
-        return;
-      }
-
-
-      status.textContent =
-        message;
-
-
-      status.className =
-        "aircraft-modal-status " +
-        type;
-    }
-
-
-    function openAircraftTypeModal(code) {
-
-      pendingAircraftCode =
-        normalizeAircraftDatabaseCode(
-          code
-        );
-
-
-      document.getElementById(
-        "unknownAircraftCode"
-      ).textContent =
-        pendingAircraftCode;
-
-
-      document.getElementById(
-        "newAircraftInputCode"
-      ).value =
-        pendingAircraftCode;
-
-
-      document.getElementById(
-        "newAircraftName"
-      ).value = "";
-
-
-      document.getElementById(
-        "newAircraftScrCode"
-      ).value =
-        pendingAircraftCode;
-
-
-      document.getElementById(
-        "newAircraftSeats"
-      ).value = "";
-
-
-      setAircraftModalStatus("");
-
-
-      document.getElementById(
-        "aircraftTypeModal"
-      ).classList.add("show");
-
-
-      setTimeout(() => {
-
-        document.getElementById(
-          "newAircraftName"
-        ).focus();
-
-      }, 50);
-
-    }
-
-
-    function closeAircraftTypeModal(
-      result = false
-    ) {
-
-      document.getElementById(
-        "aircraftTypeModal"
-      ).classList.remove("show");
-
-
-      pendingAircraftCode =
-        null;
-
-
-      if (
-        aircraftModalResolver
-      ) {
-
-        const resolver =
-          aircraftModalResolver;
-
-
-        aircraftModalResolver =
-          null;
-
-
-        resolver(result);
-
-      }
-
-    }
-
-
-    function requestAircraftTypeDefinition(
-      code
-    ) {
-
-      return new Promise(resolve => {
-
-        aircraftModalResolver =
-          resolve;
-
-
-        openAircraftTypeModal(
-          code
-        );
-
-      });
-
-    }
-
-
-    /* ============================================================
-       SAVE NEW AIRCRAFT TYPE TO FIREBASE
-       ============================================================ */
-
-    async function saveNewAircraftType() {
-
-      if (!pendingAircraftCode) {
-        return;
-      }
-
-
-      const inputCode =
-        normalizeAircraftDatabaseCode(
-          pendingAircraftCode
-        );
-
-
-      const aircraftName =
-        document
-          .getElementById(
-            "newAircraftName"
-          )
-          .value
-          .trim();
-
-
-      const scrCode =
-        normalizeAircraftDatabaseCode(
-          document
-            .getElementById(
-              "newAircraftScrCode"
-            )
-            .value
-        );
-
-
-      const seatInput =
-        document
-          .getElementById(
-            "newAircraftSeats"
-          )
-          .value
-          .trim();
-
-
-      /* ----------------------------------------------------------
-         VALIDATION
-         ---------------------------------------------------------- */
-
-      if (!aircraftName) {
-
-        setAircraftModalStatus(
-          "Please enter the aircraft name.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (
-        !/^[A-Z0-9]{2,6}$/.test(
-          inputCode
-        )
-      ) {
-
-        setAircraftModalStatus(
-          "The aircraft input code is invalid.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (
-        !/^[A-Z0-9]{2,6}$/.test(
-          scrCode
-        )
-      ) {
-
-        setAircraftModalStatus(
-          "SCR aircraft code must contain only letters and numbers.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (!seatInput) {
-
-        setAircraftModalStatus(
-          "Please enter the passenger seat capacity.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const seats =
-        parseInt(
-          seatInput,
-          10
-        );
-
-
-      if (
-        Number.isNaN(seats) ||
-        seats < 0 ||
-        seats > 999
-      ) {
-
-        setAircraftModalStatus(
-          "Seat capacity must be between 0 and 999.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const formattedSeats =
-        formatAircraftSeatCount(
-          seats
-        );
-
-
-      const newRecord = {
-
-        inputCode:
-          inputCode,
-
-        scrCode:
-          scrCode,
-
-        seats:
-          formattedSeats,
-
-        name:
-          aircraftName,
-
-        createdAt:
-          firebase
-            .database
-            .ServerValue
-            .TIMESTAMP
-
-      };
-
-
-      const saveButton =
-        document.getElementById(
-          "saveAircraftTypeBtn"
-        );
-
-
-      saveButton.disabled =
-        true;
-
-
-      setAircraftModalStatus(
-        "Checking aircraft database...",
-        "info"
-      );
-
-
-      try {
-
-        const aircraftRef =
-          firebase
+        if (
+          aircraftTypeCache.has(aircraftCode)
+        ) {
+          return aircraftTypeCache.get(
+            aircraftCode
+          );
+        }
+
+        const snapshot =
+          await firebase
             .database()
             .ref(
               "aircraftTypes/" +
-              inputCode
-            );
+              aircraftCode
+            )
+            .once("value");
 
+        if (!snapshot.exists()) {
+          return null;
+        }
 
-        /*
-         * Do not allow somebody to accidentally
-         * overwrite an existing aircraft.
-         */
-        const existingSnapshot =
-          await aircraftRef.once(
-            "value"
+        cacheAircraftRecord(
+          aircraftCode,
+          snapshot.val()
+        );
+
+        return (
+          aircraftTypeCache.get(
+            aircraftCode
+          ) || null
+        );
+      }
+
+      function getCachedAircraftType(code) {
+        return (
+          aircraftTypeCache.get(
+            normalizeAircraftDatabaseCode(code)
+          ) || null
+        );
+      }
+
+      function getAircraftCodesFromFlightInput() {
+        const inputElement =
+          document.getElementById("userInput");
+
+        if (!inputElement) {
+          return [];
+        }
+
+        const selectedService =
+          document
+            .getElementById("dropdownMenu")
+            ?.value
+            ?.charAt(0)
+            ?.toUpperCase();
+
+        if (selectedService === "D") {
+          return [];
+        }
+
+        const lines =
+          inputElement.value
+            .split("\n")
+            .map(line => line.trim())
+            .filter(Boolean);
+
+        const codes = new Set();
+
+        lines.forEach(line => {
+          const parts =
+            line.split(/\s+/);
+
+          if (parts.length >= 8) {
+            const aircraftCode =
+              normalizeAircraftDatabaseCode(
+                parts[7]
+              );
+
+            if (aircraftCode) {
+              codes.add(aircraftCode);
+            }
+          }
+        });
+
+        return Array.from(codes);
+      }
+
+      function setAircraftModalStatus(
+        message,
+        type = "info"
+      ) {
+        const status =
+          document.getElementById(
+            "aircraftModalStatus"
           );
 
+        if (!status) return;
+
+        if (!message) {
+          status.textContent = "";
+          status.className =
+            "aircraft-modal-status";
+          return;
+        }
+
+        status.textContent = message;
+        status.className =
+          "aircraft-modal-status " +
+          type;
+      }
+
+      function openAircraftTypeModal(code) {
+        pendingAircraftCode =
+          normalizeAircraftDatabaseCode(code);
+
+        document.getElementById(
+          "unknownAircraftCode"
+        ).textContent =
+          pendingAircraftCode;
+
+        document.getElementById(
+          "newAircraftInputCode"
+        ).value =
+          pendingAircraftCode;
+
+        document.getElementById(
+          "newAircraftName"
+        ).value = "";
+
+        document.getElementById(
+          "newAircraftScrCode"
+        ).value =
+          pendingAircraftCode;
+
+        document.getElementById(
+          "newAircraftSeats"
+        ).value = "";
+
+        setAircraftModalStatus("");
+
+        document.getElementById(
+          "aircraftTypeModal"
+        ).classList.add("show");
+
+        setTimeout(() => {
+          document.getElementById(
+            "newAircraftName"
+          ).focus();
+        }, 50);
+      }
+
+      function closeAircraftTypeModal(
+        result = false
+      ) {
+        document.getElementById(
+          "aircraftTypeModal"
+        ).classList.remove("show");
+
+        pendingAircraftCode = null;
+
+        if (aircraftModalResolver) {
+          const resolver =
+            aircraftModalResolver;
+
+          aircraftModalResolver = null;
+
+          resolver(result);
+        }
+      }
+
+      function requestAircraftTypeDefinition(
+        code
+      ) {
+        return new Promise(resolve => {
+          aircraftModalResolver =
+            resolve;
+
+          openAircraftTypeModal(code);
+        });
+      }
+
+      async function saveNewAircraftType() {
+        if (!pendingAircraftCode) {
+          return;
+        }
+
+        const inputCode =
+          normalizeAircraftDatabaseCode(
+            pendingAircraftCode
+          );
+
+        const aircraftName =
+          document
+            .getElementById(
+              "newAircraftName"
+            )
+            .value
+            .trim();
+
+        const scrCode =
+          normalizeAircraftDatabaseCode(
+            document
+              .getElementById(
+                "newAircraftScrCode"
+              )
+              .value
+          );
+
+        const seatInput =
+          document
+            .getElementById(
+              "newAircraftSeats"
+            )
+            .value
+            .trim();
+
+        if (!aircraftName) {
+          setAircraftModalStatus(
+            "Please enter the aircraft name.",
+            "error"
+          );
+          return;
+        }
 
         if (
-          existingSnapshot.exists()
+          !/^[A-Z0-9]{2,6}$/.test(
+            inputCode
+          )
         ) {
+          setAircraftModalStatus(
+            "Aircraft input code is invalid.",
+            "error"
+          );
+          return;
+        }
 
-          const existing =
-            existingSnapshot.val();
+        if (
+          !/^[A-Z0-9]{2,6}$/.test(
+            scrCode
+          )
+        ) {
+          setAircraftModalStatus(
+            "SCR aircraft code must contain only letters and numbers.",
+            "error"
+          );
+          return;
+        }
 
+        const seats =
+          parseInt(seatInput, 10);
+
+        if (
+          Number.isNaN(seats) ||
+          seats < 0 ||
+          seats > 999
+        ) {
+          setAircraftModalStatus(
+            "Seat capacity must be between 0 and 999.",
+            "error"
+          );
+          return;
+        }
+
+        const newRecord = {
+          inputCode: inputCode,
+          scrCode: scrCode,
+          seats:
+            formatAircraftSeatCount(seats),
+          name: aircraftName,
+          createdAt:
+            firebase.database.ServerValue
+              .TIMESTAMP
+        };
+
+        const saveButton =
+          document.getElementById(
+            "saveAircraftTypeBtn"
+          );
+
+        saveButton.disabled = true;
+
+        try {
+          setAircraftModalStatus(
+            "Checking aircraft database...",
+            "info"
+          );
+
+          const aircraftRef =
+            firebase
+              .database()
+              .ref(
+                "aircraftTypes/" +
+                inputCode
+              );
+
+          const existingSnapshot =
+            await aircraftRef.once(
+              "value"
+            );
+
+          if (
+            existingSnapshot.exists()
+          ) {
+            cacheAircraftRecord(
+              inputCode,
+              existingSnapshot.val()
+            );
+
+            setAircraftModalStatus(
+              "Aircraft already exists. Existing database entry will be used.",
+              "success"
+            );
+
+            setTimeout(() => {
+              closeAircraftTypeModal(
+                true
+              );
+            }, 500);
+
+            return;
+          }
+
+          setAircraftModalStatus(
+            "Saving aircraft to Firebase...",
+            "info"
+          );
+
+          await aircraftRef.set(
+            newRecord
+          );
 
           cacheAircraftRecord(
             inputCode,
-            existing
+            newRecord
           );
 
+          cacheAircraftRecord(
+            scrCode,
+            newRecord
+          );
 
           setAircraftModalStatus(
-            "This aircraft type was already added by another user. The existing database entry will be used.",
+            `${inputCode} added successfully.`,
             "success"
           );
 
-
           setTimeout(() => {
-
             closeAircraftTypeModal(
               true
             );
+          }, 500);
 
-          }, 600);
+        } catch (error) {
+          console.error(
+            "Aircraft save failed:",
+            error
+          );
 
+          setAircraftModalStatus(
+            "Unable to save aircraft type. Check Firebase rules and database connection.",
+            "error"
+          );
+
+        } finally {
+          saveButton.disabled = false;
+        }
+      }
+
+      async function verifyAircraftTypesBeforeGeneration() {
+        const aircraftCodes =
+          getAircraftCodesFromFlightInput();
+
+        for (
+          const aircraftCode
+          of aircraftCodes
+        ) {
+          let aircraftRecord;
+
+          try {
+            aircraftRecord =
+              await findAircraftType(
+                aircraftCode
+              );
+
+          } catch (error) {
+            console.error(
+              "Aircraft lookup error:",
+              error
+            );
+
+            showError(
+              `Unable to check aircraft type ${aircraftCode}.`
+            );
+
+            return false;
+          }
+
+          if (aircraftRecord) {
+            continue;
+          }
+
+          const added =
+            await requestAircraftTypeDefinition(
+              aircraftCode
+            );
+
+          if (!added) {
+            showError(
+              `SCR generation cancelled because ${aircraftCode} is not recognised.`
+            );
+
+            return false;
+          }
+
+          if (
+            !getCachedAircraftType(
+              aircraftCode
+            )
+          ) {
+            showError(
+              `${aircraftCode} could not be loaded after saving.`
+            );
+
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      const originalGetFinalCombinedCode =
+        window.getFinalCombinedCode;
+
+      if (
+        typeof originalGetFinalCombinedCode ===
+        "function"
+      ) {
+        window.getFinalCombinedCode =
+          function(
+            serviceTypeInput,
+            aircraftTypeInput
+          ) {
+            const serviceType =
+              normalizeAircraftDatabaseCode(
+                serviceTypeInput
+              );
+
+            const aircraftCode =
+              normalizeAircraftDatabaseCode(
+                aircraftTypeInput
+              );
+
+            if (serviceType === "D") {
+              return originalGetFinalCombinedCode(
+                serviceTypeInput,
+                aircraftTypeInput
+              );
+            }
+
+            const record =
+              getCachedAircraftType(
+                aircraftCode
+              );
+
+            if (!record) {
+              return originalGetFinalCombinedCode(
+                serviceTypeInput,
+                aircraftTypeInput
+              );
+            }
+
+            if (serviceType === "J") {
+              return (
+                record.seats +
+                record.scrCode
+              );
+            }
+
+            if (
+              serviceType === "P" ||
+              serviceType === "K" ||
+              serviceType === "T" ||
+              serviceType === "X"
+            ) {
+              return (
+                "000" +
+                record.scrCode
+              );
+            }
+
+            return originalGetFinalCombinedCode(
+              serviceTypeInput,
+              aircraftTypeInput
+            );
+          };
+      }
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          aircraftDatabaseReadyPromise =
+            loadAircraftDatabase()
+              .catch(error => {
+                console.warn(
+                  "Aircraft database preload failed:",
+                  error
+                );
+              });
+
+          document
+            .getElementById(
+              "saveAircraftTypeBtn"
+            )
+            .addEventListener(
+              "click",
+              saveNewAircraftType
+            );
+
+          document
+            .getElementById(
+              "cancelAircraftTypeBtn"
+            )
+            .addEventListener(
+              "click",
+              () => {
+                closeAircraftTypeModal(
+                  false
+                );
+              }
+            );
+
+          document
+            .getElementById(
+              "closeAircraftModalBtn"
+            )
+            .addEventListener(
+              "click",
+              () => {
+                closeAircraftTypeModal(
+                  false
+                );
+              }
+            );
+
+          document
+            .getElementById(
+              "newAircraftSeats"
+            )
+            .addEventListener(
+              "keydown",
+              event => {
+                if (
+                  event.key === "Enter"
+                ) {
+                  event.preventDefault();
+                  saveNewAircraftType();
+                }
+              }
+            );
+
+          document
+            .getElementById("formatBtn")
+            .addEventListener(
+              "click",
+              async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                if (generationInProgress) {
+                  return;
+                }
+
+                generationInProgress = true;
+
+                try {
+                  clearFeedback();
+
+                  const verified =
+                    await verifyAircraftTypesBeforeGeneration();
+
+                  if (!verified) {
+                    return;
+                  }
+
+                  const slotType =
+                    document
+                      .getElementById(
+                        "slotType"
+                      )
+                      .value;
+
+                  if (
+                    slotType === "CHANGE"
+                  ) {
+                    formatChangeSCRMessages();
+                  } else {
+                    formatSCRMessages();
+                  }
+
+                } catch (error) {
+                  console.error(
+                    "Aircraft verification failed:",
+                    error
+                  );
+
+                  showError(
+                    "Aircraft verification failed. SCR was not generated."
+                  );
+
+                } finally {
+                  generationInProgress =
+                    false;
+                }
+              },
+              true
+            );
+        }
+      );
+
+      document.addEventListener(
+        "click",
+        event => {
+          const modal =
+            document.getElementById(
+              "aircraftTypeModal"
+            );
+
+          if (
+            modal &&
+            modal.classList.contains(
+              "show"
+            ) &&
+            event.target === modal
+          ) {
+            closeAircraftTypeModal(
+              false
+            );
+          }
+        }
+      );
+    })();
+  </script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const PRESENCE_PATH =
+        "connectedUsers";
+
+      const CHANNEL_NAME =
+        "runway-slots-presence-v3";
+
+      const HEARTBEAT_INTERVAL =
+        2000;
+
+      const PEER_TIMEOUT =
+        6500;
+
+      const DISCOVERY_DELAY =
+        800;
+
+      function createTemporaryTabId() {
+        if (
+          window.crypto &&
+          typeof window.crypto.randomUUID ===
+          "function"
+        ) {
+          return window.crypto.randomUUID();
+        }
+
+        return (
+          Date.now().toString(36) +
+          "-" +
+          Math.random()
+            .toString(36)
+            .substring(2, 12) +
+          "-" +
+          Math.random()
+            .toString(36)
+            .substring(2, 12)
+        );
+      }
+
+      const thisTabId =
+        createTemporaryTabId();
+
+      const thisTabStartedAt =
+        Date.now();
+
+      let database = null;
+      let presenceRoot = null;
+      let channel = null;
+      let firebaseConnected = false;
+      let isLeader = false;
+      let electionReady = false;
+      let coordinationActive = false;
+      let presenceRef = null;
+      let heartbeatTimer = null;
+      let cleanupTimer = null;
+      let discoveryTimer = null;
+      let lastCount = 0;
+
+      const peers =
+        new Map();
+
+      function updateConnectedUsersDisplay(
+        count,
+        state = "online"
+      ) {
+        const container =
+          document.getElementById(
+            "connectedUsersStatus"
+          );
+
+        const number =
+          document.getElementById(
+            "connectedUsersCount"
+          );
+
+        if (
+          !container ||
+          !number
+        ) {
+          return;
+        }
+
+        container.classList.remove(
+          "online",
+          "offline",
+          "connecting"
+        );
+
+        container.classList.add(
+          state
+        );
+
+        if (state === "offline") {
+          number.textContent = "--";
+
+          container.title =
+            "Connected users unavailable because Firebase is offline.";
 
           return;
         }
 
+        if (
+          state === "connecting"
+        ) {
+          number.textContent = "--";
 
-        setAircraftModalStatus(
-          "Saving aircraft type to Firebase...",
-          "info"
-        );
+          container.title =
+            "Connecting to realtime user counter...";
 
+          return;
+        }
 
-        await aircraftRef.set(
-          newRecord
-        );
+        number.textContent =
+          String(count);
 
-
-        cacheAircraftRecord(
-          inputCode,
-          newRecord
-        );
-
-
-        cacheAircraftRecord(
-          scrCode,
-          newRecord
-        );
-
-
-        setAircraftModalStatus(
-          `${inputCode} has been added to the aircraft database.`,
-          "success"
-        );
-
-
-        setTimeout(() => {
-
-          closeAircraftTypeModal(
-            true
-          );
-
-        }, 600);
-
-      } catch (error) {
-
-        console.error(
-          "Aircraft database save error:",
-          error
-        );
-
-
-        setAircraftModalStatus(
-          "Unable to save this aircraft type to Firebase. Check database connection and Firebase rules.",
-          "error"
-        );
-
-      } finally {
-
-        saveButton.disabled =
-          false;
-
+        container.title =
+          `${count} connected user${count === 1 ? "" : "s"} currently using Runway Slots`;
       }
 
-    }
-
-
-
-    async function verifyAircraftTypesBeforeGeneration() {
-
-      const aircraftCodes =
-        getAircraftCodesFromFlightInput();
-
-
-      for (
-        const aircraftCode
-        of aircraftCodes
-      ) {
-
-        let aircraftRecord;
-
+      function broadcast(type) {
+        if (!channel) {
+          return;
+        }
 
         try {
-
-          aircraftRecord =
-            await findAircraftType(
-              aircraftCode
-            );
+          channel.postMessage({
+            type: type,
+            tabId: thisTabId,
+            startedAt:
+              thisTabStartedAt,
+            timestamp:
+              Date.now()
+          });
 
         } catch (error) {
+          console.warn(
+            "Presence broadcast failed:",
+            error
+          );
+        }
+      }
 
+      function rememberPeer(data) {
+        if (
+          !data ||
+          !data.tabId ||
+          data.tabId === thisTabId
+        ) {
+          return;
+        }
+
+        peers.set(
+          data.tabId,
+          {
+            tabId:
+              data.tabId,
+            startedAt:
+              Number(
+                data.startedAt
+              ) || Date.now(),
+            lastSeen:
+              Date.now()
+          }
+        );
+      }
+
+      function cleanupPeers() {
+        const now =
+          Date.now();
+
+        for (
+          const [id, peer]
+          of peers
+        ) {
+          if (
+            now - peer.lastSeen >
+            PEER_TIMEOUT
+          ) {
+            peers.delete(id);
+          }
+        }
+
+        electLeader();
+      }
+
+      function findLeader() {
+        const candidates = [
+          {
+            tabId: thisTabId,
+            startedAt:
+              thisTabStartedAt
+          }
+        ];
+
+        const now =
+          Date.now();
+
+        peers.forEach(peer => {
+          if (
+            now - peer.lastSeen <=
+            PEER_TIMEOUT
+          ) {
+            candidates.push({
+              tabId:
+                peer.tabId,
+              startedAt:
+                peer.startedAt
+            });
+          }
+        });
+
+        candidates.sort(
+          (a, b) => {
+            if (
+              a.startedAt !==
+              b.startedAt
+            ) {
+              return (
+                a.startedAt -
+                b.startedAt
+              );
+            }
+
+            return a.tabId.localeCompare(
+              b.tabId
+            );
+          }
+        );
+
+        return (
+          candidates[0] || null
+        );
+      }
+
+      async function removePresence() {
+        if (!presenceRef) {
+          return;
+        }
+
+        const oldRef =
+          presenceRef;
+
+        presenceRef = null;
+
+        try {
+          await oldRef.remove();
+
+        } catch (error) {
+          console.warn(
+            "Presence explicit removal failed:",
+            error
+          );
+        }
+      }
+
+      async function registerPresence() {
+        if (
+          !isLeader ||
+          !firebaseConnected ||
+          !presenceRoot ||
+          presenceRef
+        ) {
+          return;
+        }
+
+        const newRef =
+          presenceRoot.push();
+
+        presenceRef =
+          newRef;
+
+        try {
+          await newRef
+            .onDisconnect()
+            .remove();
+
+          if (
+            !isLeader ||
+            !firebaseConnected ||
+            presenceRef !== newRef
+          ) {
+            try {
+              await newRef.remove();
+            } catch (_) {}
+
+            return;
+          }
+
+          await newRef.set({
+            page:
+              window.location.pathname,
+            pageName:
+              document.title,
+            presenceType:
+              "temporary",
+            connectedAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP
+          });
+
+        } catch (error) {
           console.error(
-            "Aircraft lookup error:",
+            "Presence registration failed:",
             error
           );
 
-
-          showError(
-            `Unable to check aircraft type ${aircraftCode} against Firebase.`
-          );
-
-
-          return false;
-        }
-
-
-        if (aircraftRecord) {
-          continue;
-        }
-
-
-        const added =
-          await requestAircraftTypeDefinition(
-            aircraftCode
-          );
-
-        if (!added) {
-
-          showError(
-            `SCR generation cancelled because aircraft type ${aircraftCode} is not recognised.`
-          );
-
-          return false;
-        }
-
-
-        const addedRecord =
-          getCachedAircraftType(
-            aircraftCode
-          );
-
-
-        if (!addedRecord) {
-
-          showError(
-            `Aircraft type ${aircraftCode} could not be loaded after saving.`
-          );
-
-          return false;
-        }
-
-      }
-
-
-      return true;
-    }
-
-
-
-    const originalGetFinalCombinedCode =
-      window.getFinalCombinedCode;
-
-
-    window.getFinalCombinedCode =
-      function(
-        scrLineServiceType,
-        aircraftTypeInput
-      ) {
-
-        const serviceType =
-          normalizeAircraftDatabaseCode(
-            scrLineServiceType
-          );
-
-
-        const aircraftCode =
-          normalizeAircraftDatabaseCode(
-            aircraftTypeInput
-          );
-
-
-        if (serviceType === "D") {
-
-          return originalGetFinalCombinedCode(
-            scrLineServiceType,
-            aircraftTypeInput
-          );
-
-        }
-
-
-        if (!aircraftCode) {
-
-          return originalGetFinalCombinedCode(
-            scrLineServiceType,
-            aircraftTypeInput
-          );
-
-        }
-
-
-        const record =
-          getCachedAircraftType(
-            aircraftCode
-          );
-
-        if (!record) {
-
-          return originalGetFinalCombinedCode(
-            scrLineServiceType,
-            aircraftTypeInput
-          );
-
-        }
-
-
-        const scrCode =
-          record.scrCode;
-
-
-        if (serviceType === "J") {
-
-          return (
-            record.seats +
-            scrCode
-          );
-
-        }
-
-        if (
-          serviceType === "P" ||
-          serviceType === "K" ||
-          serviceType === "T" ||
-          serviceType === "X"
-        ) {
-
-          return (
-            "000" +
-            scrCode
-          );
-
-        }
-
-
-        return originalGetFinalCombinedCode(
-          scrLineServiceType,
-          aircraftTypeInput
-        );
-
-      };
-
-
-
-    const originalCreateEditableRLineRow =
-      window.createEditableRLineRow;
-
-
-    if (
-      typeof originalCreateEditableRLineRow ===
-      "function"
-    ) {
-
-      window.createEditableRLineRow =
-        function(rowData) {
-
-          const originalAircraftRecord =
-            findAircraftFromCombinedCode(
-              rowData.combinedCode
-            );
-
-
-          const row =
-            originalCreateEditableRLineRow(
-              rowData
-            );
-
-
-          if (!originalAircraftRecord) {
-            return row;
-          }
-
-
-          const serviceSelect =
-            row.querySelector(
-              ".r-service"
-            );
-
-
-          const combinedCodeInput =
-            row.querySelector(
-              ".r-combined-code"
-            );
-
-
           if (
-            !serviceSelect ||
-            !combinedCodeInput
+            presenceRef === newRef
           ) {
-            return row;
+            presenceRef = null;
+          }
+        }
+      }
+
+      async function setLeader(
+        shouldLead
+      ) {
+        if (
+          shouldLead === isLeader
+        ) {
+          if (
+            shouldLead &&
+            firebaseConnected
+          ) {
+            await registerPresence();
           }
 
-
-          serviceSelect.addEventListener(
-            "change",
-            function() {
-
-              const service =
-                normalizeAircraftDatabaseCode(
-                  serviceSelect.value
-                );
-
-              if (service === "D") {
-                return;
-              }
-
-
-              if (service === "J") {
-
-                combinedCodeInput.value =
-                  originalAircraftRecord.seats +
-                  originalAircraftRecord.scrCode;
-
-              } else {
-
-                combinedCodeInput.value =
-                  "000" +
-                  originalAircraftRecord.scrCode;
-
-              }
-
-
-              if (
-                typeof updateRowChangeHighlight ===
-                "function"
-              ) {
-
-                updateRowChangeHighlight(
-                  row
-                );
-
-              }
-
-            }
-          );
-
-
-          return row;
-
-        };
-
-    }
-
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      function() {
-
-
-        aircraftDatabaseReadyPromise =
-          loadAircraftDatabase()
-            .then(() => {
-
-              console.log(
-                "Aircraft database loaded."
-              );
-
-            })
-            .catch(error => {
-
-              console.warn(
-                "Could not preload aircraft database:",
-                error
-              );
-
-            });
-
-
-        document
-          .getElementById(
-            "saveAircraftTypeBtn"
-          )
-          .addEventListener(
-            "click",
-            saveNewAircraftType
-          );
-
-
-        document
-          .getElementById(
-            "cancelAircraftTypeBtn"
-          )
-          .addEventListener(
-            "click",
-            function() {
-
-              closeAircraftTypeModal(
-                false
-              );
-
-            }
-          );
-
-
-        document
-          .getElementById(
-            "closeAircraftModalBtn"
-          )
-          .addEventListener(
-            "click",
-            function() {
-
-              closeAircraftTypeModal(
-                false
-              );
-
-            }
-          );
-
-        document
-          .getElementById(
-            "newAircraftSeats"
-          )
-          .addEventListener(
-            "keydown",
-            function(event) {
-
-              if (
-                event.key === "Enter"
-              ) {
-
-                event.preventDefault();
-
-                saveNewAircraftType();
-
-              }
-
-            }
-          );
-
-        const formatButton =
-          document.getElementById(
-            "formatBtn"
-          );
-
-
-        formatButton.addEventListener(
-          "click",
-          async function(event) {
-
-            event.preventDefault();
-
-            event.stopImmediatePropagation();
-
-
-            if (generationInProgress) {
-              return;
-            }
-
-
-            generationInProgress =
-              true;
-
-
-            try {
-
-              clearFeedback();
-
-
-              const verified =
-                await verifyAircraftTypesBeforeGeneration();
-
-
-              if (!verified) {
-                return;
-              }
-
-              const slotType =
-                document.getElementById(
-                  "slotType"
-                ).value;
-
-
-              if (
-                slotType === "CHANGE"
-              ) {
-
-                formatChangeSCRMessages();
-
-              } else {
-
-                formatSCRMessages();
-
-              }
-
-            } catch (error) {
-
-              console.error(
-                "Aircraft verification error:",
-                error
-              );
-
-
-              showError(
-                "Aircraft verification failed. SCR was not generated."
-              );
-
-            } finally {
-
-              generationInProgress =
-                false;
-
-            }
-
-          },
-
-          true
-        );
-
-      }
-    );
-
-    document.addEventListener(
-      "click",
-      function(event) {
-
-        const modal =
-          document.getElementById(
-            "aircraftTypeModal"
-          );
-
-
-        if (
-          modal &&
-          modal.classList.contains(
-            "show"
-          ) &&
-          event.target === modal
-        ) {
-
-          closeAircraftTypeModal(
-            false
-          );
-
+          return;
         }
 
-      }
-    );
+        isLeader =
+          shouldLead;
 
+        if (shouldLead) {
+          await registerPresence();
+        } else {
+          await removePresence();
+        }
+      }
+
+      function electLeader() {
+        if (
+          !electionReady ||
+          !coordinationActive
+        ) {
+          return;
+        }
+
+        const leader =
+          findLeader();
+
+        if (!leader) {
+          return;
+        }
+
+        setLeader(
+          leader.tabId ===
+          thisTabId
+        );
+      }
+
+      function handleMessage(event) {
+        const data =
+          event.data;
+
+        if (
+          !data ||
+          !data.type ||
+          !data.tabId ||
+          data.tabId === thisTabId
+        ) {
+          return;
+        }
+
+        if (
+          data.type === "GOODBYE"
+        ) {
+          peers.delete(
+            data.tabId
+          );
+
+          electLeader();
+          return;
+        }
+
+        if (
+          data.type === "DISCOVER"
+        ) {
+          rememberPeer(data);
+
+          broadcast(
+            "HEARTBEAT"
+          );
+
+          electLeader();
+          return;
+        }
+
+        if (
+          data.type === "HEARTBEAT"
+        ) {
+          rememberPeer(data);
+          electLeader();
+        }
+      }
+
+      function startCoordination() {
+        if (coordinationActive) {
+          return;
+        }
+
+        coordinationActive = true;
+        electionReady = false;
+        peers.clear();
+
+        if (
+          "BroadcastChannel" in
+          window
+        ) {
+          channel =
+            new BroadcastChannel(
+              CHANNEL_NAME
+            );
+
+          channel.onmessage =
+            handleMessage;
+
+          broadcast("DISCOVER");
+
+          heartbeatTimer =
+            setInterval(
+              () => {
+                broadcast(
+                  "HEARTBEAT"
+                );
+              },
+              HEARTBEAT_INTERVAL
+            );
+
+          cleanupTimer =
+            setInterval(
+              cleanupPeers,
+              2500
+            );
+
+          discoveryTimer =
+            setTimeout(
+              () => {
+                electionReady = true;
+
+                broadcast(
+                  "HEARTBEAT"
+                );
+
+                electLeader();
+              },
+              DISCOVERY_DELAY
+            );
+
+        } else {
+          console.warn(
+            "BroadcastChannel is unavailable. Tabs may be counted separately."
+          );
+
+          electionReady = true;
+
+          setLeader(true);
+        }
+      }
+
+      function stopCoordination() {
+        if (!coordinationActive) {
+          return;
+        }
+
+        broadcast("GOODBYE");
+
+        coordinationActive = false;
+        electionReady = false;
+
+        if (heartbeatTimer) {
+          clearInterval(
+            heartbeatTimer
+          );
+
+          heartbeatTimer = null;
+        }
+
+        if (cleanupTimer) {
+          clearInterval(
+            cleanupTimer
+          );
+
+          cleanupTimer = null;
+        }
+
+        if (discoveryTimer) {
+          clearTimeout(
+            discoveryTimer
+          );
+
+          discoveryTimer = null;
+        }
+
+        if (channel) {
+          try {
+            channel.close();
+          } catch (_) {}
+
+          channel = null;
+        }
+
+        peers.clear();
+
+        if (isLeader) {
+          isLeader = false;
+          removePresence();
+        }
+      }
+
+      function startPresenceCounter() {
+        presenceRoot.on(
+          "value",
+          snapshot => {
+            lastCount =
+              snapshot.numChildren();
+
+            if (firebaseConnected) {
+              updateConnectedUsersDisplay(
+                lastCount,
+                "online"
+              );
+            }
+          },
+          error => {
+            console.error(
+              "Presence counter failed:",
+              error
+            );
+
+            updateConnectedUsersDisplay(
+              0,
+              "offline"
+            );
+          }
+        );
+      }
+
+      function monitorFirebaseConnection() {
+        database
+          .ref(".info/connected")
+          .on(
+            "value",
+            async snapshot => {
+              firebaseConnected =
+                snapshot.val() ===
+                true;
+
+              if (
+                !firebaseConnected
+              ) {
+                presenceRef = null;
+
+                updateConnectedUsersDisplay(
+                  0,
+                  "offline"
+                );
+
+                return;
+              }
+
+              updateConnectedUsersDisplay(
+                lastCount,
+                "connecting"
+              );
+
+              if (isLeader) {
+                await registerPresence();
+              }
+            }
+          );
+      }
+
+      function initializeConnectedUsers() {
+        updateConnectedUsersDisplay(
+          0,
+          "connecting"
+        );
+
+        try {
+          if (
+            typeof firebase ===
+              "undefined" ||
+            !firebase.apps ||
+            !firebase.apps.length ||
+            typeof firebase.database !==
+              "function"
+          ) {
+            throw new Error(
+              "Firebase is not initialized."
+            );
+          }
+
+          database =
+            firebase.database();
+
+          presenceRoot =
+            database.ref(
+              PRESENCE_PATH
+            );
+
+          startPresenceCounter();
+          monitorFirebaseConnection();
+          startCoordination();
+
+        } catch (error) {
+          console.error(
+            "Connected users failed:",
+            error
+          );
+
+          updateConnectedUsersDisplay(
+            0,
+            "offline"
+          );
+        }
+      }
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        initializeConnectedUsers
+      );
+
+      window.addEventListener(
+        "pagehide",
+        () => {
+          stopCoordination();
+        }
+      );
+
+      window.addEventListener(
+        "pageshow",
+        event => {
+          if (
+            event.persisted &&
+            presenceRoot
+          ) {
+            startCoordination();
+          }
+        }
+      );
+    })();
   </script>
 
 </body>
