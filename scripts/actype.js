@@ -2041,7 +2041,7 @@
 
 
               connectionText.textContent =
-                "Firebase Connected";
+                "Database Connected";
 
             }
 
@@ -2055,7 +2055,7 @@
 
 
               connectionText.textContent =
-                "Firebase Disconnected";
+                "Database Disconnected";
 
             }
 
