@@ -1300,7 +1300,136 @@
         flex:0 0 auto;
       }
     }
+.aircraft-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.55);
 
+  align-items: center;
+  justify-content: center;
+}
+
+.aircraft-modal.show {
+  display: flex;
+}
+
+.aircraft-modal-window {
+  width: min(480px, calc(100% - 30px));
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.aircraft-modal-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #1f2937;
+  color: #ffffff;
+
+  padding: 13px 16px;
+  font-weight: 700;
+}
+
+.aircraft-modal-titlebar button {
+  border: 0;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+
+  font-size: 24px;
+  line-height: 1;
+}
+
+.aircraft-modal-body {
+  padding: 20px;
+}
+
+.aircraft-modal-body p {
+  margin-top: 0;
+  line-height: 1.5;
+}
+
+.aircraft-field {
+  margin-bottom: 15px;
+}
+
+.aircraft-field label {
+  display: block;
+  margin-bottom: 6px;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.aircraft-field input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+
+  font-size: 14px;
+}
+
+.aircraft-field input:focus {
+  outline: 2px solid #3b82f6;
+  border-color: #3b82f6;
+}
+
+.aircraft-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+
+  margin-top: 20px;
+}
+
+#saveAircraftType {
+  background: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 7px;
+
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#saveAircraftType:hover {
+  background: #1d4ed8;
+}
+
+#cancelAircraftType {
+  background: #e5e7eb;
+  color: #111827;
+
+  border: none;
+  border-radius: 7px;
+
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.aircraft-modal-status {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.aircraft-modal-status.error {
+  color: #dc2626;
+}
+
+.aircraft-modal-status.success {
+  color: #16a34a;
+}
   </style>
 </head>
 
@@ -1498,6 +1627,72 @@
         </div>
       </div>
     </section>
+    <div id="aircraftTypeModal" class="aircraft-modal">
+  <div class="aircraft-modal-window">
+
+    <div class="aircraft-modal-titlebar">
+      <span>Aircraft Type Not Recognised</span>
+      <button type="button" id="closeAircraftModal">×</button>
+    </div>
+
+    <div class="aircraft-modal-body">
+
+      <p>
+        Aircraft type
+        <strong id="unknownAircraftCode"></strong>
+        is not currently stored in the aircraft database.
+      </p>
+
+      <p>Please enter the aircraft details below.</p>
+
+      <div class="aircraft-field">
+        <label for="newAircraftName">Aircraft Name</label>
+        <input
+          type="text"
+          id="newAircraftName"
+          placeholder="e.g. Airbus A320-200"
+        >
+      </div>
+
+      <div class="aircraft-field">
+        <label for="newAircraftScrCode">SCR Aircraft Code</label>
+        <input
+          type="text"
+          id="newAircraftScrCode"
+          placeholder="e.g. 320"
+          maxlength="4"
+        >
+      </div>
+
+      <div class="aircraft-field">
+        <label for="newAircraftSeats">Number of Seats</label>
+        <input
+          type="number"
+          id="newAircraftSeats"
+          placeholder="e.g. 180"
+          min="0"
+          max="999"
+        >
+      </div>
+
+      <div class="aircraft-modal-buttons">
+        <button type="button" id="saveAircraftType">
+          Add Aircraft Type
+        </button>
+
+        <button type="button" id="cancelAircraftType">
+          Cancel
+        </button>
+      </div>
+
+      <div
+        id="aircraftModalStatus"
+        class="aircraft-modal-status"
+      ></div>
+
+    </div>
+  </div>
+</div>
   </main>
 
   <footer>
@@ -2849,6 +3044,316 @@
       window.onclick = function(event) { if (event.target == modal && modal) modal.style.display = "none"; };
       window.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal) modal.style.display = "none"; });
     });
+
+    const aircraftDatabase = firebase.database().ref("aircraftTypes");
+
+let pendingUnknownAircraft = null;
+
+
+/**
+ * Normalise an aircraft code before looking it up.
+ */
+function normaliseAircraftInput(code) {
+  return String(code || "")
+    .trim()
+    .toUpperCase();
+}
+
+
+/**
+ * Convert seat count to SCR 3-digit format.
+ *
+ * 8   -> 008
+ * 9   -> 009
+ * 180 -> 180
+ */
+function formatAircraftSeats(seats) {
+  return String(seats || "0").padStart(3, "0");
+}
+
+
+/**
+ * Retrieve an aircraft from Firebase.
+ */
+async function getAircraftType(code) {
+
+  const aircraftCode = normaliseAircraftInput(code);
+
+  if (!aircraftCode) {
+    return null;
+  }
+
+  try {
+
+    const snapshot = await firebase
+      .database()
+      .ref(`aircraftTypes/${aircraftCode}`)
+      .once("value");
+
+    if (!snapshot.exists()) {
+      return null;
+    }
+
+    return snapshot.val();
+
+  } catch (error) {
+
+    console.error(
+      "Unable to retrieve aircraft type:",
+      error
+    );
+
+    throw error;
+  }
+}
+
+    function showUnknownAircraftModal(code) {
+
+  const aircraftCode = normaliseAircraftInput(code);
+
+  pendingUnknownAircraft = aircraftCode;
+
+  document.getElementById(
+    "unknownAircraftCode"
+  ).textContent = aircraftCode;
+
+  document.getElementById(
+    "newAircraftName"
+  ).value = "";
+
+  document.getElementById(
+    "newAircraftScrCode"
+  ).value = aircraftCode;
+
+  document.getElementById(
+    "newAircraftSeats"
+  ).value = "";
+
+  const status =
+    document.getElementById("aircraftModalStatus");
+
+  status.textContent = "";
+  status.className = "aircraft-modal-status";
+
+  document
+    .getElementById("aircraftTypeModal")
+    .classList.add("show");
+}
+
+    function closeUnknownAircraftModal() {
+
+  document
+    .getElementById("aircraftTypeModal")
+    .classList.remove("show");
+
+  pendingUnknownAircraft = null;
+}
+
+    async function saveNewAircraftType() {
+
+  if (!pendingUnknownAircraft) {
+    return;
+  }
+
+  const name = document
+    .getElementById("newAircraftName")
+    .value
+    .trim();
+
+  const scrCode = normaliseAircraftInput(
+    document
+      .getElementById("newAircraftScrCode")
+      .value
+  );
+
+  const seatsInput = document
+    .getElementById("newAircraftSeats")
+    .value
+    .trim();
+
+  const status =
+    document.getElementById("aircraftModalStatus");
+
+
+  /* ---------------------------
+     Validation
+     --------------------------- */
+
+  if (!name) {
+
+    status.textContent =
+      "Please enter the aircraft name.";
+
+    status.className =
+      "aircraft-modal-status error";
+
+    return;
+  }
+
+
+  if (!scrCode) {
+
+    status.textContent =
+      "Please enter the SCR aircraft code.";
+
+    status.className =
+      "aircraft-modal-status error";
+
+    return;
+  }
+
+
+  if (!seatsInput) {
+
+    status.textContent =
+      "Please enter the number of seats.";
+
+    status.className =
+      "aircraft-modal-status error";
+
+    return;
+  }
+
+
+  const seatNumber = Number(seatsInput);
+
+  if (
+    Number.isNaN(seatNumber) ||
+    seatNumber < 0 ||
+    seatNumber > 999
+  ) {
+
+    status.textContent =
+      "Seat count must be between 0 and 999.";
+
+    status.className =
+      "aircraft-modal-status error";
+
+    return;
+  }
+
+
+  const inputCode = pendingUnknownAircraft;
+
+  const aircraftData = {
+
+    inputCode: inputCode,
+
+    name: name,
+
+    scrCode: scrCode,
+
+    seats: formatAircraftSeats(seatNumber),
+
+    createdAt:
+      firebase.database.ServerValue.TIMESTAMP
+
+  };
+
+
+  try {
+
+    status.textContent =
+      "Saving aircraft type...";
+
+    status.className =
+      "aircraft-modal-status";
+
+
+    await firebase
+      .database()
+      .ref(`aircraftTypes/${inputCode}`)
+      .set(aircraftData);
+
+
+    status.textContent =
+      `${inputCode} added successfully.`;
+
+    status.className =
+      "aircraft-modal-status success";
+
+
+    setTimeout(() => {
+
+      document
+        .getElementById("aircraftTypeModal")
+        .classList.remove("show");
+
+      const aircraftJustAdded =
+        pendingUnknownAircraft;
+
+      pendingUnknownAircraft = null;
+
+
+      /*
+       * Restart generation here.
+       *
+       * Replace generateSCR() with the name
+       * of your existing generation function.
+       */
+      if (typeof generateSCR === "function") {
+
+        generateSCR();
+
+      }
+
+    }, 500);
+
+
+  } catch (error) {
+
+    console.error(
+      "Aircraft save failed:",
+      error
+    );
+
+    status.textContent =
+      "Unable to save the aircraft type to Firebase.";
+
+    status.className =
+      "aircraft-modal-status error";
+  }
+}
+
+    document
+  .getElementById("saveAircraftType")
+  .addEventListener(
+    "click",
+    saveNewAircraftType
+  );
+
+
+document
+  .getElementById("cancelAircraftType")
+  .addEventListener(
+    "click",
+    closeUnknownAircraftModal
+  );
+
+
+document
+  .getElementById("closeAircraftModal")
+  .addEventListener(
+    "click",
+    closeUnknownAircraftModal
+  );
+
+    const aircraftRecord =
+  await getAircraftType(aircraft);
+
+if (!aircraftRecord) {
+
+  showUnknownAircraftModal(aircraft);
+
+  return;
+}
+
+const scrAircraftCode =
+  aircraftRecord.scrCode;
+
+const aircraftSeats =
+  aircraftRecord.seats;
+    
   </script>
 </body>
 </html>
