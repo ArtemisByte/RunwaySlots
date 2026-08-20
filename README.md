@@ -4,6 +4,8 @@ Welcome to RunwaySlots – your go-to platform for managing SCR messages with ea
 Whether you need to create, change, or cancel SCR messages, we've got you covered. 
 Plus, enjoy additional tools to streamline your workflow. 🚀
 
+** ONLY WORKING WITH ROCS SYSTEMS **
+
 🌟 Features
 
 📝 SCR Message Management
@@ -14,15 +16,13 @@ Plus, enjoy additional tools to streamline your workflow. 🚀
 
 ❌ Cancel SCR messages when necessary.
 
-
 🌍 Real-Time Airport Database
 
-🏗️ Add new airport information.
+🏗️ Add future aircraft types
 
-✍️ Edit existing airport data.
+📊 Advanced reporting & analytics
 
-🔍 Search for airport details in real-time.
-
+🛠️ New Experimental Page with New Features
 
 ⚡ Quick Links & More
 
@@ -36,6 +36,8 @@ Plus, enjoy additional tools to streamline your workflow. 🚀
 
 
 📌 How It Works
+
+
 
 NO LOGINS !!
 
@@ -53,7 +55,6 @@ Constantly working to improve RunwaySlots! Here’s what’s coming soon:
 
 🛠️ New Experimental Page
 
-📊 Advanced reporting & analytics
 
 
 
@@ -68,9 +69,9 @@ Have feedback or feature requests? I'd love to hear from you! 📨
 
 
 CREATED BY ArtemisByte/KunchackoBoben 2026 
+ 
+Vibe Coded with A.I. [OPENAI chatGPT] with human intervention.
 
-Just Some Information: 
-Vibe Coded with A.I. but also had human intervention
 Wesbite tested thoroughly to ensure errors are not generated.
 
 
