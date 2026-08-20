@@ -838,6 +838,12 @@
   }
 
   function start() {
+    const historyModeFilter = $("historyModeFilter");
+    if (historyModeFilter) historyModeFilter.value = "ALL";
+
+    const historySearch = $("historySearch");
+    if (historySearch) historySearch.value = "";
+
     bindEvents();
     updateLineCounter();
     setupPresence();
