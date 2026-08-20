@@ -19,6 +19,7 @@
       <li><a href="sir.html">SIR Request</a></li>
       <li><a href="multiflight.html">Multi Flight</a></li>
       <li><a href="airport-search.html">Airport Database</a></li>
+      <li><a href="aircrafttype.html">Aircraft Database</a></li>
       <li><a href="gcrformat.html">GCR Format</a></li>
       <li><a href="turnaround.html">Turnaround Format</a></li>
       <li><a href="quicklinks.html">Quick Links</a></li>
@@ -49,7 +50,7 @@
 
       <div id="fbStatus" class="status-indicator" title="Firebase Realtime Database status">
         <span class="dot" aria-hidden="true"></span>
-        <span class="text">DB Not Connected</span>
+        <span class="text">Database Not Connected</span>
       </div>
     </div>
   </div>
@@ -78,11 +79,6 @@
               <option value="CANCEL">CANCEL SLOT</option>
             </select>
           </div>
-
-          <div class="format-help">
-            <strong>Expected format:</strong>
-            FLIGHT FROM TO DDMMMYYYY DEP ARR AIRCRAFT REG
-          </div>
         </div>
 
         <div class="main-actions">
@@ -109,8 +105,7 @@
 
     <aside class="history-window">
       <div class="title-bar history-title">
-        <span>GCR Shared History</span>
-        <span class="live-history">LIVE</span>
+        <span>GCR History</span>
       </div>
 
       <div class="history-content">
@@ -122,10 +117,6 @@
             <option value="CHANGE">CHANGE</option>
             <option value="CANCEL">CANCEL</option>
           </select>
-        </div>
-
-        <div class="history-note">
-          History is shared between users. Deleting an entry removes it from the visible GCR history only; the backup copy remains.
         </div>
 
         <div id="historyList" class="history-list">
