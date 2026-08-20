@@ -24,7 +24,6 @@
   const GCR_BACKUP_PATH = "gcrHistoryBackup";
   const GCR_STATS_PATH = "gcrStats";
   const CONNECTED_USERS_PATH = "connectedUsers";
-  const HISTORY_LIMIT = 100;
 
   const monthMap = {
     JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
@@ -507,6 +506,9 @@
 
     list.innerHTML = "";
 
+    const count = $("historyCount");
+    if (count) count.textContent = String(filtered.length);
+
     if (!filtered.length) {
       const empty = document.createElement("div");
       empty.className = "history-empty";
@@ -587,7 +589,7 @@
       return;
     }
 
-    db.ref(GCR_HISTORY_PATH).limitToLast(HISTORY_LIMIT).on("value", (snap) => {
+    db.ref(GCR_HISTORY_PATH).on("value", (snap) => {
       const records = [];
       snap.forEach((child) => records.push({ id: child.key, ...(child.val() || {}) }));
       historyRecords = records.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
@@ -595,6 +597,17 @@
     }, (err) => {
       console.warn("GCR history listener failed:", err);
       showError("Shared GCR history could not be loaded.");
+    });
+  }
+
+  function setupStatsListener() {
+    if (!db) return;
+    db.ref(GCR_STATS_PATH).on("value", (snap) => {
+      const stats = snap.val() || {};
+      if ($("newCount")) $("newCount").textContent = Number(stats.NEW || 0).toLocaleString();
+      if ($("changeCount")) $("changeCount").textContent = Number(stats.CHANGE || 0).toLocaleString();
+      if ($("cancelCount")) $("cancelCount").textContent = Number(stats.CANCEL || 0).toLocaleString();
+      if ($("totalCount")) $("totalCount").textContent = Number(stats.TOTAL || 0).toLocaleString();
     });
   }
 
@@ -829,6 +842,7 @@
     updateLineCounter();
     setupPresence();
     setupHistoryListener();
+    setupStatsListener();
     loadAircraftTypes();
   }
 
