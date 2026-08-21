@@ -110,7 +110,7 @@
       width: min(1500px, calc(100% - 16px));
       margin: 8px auto;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 430px;
+      grid-template-columns: minmax(0, 1fr) 560px;
       gap: 8px;
       align-items: start;
     }
@@ -493,6 +493,165 @@
       border: 1px solid #808080;
     }
 
+
+    .history-window {
+      position: sticky;
+      top: 42px;
+      align-self: start;
+    }
+
+    .history-window .titlebar {
+      min-height: 32px;
+      height: auto;
+      font-size: 17px;
+      padding: 4px 8px;
+      background: #0000aa;
+    }
+
+    .history-window .window-body {
+      padding: 10px 12px 12px;
+    }
+
+    .history-search-row {
+      margin-bottom: 8px;
+    }
+
+    .history-search-row input {
+      height: 42px;
+      font-size: 18px;
+      padding: 6px 8px;
+      border-top: 3px solid #333;
+      border-left: 3px solid #333;
+      border-right: 3px solid #888;
+      border-bottom: 3px solid #888;
+    }
+
+    .history-command-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 3px solid #808080;
+    }
+
+    .history-command-row button,
+    .history-card-actions button {
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 13px;
+      min-height: 36px;
+      padding: 5px 10px;
+    }
+
+    .history-filter-bar {
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-filter-panel {
+      margin: -2px 0 10px;
+      padding: 7px;
+    }
+
+    .history-filter-options button {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .history-list {
+      max-height: calc(100vh - 235px);
+      min-height: 520px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f5f5f5;
+      border-top: 3px solid #808080;
+      border-left: 3px solid #808080;
+      border-right: 3px solid #fff;
+      border-bottom: 3px solid #fff;
+    }
+
+    .history-item {
+      margin-bottom: 14px;
+      padding: 10px 12px 12px;
+      background: #fff;
+      border: 3px solid #808080;
+    }
+
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .history-title {
+      margin-bottom: 8px;
+      color: #000080;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .history-meta {
+      color: #222;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .history-meta-row {
+      display: block;
+    }
+
+    .history-meta-label {
+      font-weight: 800;
+    }
+
+    .history-preview {
+      margin-top: 8px;
+      padding: 7px 9px;
+      max-height: 96px;
+      overflow: hidden;
+      background: #fff;
+      color: #000080;
+      border: 2px solid #666;
+      font: 14px/1.25 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .history-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .history-card-actions .remove-history-btn {
+      flex-basis: 100%;
+      width: max-content;
+      max-width: 210px;
+    }
+
+    @media (max-width: 1250px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr) 500px;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .history-window {
+        position: static;
+      }
+
+      .history-list {
+        max-height: 650px;
+      }
+    }
+
     @media (max-width: 1100px) {
       .workspace {
         grid-template-columns: 1fr;
@@ -633,19 +792,21 @@
       </div>
     </main>
 
-    <aside class="window">
+    <aside class="window history-window">
       <div class="titlebar">
-        <span>SCR History</span>
+        <span>SCR History [SHARED HISTORY DATABASE]</span>
       </div>
+
       <div class="window-body">
-        <div class="history-tools">
-          <input type="text" id="historySearch" placeholder="Search airport, flight, user, REG...">
-          <button type="button" id="clearHistoryBtn" class="danger">Clear All</button>
+        <div class="history-search-row">
+          <input type="text" id="historySearch" placeholder="Search airport, flight, type...">
         </div>
 
-        <div class="history-filter-bar">
+        <div class="history-command-row">
+          <button type="button" id="refreshHistoryBtn">Refresh</button>
+          <button type="button" id="clearHistoryBtn" class="danger">Clear All</button>
           <button type="button" id="historyFilterBtn">Filter</button>
-          <span id="historyFilterStatus" class="hint">Showing: ALL</span>
+          <span id="historyFilterStatus" class="hint" style="align-self:center;">Showing: ALL</span>
         </div>
 
         <div id="historyFilterPanel" class="history-filter-panel">
@@ -657,7 +818,6 @@
           </div>
         </div>
 
-        <div class="hint" style="margin-bottom:6px;">LIVE shared history from Firebase.</div>
         <div id="historyList" class="history-list">
           <div class="empty">Loading shared history...</div>
         </div>
@@ -799,7 +959,7 @@
   <div id="viewScrModal" class="modal-overlay" aria-hidden="true">
     <div class="modal-window">
       <div class="titlebar">
-        <span>SCR Preview</span>
+        <span id="viewScrModalTitle">SCR Preview</span>
       </div>
       <div class="modal-body">
         <pre id="viewScrText" style="background:#fff; border:2px inset #fff; padding:8px; white-space:pre-wrap;"></pre>
@@ -1834,23 +1994,41 @@
         const item = document.createElement("div");
         item.className = "history-item";
 
+        const displayType = entry.type || (
+          normaliseCode(entry.slotTypeValue).includes("CHANGE") ? "CHANGE SCR" :
+          normaliseCode(entry.slotTypeValue).includes("CANCEL") ? "CANCEL SLOT" :
+          "NEW SLOT"
+        );
+
+        const initialSuffix =
+          normaliseCode(entry.slotTypeValue).includes("CHANGE") &&
+          !String(displayType).toUpperCase().includes("INITIAL")
+            ? " (Initial)"
+            : "";
+
         item.innerHTML = `
           <div class="history-title">
-            ${escapeHtml(entry.type || "SCR")} - ${escapeHtml(entry.airport || "UNKNOWN")}
+            ${escapeHtml(displayType + initialSuffix)} - ${escapeHtml(entry.airport || "UNKNOWN")}
           </div>
+
           <div class="history-meta">
-            Flight: ${escapeHtml(entry.flightNumber || "-")}<br>
-            Direction: ${escapeHtml(entry.direction || "-")}<br>
-            Service: ${escapeHtml(entry.serviceType || "-")}<br>
-            REG: ${escapeHtml(entry.registration || "-")}<br>
-            User: ${escapeHtml(entry.username || "-")}<br>
-            Time: ${escapeHtml(entry.timestamp || "-")}
+            <span class="history-meta-row"><span class="history-meta-label">Flight:</span> ${escapeHtml(entry.flightNumber || "-")}</span>
+            <span class="history-meta-row"><span class="history-meta-label">Direction:</span> ${escapeHtml(entry.direction || "-")}</span>
+            <span class="history-meta-row"><span class="history-meta-label">Slot Type:</span> ${escapeHtml(String(entry.slotTypeValue || entry.type || "-").toLowerCase())}</span>
+            <span class="history-meta-row"><span class="history-meta-label">Service:</span> ${escapeHtml(entry.serviceType || "-")}</span>
+            <span class="history-meta-row"><span class="history-meta-label">Reg:</span> ${escapeHtml(entry.registration || "-")}</span>
+            <span class="history-meta-row"><span class="history-meta-label">Time:</span> ${escapeHtml(entry.timestamp || "-")}</span>
           </div>
-          <div class="history-preview">${escapeHtml(formatPreviewText(entry.scrMessage || ""))}</div>
-          <div class="history-actions">
-            <button type="button" data-history-action="view" data-index="${index}">View SCR</button>
-            <button type="button" data-history-action="copy" data-index="${index}">Copy SCR</button>
-            <button type="button" data-history-action="delete" data-index="${index}">Delete</button>
+
+          <div class="history-preview">${escapeHtml(entry.scrMessage || "")}</div>
+
+          <div class="history-card-actions">
+            <button type="button" data-history-action="view">View SCR</button>
+            <button type="button" data-history-action="copy">Copy SCR</button>
+            <button type="button" data-history-action="change">Change SCR</button>
+            <button type="button" data-history-action="input">View Input</button>
+            <button type="button" data-history-action="cancel">Cancel SCR</button>
+            <button type="button" class="remove-history-btn" data-history-action="delete">Remove History</button>
           </div>
         `;
 
@@ -1859,8 +2037,67 @@
       });
     }
 
-    function openViewScr(text) {
+
+    async function refreshHistoryNow() {
+      if (!db) return;
+
+      try {
+        $("refreshHistoryBtn").disabled = true;
+
+        const snapshot = await db.ref(HISTORY_PATH).once("value");
+        const rows = [];
+
+        snapshot.forEach(child => {
+          rows.push({
+            firebaseKey: child.key,
+            ...child.val()
+          });
+        });
+
+        rows.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+        sharedHistoryCache = rows;
+        renderHistory();
+        showSuccess("SCR History refreshed.");
+      } catch (error) {
+        console.error(error);
+        showError("Unable to refresh SCR History.");
+      } finally {
+        $("refreshHistoryBtn").disabled = false;
+      }
+    }
+
+    function loadHistoryEntryForAction(entry, mode) {
+      if (!entry) return;
+
+      const rawInput = String(entry.rawInput || "").trim();
+
+      if (!rawInput) {
+        showError("The original input is not available for this history entry.");
+        return;
+      }
+
+      $("userInput").value = rawInput;
+      $("slotType").value = mode;
+
+      const parsedResult = parseInput(rawInput);
+      $("detectedReg").value =
+        parsedResult.parsed.length ? parsedResult.parsed[0].registration : "";
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      showSuccess(
+        mode === "CHANGE"
+          ? "Original input loaded for CHANGE SCR."
+          : "Original input loaded for CANCEL SCR."
+      );
+    }
+
+    function openViewScr(text, title = "SCR Preview") {
       viewedScrText = String(text || "");
+      $("viewScrModalTitle").textContent = title;
       $("viewScrText").textContent = viewedScrText;
       $("viewScrModal").classList.add("show");
       $("viewScrModal").setAttribute("aria-hidden", "false");
@@ -1916,7 +2153,7 @@
         currentGeneratedMessages = [];
         renderGeneratedMessages([]);
       });
-    
+      });
 
       $("outputList").addEventListener("click", event => {
         const button = event.target.closest("button[data-action]");
@@ -1936,6 +2173,7 @@
       });
 
       $("historySearch").addEventListener("input", renderHistory);
+      $("refreshHistoryBtn").addEventListener("click", refreshHistoryNow);
 
       $("historyFilterBtn").addEventListener("click", () => {
         $("historyFilterPanel").classList.toggle("show");
@@ -1958,22 +2196,35 @@
         const button = event.target.closest("button[data-history-action]");
         if (!button) return;
 
-        const visibleItems = [...$("historyList").querySelectorAll(".history-item")];
         const parent = button.closest(".history-item");
         const firebaseKey = parent ? parent.dataset.firebaseKey : "";
         const entry = sharedHistoryCache.find(item => item.firebaseKey === firebaseKey);
 
         if (!entry) return;
 
-        if (button.dataset.historyAction === "view") {
-          openViewScr(entry.scrMessage || "");
+        const action = button.dataset.historyAction;
+
+        if (action === "view") {
+          openViewScr(entry.scrMessage || "", "SCR Preview");
         }
 
-        if (button.dataset.historyAction === "copy") {
+        if (action === "copy") {
           copyText(entry.scrMessage || "");
         }
 
-        if (button.dataset.historyAction === "delete") {
+        if (action === "change") {
+          loadHistoryEntryForAction(entry, "CHANGE");
+        }
+
+        if (action === "input") {
+          openViewScr(entry.rawInput || "No original input stored.", "Original Input");
+        }
+
+        if (action === "cancel") {
+          loadHistoryEntryForAction(entry, "CANCEL");
+        }
+
+        if (action === "delete") {
           deleteHistoryEntry(entry);
         }
       });
