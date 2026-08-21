@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi Flight SCR Generator</title>
+
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="styles/navi-ui.css">
+  <link rel="stylesheet" href="styles/infobar.css">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+      font-size: 13px;
+      background: #008080;
+      color: #000;
+    }
+
+    body {
+      padding-bottom: 30px;
+    }
+
+    nav {
+      background: #c0c0c0;
+      border-bottom: 2px solid #000;
+      padding: 4px;
+      position: sticky;
+      top: 0;
+      z-index: 2000;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav a {
+      display: block;
+      padding: 5px 8px;
+      color: #000;
+      text-decoration: none;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+    }
+
+    nav a:active,
+    nav a.active {
+      border-top-color: #404040;
+      border-left-color: #404040;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+      background: #b0b0b0;
+    }
+
+    .info-bar {
+      margin: 8px auto 0;
+      width: min(1500px, calc(100% - 16px));
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      padding: 4px 7px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-left, .status-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .db-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 4px;
+      background: #ff0;
+      border: 1px solid #000;
+    }
+
+    .db-dot.online { background: #00c000; }
+    .db-dot.offline { background: #f00; }
+    .db-dot.connecting { background: #ff0; }
+
+    .workspace {
+      width: min(1500px, calc(100% - 16px));
+      margin: 8px auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 430px;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .window {
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #000;
+      border-bottom: 2px solid #000;
+      box-shadow: 1px 1px 0 #404040;
+      min-width: 0;
+    }
+
+    .titlebar {
+      height: 26px;
+      background: #000080;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 3px 2px 6px;
+      font-weight: bold;
+    }
+
+    .titlebar.inactive {
+      background: #808080;
+    }
+
+    .window-body {
+      padding: 8px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 8px;
+    }
+
+    .groupbox {
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 8px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .groupbox-title {
+      position: absolute;
+      top: -8px;
+      left: 8px;
+      padding: 0 4px;
+      background: #c0c0c0;
+      font-weight: bold;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    textarea,
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      font: inherit;
+      background: #fff;
+      color: #000;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 4px;
+      border-radius: 0;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    button {
+      font: inherit;
+      color: #000;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #404040;
+      border-bottom: 2px solid #404040;
+      padding: 4px 9px;
+      min-height: 27px;
+      cursor: pointer;
+    }
+
+    button:active {
+      border-top-color: #404040;
+      border-left-color: #404040;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+      padding: 5px 8px 3px 10px;
+    }
+
+    button.primary {
+      font-weight: bold;
+    }
+
+    button.danger {
+      color: #800000;
+    }
+
+    button:disabled {
+      color: #808080;
+      cursor: default;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .field {
+      flex: 1 1 130px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+
+    .hint {
+      color: #404040;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .notice {
+      display: none;
+      margin-bottom: 8px;
+      padding: 6px;
+      border: 1px solid #000;
+      background: #ffffe1;
+    }
+
+    .notice.error {
+      color: #800000;
+      background: #ffd8d8;
+    }
+
+    .notice.success {
+      color: #004000;
+      background: #d8ffd8;
+    }
+
+    #outputList {
+      display: grid;
+      gap: 8px;
+    }
+
+    .scr-card {
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .scr-card-title {
+      background: #e0e0e0;
+      padding: 4px 6px;
+      border-bottom: 1px solid #808080;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .scr-card pre {
+      margin: 0;
+      padding: 8px;
+      min-height: 100px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: 12px/1.35 Consolas, "Courier New", monospace;
+    }
+
+    .scr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 8px 8px;
+    }
+
+    .history-tools {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+
+    .history-filter-bar {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .history-filter-panel {
+      display: none;
+      margin-bottom: 6px;
+      padding: 7px;
+      background: #c0c0c0;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .history-filter-panel.show {
+      display: block;
+    }
+
+    .history-filter-options {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .history-filter-options button.active {
+      border-top-color: #404040;
+      border-left-color: #404040;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+      background: #a8a8a8;
+      font-weight: bold;
+    }
+
+    .history-list {
+      max-height: 720px;
+      overflow: auto;
+      background: #fff;
+      border-top: 2px solid #404040;
+      border-left: 2px solid #404040;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .history-item {
+      padding: 7px;
+      border-bottom: 1px solid #c0c0c0;
+    }
+
+    .history-item:last-child {
+      border-bottom: 0;
+    }
+
+    .history-title {
+      font-weight: bold;
+      color: #000080;
+      margin-bottom: 3px;
+    }
+
+    .history-meta {
+      font-size: 11px;
+      color: #404040;
+      line-height: 1.35;
+    }
+
+    .history-preview {
+      margin-top: 5px;
+      padding: 5px;
+      background: #f4f4f4;
+      border: 1px solid #808080;
+      font: 11px Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 82px;
+      overflow: hidden;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 5px;
+    }
+
+    .empty {
+      padding: 14px;
+      text-align: center;
+      color: #606060;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0,0,0,.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-window {
+      width: min(720px, 100%);
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #000;
+      border-bottom: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    .modal-body {
+      padding: 10px;
+    }
+
+    .modal-message {
+      margin-bottom: 8px;
+      padding: 6px;
+      background: #ffffe1;
+      border: 1px solid #808080;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .modal-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .readonly {
+      background: #e8e8e8 !important;
+      color: #404040;
+    }
+
+    .change-editor {
+      margin: 8px;
+      padding: 8px;
+      background: #e8e8e8;
+      border: 1px solid #808080;
+    }
+
+    .change-editor textarea {
+      min-height: 150px;
+    }
+
+    .progress-status {
+      display: none;
+      margin-top: 6px;
+      padding: 5px;
+      background: #ffffe1;
+      border: 1px solid #808080;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .history-list {
+        max-height: 500px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-grid .full {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="sir.html">SIR Request</a></li>
+      <li><a class="active" href="multiflight.html">Multi Flight</a></li>
+      <li><a href="airport-search.html">Airport Database</a></li>
+      <li><a href="gcrformat.html">GCR Format</a></li>
+      <li><a href="turnaround.html">Turnaround Format</a></li>
+      <li><a href="quicklinks.html">Quick Links</a></li>
+      <li><a href="analytics.html">Analytics</a></li>
+      <li><a href="test2.html">EXPERIMENTAL</a></li>
+      <li><a href="updates.html">SYSTEM UPDATES</a></li>
+      <li><a href="https://forms.gle/Q4T4TbhEU9Sa7jbg7" target="_blank" rel="noopener">Log Issues</a></li>
+    </ul>
+  </nav>
+
+  <div class="info-bar">
+    <div class="status-left">
+      <span><span id="dbDot" class="db-dot connecting"></span><strong id="dbStatus">Database: Connecting</strong></span>
+      <span>Connected Users: <strong id="connectedUsersCount">0</strong></span>
+    </div>
+    <div class="status-right">
+      <span>UTC: <strong id="utcClock">--:--:--</strong></span>
+      <span id="currentUserText"></span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <main class="window">
+      <div class="titlebar">
+        <span>Multi Flight SCR Generator</span>
+      </div>
+
+      <div class="window-body">
+        <div id="errorMessage" class="notice error"></div>
+        <div id="successMessage" class="notice success"></div>
+
+        <div class="main-grid">
+          <section>
+            <div class="groupbox">
+              <span class="groupbox-title">Flight Input</span>
+
+              <label for="userInput">Flight information — one flight per line</label>
+              <textarea id="userInput" placeholder="FR9531P BLQ OPO 19AUG2026 1040 1320 EIDLX 738"></textarea>
+              <div class="hint">
+                Format: FLIGHT FROM TO DDMMMYYYY DEP ARR REG AIRCRAFT
+              </div>
+
+              <div class="controls">
+                <button type="button" id="clearInputBtn">Clear Input</button>
+              </div>
+            </div>
+
+            <div class="groupbox">
+              <span class="groupbox-title">Controls</span>
+
+              <div class="row">
+                <div class="field">
+                  <label for="slotType">SCR Action</label>
+                  <select id="slotType">
+                    <option value="NEW">NEW SLOT</option>
+                    <option value="CANCEL">CANCEL SLOT</option>
+                    <option value="CHANGE">CHANGE SCR</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="serviceType">Service Type</label>
+                  <select id="serviceType">
+                    <option value="J">J - Passenger</option>
+                    <option value="P">P - Positioner</option>
+                    <option value="D">D - General Aviation</option>
+                    <option value="K">K - Training</option>
+                    <option value="T">T - Training</option>
+                    <option value="X">X - Technical</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="siExtra">Extra SI text</label>
+                  <input type="text" id="siExtra" placeholder="Optional">
+                </div>
+              </div>
+
+              <div id="progressStatus" class="progress-status"></div>
+
+              <div class="controls">
+                <button type="button" id="generateBtn" class="primary">Generate SCR</button>
+                <button type="button" id="clearOutputBtn">Clear Output</button>
+              </div>
+            </div>
+            </div>
+
+            <div class="groupbox">
+              <span class="groupbox-title">Generated SCR</span>
+              <div id="outputList">
+                <div class="empty">No SCR generated.</div>
+              </div>
+            </div>
+          </section>
+
+          <aside>
+
+            <div class="groupbox">
+              <span class="groupbox-title">Detected Registration</span>
+              <input type="text" id="detectedReg" class="readonly" readonly value="">
+              <div class="hint">Taken automatically from the first valid input line.</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <aside class="window">
+      <div class="titlebar">
+        <span>SCR History</span>
+      </div>
+      <div class="window-body">
+        <div class="history-tools">
+          <input type="text" id="historySearch" placeholder="Search airport, flight, user, REG...">
+          <button type="button" id="clearHistoryBtn" class="danger">Clear All</button>
+        </div>
+
+        <div class="history-filter-bar">
+          <button type="button" id="historyFilterBtn">Filter</button>
+          <span id="historyFilterStatus" class="hint">Showing: ALL</span>
+        </div>
+
+        <div id="historyFilterPanel" class="history-filter-panel">
+          <div class="history-filter-options">
+            <button type="button" class="history-filter-option active" data-filter="ALL">ALL</button>
+            <button type="button" class="history-filter-option" data-filter="NEW">NEW</button>
+            <button type="button" class="history-filter-option" data-filter="CHANGE">CHANGE</button>
+            <button type="button" class="history-filter-option" data-filter="CANCEL">CANCEL</button>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-bottom:6px;">LIVE shared history from Firebase.</div>
+        <div id="historyList" class="history-list">
+          <div class="empty">Loading shared history...</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="aircraftModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-window">
+      <div class="titlebar">
+        <span>Add Aircraft Type</span>
+      </div>
+      <div class="modal-body">
+        <div id="aircraftModalMessage" class="modal-message"></div>
+
+        <div class="modal-grid">
+          <div>
+            <label for="newAircraftInputCode">Input Code</label>
+            <input type="text" id="newAircraftInputCode" class="readonly" readonly>
+          </div>
+
+          <div>
+            <label for="newAircraftScrCode">SCR Code</label>
+            <input type="text" id="newAircraftScrCode" maxlength="3" placeholder="73H">
+          </div>
+
+          <div>
+            <label for="newAircraftSeats">Total Seats</label>
+            <input type="number" id="newAircraftSeats" min="0" max="999" placeholder="189">
+          </div>
+
+          <div>
+            <label for="newAircraftName">Aircraft Name</label>
+            <input type="text" id="newAircraftName" placeholder="Boeing 737-800">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelAircraftBtn">Cancel</button>
+          <button type="button" id="saveAircraftBtn" class="primary">Save Aircraft</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="airportModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-window">
+      <div class="titlebar">
+        <span>Add Airport to Database</span>
+      </div>
+
+      <div class="modal-body">
+        <div id="airportModalMessage" class="modal-message"></div>
+
+        <div class="modal-grid">
+          <div>
+            <label for="newAirportIata">IATA Code</label>
+            <input type="text" id="newAirportIata" maxlength="3" class="readonly" readonly>
+          </div>
+
+          <div>
+            <label for="newAirportIcao">ICAO Code</label>
+            <input type="text" id="newAirportIcao" maxlength="4" placeholder="EGLL">
+          </div>
+
+          <div class="full">
+            <label for="newAirportName">Airport Name</label>
+            <input type="text" id="newAirportName" placeholder="Airport name">
+          </div>
+
+          <div>
+            <label for="newAirportCountry">Country</label>
+            <input type="text" id="newAirportCountry" placeholder="Country">
+          </div>
+
+          <div>
+            <label for="newAirportContact">Contact Number</label>
+            <input type="text" id="newAirportContact" placeholder="+00 ...">
+          </div>
+
+          <div>
+            <label for="newAirportEmail">SCR Email</label>
+            <input type="text" id="newAirportEmail" placeholder="slot.coordination@example.com">
+          </div>
+
+          <div>
+            <label for="newAirportGeneralEmail">General Aviation Email</label>
+            <input type="text" id="newAirportGeneralEmail" placeholder="ga@example.com">
+          </div>
+
+          <div>
+            <label for="newAirportSummerLevel">Summer Level</label>
+            <select id="newAirportSummerLevel">
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3" selected>Level 3</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="newAirportWinterLevel">Winter Level</label>
+            <select id="newAirportWinterLevel">
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3" selected>Level 3</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="newAirportGcr">GCR Required</label>
+            <select id="newAirportGcr">
+              <option value="NO">NO</option>
+              <option value="YES">YES</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="newAirportPpr">PPR Required</label>
+            <select id="newAirportPpr">
+              <option value="NO">NO</option>
+              <option value="YES">YES</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="newAirportAdditionalInfo">Additional Information</label>
+            <textarea id="newAirportAdditionalInfo" style="min-height:90px;" placeholder="Optional airport notes"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelAirportBtn">Cancel</button>
+          <button type="button" id="saveAirportBtn" class="primary">Save Airport</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewScrModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-window">
+      <div class="titlebar">
+        <span>SCR Preview</span>
+      </div>
+      <div class="modal-body">
+        <pre id="viewScrText" style="background:#fff; border:2px inset #fff; padding:8px; white-space:pre-wrap;"></pre>
+        <div class="modal-actions">
+          <button type="button" id="viewScrCopyBtn">Copy</button>
+          <button type="button" id="viewScrCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/testfirebase.js"></script>
+
+  <script>
+    "use strict";
+
+    const DEFAULT_EMAIL = "slotdesk@ryanair.com";
+    const HISTORY_PATH = "scrHistory";
+    const AIRPORT_PATH = "airports";
+    const AIRCRAFT_PATH = "aircraftTypes";
+    const CONNECTED_USERS_PATH = "connectedUsers";
+
+    let db = null;
+    let sharedHistoryCache = [];
+    let currentGeneratedMessages = [];
+    let aircraftModalResolver = null;
+    let airportModalResolver = null;
+    let viewedScrText = "";
+    let historyModeFilter = "ALL";
+
+    const months = {
+      JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
+      JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11
+    };
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function showError(message) {
+      const el = $("errorMessage");
+      el.textContent = message;
+      el.style.display = "block";
+      $("successMessage").style.display = "none";
+    }
+
+    function showSuccess(message) {
+      const el = $("successMessage");
+      el.textContent = message;
+      el.style.display = "block";
+      $("errorMessage").style.display = "none";
+
+      window.clearTimeout(showSuccess.timer);
+      showSuccess.timer = window.setTimeout(() => {
+        el.style.display = "none";
+      }, 5000);
+    }
+
+    function clearFeedback() {
+      $("errorMessage").style.display = "none";
+      $("successMessage").style.display = "none";
+    }
+
+    function setProgress(message) {
+      const el = $("progressStatus");
+      if (!message) {
+        el.style.display = "none";
+        el.textContent = "";
+        return;
+      }
+      el.textContent = message;
+      el.style.display = "block";
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function normaliseCode(value) {
+      return String(value || "").trim().toUpperCase();
+    }
+
+    function formatPreviewText(text, maxLength = 180) {
+      const cleaned = String(text || "").replace(/\s+/g, " ").trim();
+      return cleaned.length > maxLength ? cleaned.slice(0, maxLength) + "..." : cleaned;
+    }
+
+    function getUserName() {
+      return String(localStorage.getItem("rb_username") || "").trim();
+    }
+
+    function updateUtcClock() {
+      const now = new Date();
+      $("utcClock").textContent =
+        String(now.getUTCHours()).padStart(2, "0") + ":" +
+        String(now.getUTCMinutes()).padStart(2, "0") + ":" +
+        String(now.getUTCSeconds()).padStart(2, "0");
+    }
+
+    function setDbStatus(status) {
+      const dot = $("dbDot");
+      dot.classList.remove("online", "offline", "connecting");
+
+      if (status === "online") {
+        dot.classList.add("online");
+        $("dbStatus").textContent = "Database: Online";
+      } else if (status === "offline") {
+        dot.classList.add("offline");
+        $("dbStatus").textContent = "Database: Offline";
+      } else {
+        dot.classList.add("connecting");
+        $("dbStatus").textContent = "Database: Connecting";
+      }
+    }
+
+    function initFirebase() {
+      if (
+        typeof firebase === "undefined" ||
+        !firebase.apps ||
+        firebase.apps.length === 0
+      ) {
+        setDbStatus("offline");
+        showError("Firebase is not initialised. Check scripts/firebase.js");
+        return false;
+      }
+
+      db = firebase.database();
+
+      db.ref(".info/connected").on("value", snapshot => {
+        setDbStatus(snapshot.val() === true ? "online" : "offline");
+      });
+
+      startConnectedUsers();
+      startHistoryListener();
+      return true;
+    }
+
+    function startConnectedUsers() {
+      if (!db) return;
+
+      let sessionId = sessionStorage.getItem("runway_connected_session");
+
+      if (!sessionId) {
+        sessionId =
+          Date.now().toString(36) +
+          "_" +
+          Math.random().toString(36).slice(2, 12);
+
+        sessionStorage.setItem("runway_connected_session", sessionId);
+      }
+
+      const presenceRef = db.ref(CONNECTED_USERS_PATH + "/" + sessionId);
+      const connectedRef = db.ref(".info/connected");
+
+      connectedRef.on("value", snapshot => {
+        if (snapshot.val() !== true) return;
+
+        presenceRef.onDisconnect().remove();
+
+        presenceRef.set({
+          connectedAt: firebase.database.ServerValue.TIMESTAMP,
+          lastSeen: firebase.database.ServerValue.TIMESTAMP,
+          username: getUserName() || ""
+        });
+      });
+
+      db.ref(CONNECTED_USERS_PATH).on("value", snapshot => {
+        $("connectedUsersCount").textContent = snapshot.numChildren();
+      });
+    }
+
+    function startHistoryListener() {
+      if (!db) return;
+
+      db.ref(HISTORY_PATH).on("value", snapshot => {
+        const rows = [];
+
+        snapshot.forEach(child => {
+          rows.push({
+            firebaseKey: child.key,
+            ...child.val()
+          });
+        });
+
+        rows.sort((a, b) => {
+          const aTime = Number(a.createdAt || 0);
+          const bTime = Number(b.createdAt || 0);
+          return bTime - aTime;
+        });
+
+        sharedHistoryCache = rows;
+        renderHistory();
+      }, error => {
+        console.error(error);
+        showError("Unable to load shared SCR history.");
+      });
+    }
+
+    function parseDate(input) {
+      const value = normaliseCode(input);
+      const match = value.match(/^(\d{2})([A-Z]{3})(\d{4})$/);
+
+      if (!match) return null;
+
+      const day = Number(match[1]);
+      const month = months[match[2]];
+      const year = Number(match[3]);
+
+      if (month === undefined) return null;
+
+      const date = new Date(Date.UTC(year, month, day));
+
+      if (
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month ||
+        date.getUTCDate() !== day
+      ) {
+        return null;
+      }
+
+      return date;
+    }
+
+    function toScrDate(date) {
+      const monthNames = [
+        "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+        "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+      ];
+
+      return String(date.getUTCDate()).padStart(2, "0") +
+        monthNames[date.getUTCMonth()];
+    }
+
+    function getDayOfOperation(date) {
+      const codes = [
+        "0000007",
+        "1000000",
+        "0200000",
+        "0030000",
+        "0004000",
+        "0000500",
+        "0000060"
+      ];
+
+      return codes[date.getUTCDay()];
+    }
+
+    function getLastSundayUTC(year, month) {
+      const date = new Date(Date.UTC(year, month + 1, 0));
+
+      while (date.getUTCDay() !== 0) {
+        date.setUTCDate(date.getUTCDate() - 1);
+      }
+
+      return date;
+    }
+
+    function getIataSeason(date = new Date()) {
+      const year = date.getUTCFullYear();
+      const summerStart = getLastSundayUTC(year, 2);
+      const winterStart = getLastSundayUTC(year, 9);
+
+      if (date >= summerStart && date < winterStart) {
+        return "S" + String(year).slice(-2);
+      }
+
+      if (date < summerStart) {
+        return "W" + String(year - 1).slice(-2);
+      }
+
+      return "W" + String(year).slice(-2);
+    }
+
+    function getCurrentScrDate() {
+      return toScrDate(new Date());
+    }
+
+    function parseInput(text) {
+      const parsed = [];
+      const errors = [];
+
+      String(text || "")
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .forEach((line, index) => {
+          const parts = line.split(/\s+/);
+
+          if (parts.length < 8) {
+            errors.push(`Line ${index + 1}: expected 8 fields.`);
+            return;
+          }
+
+          const [
+            flight,
+            from,
+            to,
+            dateRaw,
+            dep,
+            arr,
+            reg,
+            aircraft
+          ] = parts;
+
+          const dateObj = parseDate(dateRaw);
+
+          if (!dateObj) {
+            errors.push(`Line ${index + 1}: invalid date ${dateRaw}.`);
+            return;
+          }
+
+          if (!/^[A-Z0-9]{3}$/.test(normaliseCode(from))) {
+            errors.push(`Line ${index + 1}: invalid FROM airport ${from}.`);
+            return;
+          }
+
+          if (!/^[A-Z0-9]{3}$/.test(normaliseCode(to))) {
+            errors.push(`Line ${index + 1}: invalid TO airport ${to}.`);
+            return;
+          }
+
+          if (!/^\d{4}$/.test(dep) || !/^\d{4}$/.test(arr)) {
+            errors.push(`Line ${index + 1}: departure/arrival time must be HHMM.`);
+            return;
+          }
+
+          parsed.push({
+            raw: line,
+            flight: normaliseCode(flight),
+            from: normaliseCode(from),
+            to: normaliseCode(to),
+            dateObj,
+            date: toScrDate(dateObj),
+            dayOfOperation: getDayOfOperation(dateObj),
+            departureTime: dep,
+            arrivalTime: arr,
+            registration: normaliseCode(reg),
+            aircraftTypeInput: normaliseCode(aircraft)
+          });
+        });
+
+      return { parsed, errors };
+    }
+
+    async function findAirportByIata(iata) {
+      const code = normaliseCode(iata);
+      if (!db || !code) return null;
+
+      try {
+        let direct = await db.ref(AIRPORT_PATH + "/" + code).once("value");
+
+        if (direct.exists()) {
+          return {
+            firebaseKey: direct.key,
+            ...direct.val()
+          };
+        }
+
+        const query = await db.ref(AIRPORT_PATH)
+          .orderByChild("airportCode")
+          .equalTo(code)
+          .once("value");
+
+        let result = null;
+
+        query.forEach(child => {
+          if (!result) {
+            result = {
+              firebaseKey: child.key,
+              ...child.val()
+            };
+          }
+        });
+
+        return result;
+      } catch (error) {
+        console.error("Airport lookup failed:", error);
+        throw new Error(`Airport database lookup failed for ${code}.`);
+      }
+    }
+
+    async function findAircraftType(code) {
+      const inputCode = normaliseCode(code);
+      if (!db || !inputCode) return null;
+
+      try {
+        const direct = await db.ref(AIRCRAFT_PATH + "/" + inputCode).once("value");
+
+        if (direct.exists()) {
+          return {
+            firebaseKey: direct.key,
+            ...direct.val()
+          };
+        }
+
+        const query = await db.ref(AIRCRAFT_PATH)
+          .orderByChild("inputCode")
+          .equalTo(inputCode)
+          .once("value");
+
+        let result = null;
+
+        query.forEach(child => {
+          if (!result) {
+            result = {
+              firebaseKey: child.key,
+              ...child.val()
+            };
+          }
+        });
+
+        return result;
+      } catch (error) {
+        console.error("Aircraft lookup failed:", error);
+        throw new Error(`Aircraft database lookup failed for ${inputCode}.`);
+      }
+    }
+
+    function clearAircraftModalFields(code) {
+      $("newAircraftInputCode").value = code;
+      $("newAircraftScrCode").value = "";
+      $("newAircraftSeats").value = "";
+      $("newAircraftName").value = "";
+      $("aircraftModalMessage").textContent =
+        `${code} is not currently in the Aircraft Type Database. Add it below to continue SCR generation.`;
+    }
+
+    function requestNewAircraft(code) {
+      return new Promise(resolve => {
+        aircraftModalResolver = resolve;
+        clearAircraftModalFields(code);
+        $("aircraftModal").classList.add("show");
+        $("aircraftModal").setAttribute("aria-hidden", "false");
+
+        setTimeout(() => $("newAircraftScrCode").focus(), 20);
+      });
+    }
+
+    function closeAircraftModal(result) {
+      $("aircraftModal").classList.remove("show");
+      $("aircraftModal").setAttribute("aria-hidden", "true");
+
+      if (aircraftModalResolver) {
+        const resolve = aircraftModalResolver;
+        aircraftModalResolver = null;
+        resolve(result);
+      }
+    }
+
+    async function saveAircraftFromModal() {
+      const inputCode = normaliseCode($("newAircraftInputCode").value);
+      const scrCode = normaliseCode($("newAircraftScrCode").value);
+      const seats = Number($("newAircraftSeats").value);
+      const name = $("newAircraftName").value.trim();
+
+      if (!inputCode || !scrCode || !Number.isFinite(seats) || seats < 0 || !name) {
+        $("aircraftModalMessage").textContent =
+          "Complete Input Code, SCR Code, Total Seats and Aircraft Name.";
+        return;
+      }
+
+      const record = {
+        inputCode,
+        scrCode,
+        seats,
+        name
+      };
+
+      try {
+        $("saveAircraftBtn").disabled = true;
+        await db.ref(AIRCRAFT_PATH + "/" + inputCode).set(record);
+        closeAircraftModal(record);
+        showSuccess(`${inputCode} added to Aircraft Type Database.`);
+      } catch (error) {
+        console.error(error);
+        $("aircraftModalMessage").textContent =
+          "Unable to save aircraft type: " + (error.message || error);
+      } finally {
+        $("saveAircraftBtn").disabled = false;
+      }
+    }
+
+    function clearAirportModalFields(iata) {
+      $("newAirportIata").value = iata;
+      $("newAirportIcao").value = "";
+      $("newAirportName").value = "";
+      $("newAirportCountry").value = "";
+      $("newAirportContact").value = "";
+      $("newAirportEmail").value = "";
+      $("newAirportGeneralEmail").value = "";
+      $("newAirportSummerLevel").value = "3";
+      $("newAirportWinterLevel").value = "3";
+      $("newAirportGcr").value = "NO";
+      $("newAirportPpr").value = "NO";
+      $("newAirportAdditionalInfo").value = "";
+
+      $("airportModalMessage").textContent =
+        `${iata} is not currently in the Airport Database. Add the airport below to continue SCR generation.`;
+    }
+
+    function requestNewAirport(iata) {
+      return new Promise(resolve => {
+        airportModalResolver = resolve;
+        clearAirportModalFields(iata);
+        $("airportModal").classList.add("show");
+        $("airportModal").setAttribute("aria-hidden", "false");
+
+        setTimeout(() => $("newAirportIcao").focus(), 20);
+      });
+    }
+
+    function closeAirportModal(result) {
+      $("airportModal").classList.remove("show");
+      $("airportModal").setAttribute("aria-hidden", "true");
+
+      if (airportModalResolver) {
+        const resolve = airportModalResolver;
+        airportModalResolver = null;
+        resolve(result);
+      }
+    }
+
+    async function saveAirportFromModal() {
+      const airportCode = normaliseCode($("newAirportIata").value);
+      const airportIcao = normaliseCode($("newAirportIcao").value);
+      const airportName = $("newAirportName").value.trim();
+      const country = $("newAirportCountry").value.trim();
+
+      if (!/^[A-Z0-9]{3}$/.test(airportCode)) {
+        $("airportModalMessage").textContent = "A valid 3-character IATA code is required.";
+        return;
+      }
+
+      if (airportIcao && !/^[A-Z0-9]{4}$/.test(airportIcao)) {
+        $("airportModalMessage").textContent = "ICAO code must contain 4 characters.";
+        return;
+      }
+
+      if (!airportName) {
+        $("airportModalMessage").textContent = "Airport Name is required.";
+        return;
+      }
+
+      const record = {
+        airportCode,
+        airportIcao,
+        airportName,
+        country,
+        email: $("newAirportEmail").value.trim(),
+        generalEmail: $("newAirportGeneralEmail").value.trim(),
+        contactNumber: $("newAirportContact").value.trim(),
+        summerLevel: Number($("newAirportSummerLevel").value),
+        winterLevel: Number($("newAirportWinterLevel").value),
+        gcr: normaliseCode($("newAirportGcr").value),
+        ppr: normaliseCode($("newAirportPpr").value),
+        additionalInformation: $("newAirportAdditionalInfo").value.trim()
+      };
+
+      try {
+        $("saveAirportBtn").disabled = true;
+
+        await db.ref(AIRPORT_PATH + "/" + airportCode).set(record);
+
+        closeAirportModal(record);
+        showSuccess(`${airportCode} added to Airport Database. SCR generation continued.`);
+      } catch (error) {
+        console.error(error);
+        $("airportModalMessage").textContent =
+          "Unable to save airport: " + (error.message || error);
+      } finally {
+        $("saveAirportBtn").disabled = false;
+      }
+    }
+
+    async function ensureAirportsExist(parsedEntries) {
+      const uniqueCodes = [...new Set(
+        parsedEntries.flatMap(entry => [entry.from, entry.to])
+      )];
+
+      const airports = new Map();
+
+      for (let i = 0; i < uniqueCodes.length; i++) {
+        const code = uniqueCodes[i];
+
+        setProgress(`Checking airport ${i + 1} of ${uniqueCodes.length}: ${code}`);
+
+        let airport = await findAirportByIata(code);
+
+        if (!airport) {
+          setProgress(`${code} is not recognised. Airport information is required.`);
+          airport = await requestNewAirport(code);
+
+          if (!airport) {
+            throw new Error(`SCR generation cancelled because ${code} was not added.`);
+          }
+        }
+
+        airports.set(code, airport);
+      }
+
+      return airports;
+    }
+
+    async function ensureAircraftTypesExist(parsedEntries) {
+      const uniqueCodes = [...new Set(
+        parsedEntries.map(entry => entry.aircraftTypeInput)
+      )];
+
+      const aircraft = new Map();
+
+      for (let i = 0; i < uniqueCodes.length; i++) {
+        const code = uniqueCodes[i];
+
+        setProgress(`Checking aircraft ${i + 1} of ${uniqueCodes.length}: ${code}`);
+
+        let record = await findAircraftType(code);
+
+        if (!record) {
+          setProgress(`${code} is not recognised. Aircraft information is required.`);
+          record = await requestNewAircraft(code);
+
+          if (!record) {
+            throw new Error(`SCR generation cancelled because ${code} was not added.`);
+          }
+        }
+
+        aircraft.set(code, record);
+      }
+
+      return aircraft;
+    }
+
+    function buildCombinedAircraftCode(serviceType, aircraftRecord) {
+      const scrCode = normaliseCode(aircraftRecord.scrCode || aircraftRecord.inputCode);
+      const seatsNumber = Number(aircraftRecord.seats || 0);
+      const seats = String(Math.max(0, Math.min(999, seatsNumber))).padStart(3, "0");
+
+      if (serviceType === "J") {
+        return seats + scrCode;
+      }
+
+      if (serviceType === "D") {
+        if (scrCode === "CL5") return "009CL5";
+        if (scrCode === "L45") return "008L45";
+        return seats + scrCode;
+      }
+
+      return "000" + scrCode;
+    }
+
+    function buildSiLine(mode, airportCode, serviceType, registration, extraText) {
+      let action = "NEW SLOT REQ";
+
+      if (mode === "CANCEL") action = "SLOT CANX REQ";
+      if (mode === "CHANGE") action = "SLOT CHG REQ";
+
+      let line = `SI ${action} ${airportCode}`;
+
+      if (serviceType === "D" && registration) {
+        line += ` // REG: ${registration}`;
+      }
+
+      if (extraText) {
+        line += ` // ${extraText}`;
+      }
+
+      return line;
+    }
+
+    function groupFlightsByAirport(parsedEntries) {
+      const groups = new Map();
+
+      parsedEntries.forEach(entry => {
+        if (!groups.has(entry.from)) {
+          groups.set(entry.from, []);
+        }
+
+        if (!groups.has(entry.to)) {
+          groups.set(entry.to, []);
+        }
+
+        groups.get(entry.from).push({
+          direction: "departure",
+          entry
+        });
+
+        groups.get(entry.to).push({
+          direction: "arrival",
+          entry
+        });
+      });
+
+      return groups;
+    }
+
+    function buildStandardLine(prefix, direction, entry, combinedCode, serviceType) {
+      if (direction === "departure") {
+        return `${prefix} ${entry.flight} ${entry.date}${entry.date} ${entry.dayOfOperation} ${combinedCode} ${entry.departureTime}${entry.to} ${serviceType}`;
+      }
+
+      return `${prefix}${entry.flight} ${entry.date}${entry.date} ${entry.dayOfOperation} ${combinedCode} ${entry.from}${entry.arrivalTime} ${serviceType}`;
+    }
+
+    function buildAirportScr(
+      airportCode,
+      flights,
+      mode,
+      serviceType,
+      aircraftMap,
+      extraText
+    ) {
+      const lines = [
+        "SCR",
+        getIataSeason(),
+        getCurrentScrDate(),
+        airportCode
+      ];
+
+      if (mode === "CHANGE") {
+        flights.forEach(item => {
+          const aircraftRecord = aircraftMap.get(item.entry.aircraftTypeInput);
+          const combinedCode = buildCombinedAircraftCode(serviceType, aircraftRecord);
+
+          lines.push(
+            buildStandardLine(
+              "C",
+              item.direction,
+              item.entry,
+              combinedCode,
+              serviceType
+            )
+          );
+
+          lines.push(
+            buildStandardLine(
+              "R",
+              item.direction,
+              item.entry,
+              combinedCode,
+              serviceType
+            )
+          );
+        });
+      } else {
+        const prefix = mode === "CANCEL" ? "D" : "N";
+
+        flights.forEach(item => {
+          const aircraftRecord = aircraftMap.get(item.entry.aircraftTypeInput);
+          const combinedCode = buildCombinedAircraftCode(serviceType, aircraftRecord);
+
+          lines.push(
+            buildStandardLine(
+              prefix,
+              item.direction,
+              item.entry,
+              combinedCode,
+              serviceType
+            )
+          );
+        });
+      }
+
+      const registration =
+        flights.find(item => item.entry.registration)?.entry.registration || "";
+
+      lines.push(
+        buildSiLine(
+          mode,
+          airportCode,
+          serviceType,
+          registration,
+          extraText
+        )
+      );
+
+      return lines.join("\n");
+    }
+
+    async function addHistoryEntry(data) {
+      if (!db) return;
+
+      const username = getUserName();
+
+      await db.ref(HISTORY_PATH).push({
+        ...data,
+        username,
+        timestamp: new Date().toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        }),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+
+    function getAirportEmailFromRecord(airport, serviceType) {
+      const normalEmail = String(airport.email || "").trim();
+      const generalEmail = String(
+        airport.generalEmail ||
+        airport.emailGeneral ||
+        ""
+      ).trim();
+
+      if (serviceType === "D") {
+        return generalEmail || normalEmail || DEFAULT_EMAIL;
+      }
+
+      return normalEmail || DEFAULT_EMAIL;
+    }
+
+    function renderGeneratedMessages(messages) {
+      const container = $("outputList");
+      container.innerHTML = "";
+
+      if (!messages.length) {
+        container.innerHTML = '<div class="empty">No SCR generated.</div>';
+        return;
+      }
+
+      messages.forEach((message, index) => {
+        const card = document.createElement("div");
+        card.className = "scr-card";
+
+        card.innerHTML = `
+          <div class="scr-card-title">
+            <span>${escapeHtml(message.airportCode)}</span>
+            <span>${escapeHtml(message.mode)}</span>
+          </div>
+          <pre>${escapeHtml(message.scrMessage)}</pre>
+          <div class="scr-actions">
+            <button type="button" data-action="copy" data-index="${index}">Copy</button>
+            <button type="button" data-action="email" data-index="${index}">Send Email</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function generateScr() {
+      clearFeedback();
+
+      if (!db) {
+        showError("Firebase is not available.");
+        return;
+      }
+
+      const input = $("userInput").value;
+      const { parsed, errors } = parseInput(input);
+
+      if (errors.length) {
+        showError(errors.join(" "));
+        return;
+      }
+
+      if (!parsed.length) {
+        showError("Enter at least one valid flight.");
+        return;
+      }
+
+      $("detectedReg").value = parsed[0].registration || "";
+
+      const mode = normaliseCode($("slotType").value);
+      const serviceType = normaliseCode($("serviceType").value);
+      const extraText = $("siExtra").value.trim();
+
+      try {
+        $("generateBtn").disabled = true;
+
+        setProgress("Checking Airport Database...");
+        const airportMap = await ensureAirportsExist(parsed);
+
+        setProgress("Checking Aircraft Type Database...");
+        const aircraftMap = await ensureAircraftTypesExist(parsed);
+
+        setProgress("Generating SCR messages...");
+
+        const groups = groupFlightsByAirport(parsed);
+        const messages = [];
+
+        for (const [airportCode, flights] of groups.entries()) {
+          const scrMessage = buildAirportScr(
+            airportCode,
+            flights,
+            mode,
+            serviceType,
+            aircraftMap,
+            extraText
+          );
+
+          const airportRecord = airportMap.get(airportCode) || {};
+
+          const historyData = {
+            type:
+              mode === "NEW" ? "NEW SLOT" :
+              mode === "CANCEL" ? "CANCEL SLOT" :
+              "CHANGE SCR",
+            slotTypeValue: mode,
+            flightNumber: [...new Set(flights.map(item => item.entry.flight))].join(", "),
+            airport: airportCode,
+            direction: [...new Set(flights.map(item => item.direction))].join("/"),
+            rawInput: input,
+            scrMessage,
+            serviceType,
+            registration:
+              flights.find(item => item.entry.registration)?.entry.registration || "",
+            aircraftTypes:
+              [...new Set(flights.map(item => item.entry.aircraftTypeInput))].join(", ")
+          };
+
+          await addHistoryEntry(historyData);
+
+          messages.push({
+            airportCode,
+            mode,
+            serviceType,
+            airportRecord,
+            email: getAirportEmailFromRecord(airportRecord, serviceType),
+            scrMessage
+          });
+        }
+
+        currentGeneratedMessages = messages;
+        renderGeneratedMessages(messages);
+
+        setProgress("");
+        showSuccess(
+          `Generated ${messages.length} SCR message${messages.length === 1 ? "" : "s"}.`
+        );
+      } catch (error) {
+        console.error(error);
+        setProgress("");
+        showError(error.message || "SCR generation failed.");
+      } finally {
+        $("generateBtn").disabled = false;
+      }
+    }
+
+    function buildEmailSubject(message) {
+      if (message.mode === "NEW") {
+        return `NEW SLOT REQ ${message.airportCode}`;
+      }
+
+      if (message.mode === "CANCEL") {
+        return `SLOT CANX REQ ${message.airportCode}`;
+      }
+
+      return `SLOT CHG REQ ${message.airportCode}`;
+    }
+
+    function sendEmail(message) {
+      const subject = buildEmailSubject(message);
+
+      window.location.href =
+        `mailto:${encodeURIComponent(message.email || DEFAULT_EMAIL)}` +
+        `?subject=${encodeURIComponent(subject)}` +
+        `&body=${encodeURIComponent(message.scrMessage)}`;
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showSuccess("Copied to clipboard.");
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        showSuccess("Copied to clipboard.");
+      }
+    }
+
+    function renderHistory() {
+      const container = $("historyList");
+      const query = normaliseCode($("historySearch").value).toLowerCase();
+
+      const rows = sharedHistoryCache.filter(entry => {
+        const mode = normaliseCode(
+          entry.slotTypeValue ||
+          entry.mode ||
+          entry.type
+        );
+
+        const matchesMode =
+          historyModeFilter === "ALL" ||
+          mode.includes(historyModeFilter);
+
+        if (!matchesMode) {
+          return false;
+        }
+
+        if (!query) {
+          return true;
+        }
+
+        const blob = [
+          entry.type,
+          entry.slotTypeValue,
+          entry.airport,
+          entry.flightNumber,
+          entry.direction,
+          entry.registration,
+          entry.serviceType,
+          entry.username,
+          entry.scrMessage,
+          entry.rawInput,
+          entry.timestamp
+        ].join(" ").toLowerCase();
+
+        return blob.includes(query);
+      });
+
+      if (!rows.length) {
+        container.innerHTML = '<div class="empty">No matching SCR history found.</div>';
+        return;
+      }
+
+      container.innerHTML = "";
+
+      rows.forEach((entry, index) => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+
+        item.innerHTML = `
+          <div class="history-title">
+            ${escapeHtml(entry.type || "SCR")} - ${escapeHtml(entry.airport || "UNKNOWN")}
+          </div>
+          <div class="history-meta">
+            Flight: ${escapeHtml(entry.flightNumber || "-")}<br>
+            Direction: ${escapeHtml(entry.direction || "-")}<br>
+            Service: ${escapeHtml(entry.serviceType || "-")}<br>
+            REG: ${escapeHtml(entry.registration || "-")}<br>
+            User: ${escapeHtml(entry.username || "-")}<br>
+            Time: ${escapeHtml(entry.timestamp || "-")}
+          </div>
+          <div class="history-preview">${escapeHtml(formatPreviewText(entry.scrMessage || ""))}</div>
+          <div class="history-actions">
+            <button type="button" data-history-action="view" data-index="${index}">View SCR</button>
+            <button type="button" data-history-action="copy" data-index="${index}">Copy SCR</button>
+            <button type="button" data-history-action="delete" data-index="${index}">Delete</button>
+          </div>
+        `;
+
+        item.dataset.firebaseKey = entry.firebaseKey || "";
+        container.appendChild(item);
+      });
+    }
+
+    function openViewScr(text) {
+      viewedScrText = String(text || "");
+      $("viewScrText").textContent = viewedScrText;
+      $("viewScrModal").classList.add("show");
+      $("viewScrModal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeViewScr() {
+      $("viewScrModal").classList.remove("show");
+      $("viewScrModal").setAttribute("aria-hidden", "true");
+    }
+
+    async function deleteHistoryEntry(entry) {
+      if (!entry || !entry.firebaseKey || !db) return;
+
+      if (!window.confirm("Delete this visible SCR history entry?")) {
+        return;
+      }
+
+      try {
+        await db.ref(HISTORY_PATH + "/" + entry.firebaseKey).remove();
+        showSuccess("SCR history entry deleted.");
+      } catch (error) {
+        console.error(error);
+        showError("Unable to delete SCR history entry.");
+      }
+    }
+
+    async function clearAllHistory() {
+      if (!db) return;
+
+      if (!window.confirm("Delete ALL visible SCR history entries?")) {
+        return;
+      }
+
+      try {
+        await db.ref(HISTORY_PATH).remove();
+        showSuccess("Visible SCR history cleared.");
+      } catch (error) {
+        console.error(error);
+        showError("Unable to clear SCR history.");
+      }
+    }
+
+    function bindEvents() {
+      $("generateBtn").addEventListener("click", generateScr);
+
+      $("clearInputBtn").addEventListener("click", () => {
+        $("userInput").value = "";
+        $("detectedReg").value = "";
+        clearFeedback();
+      });
+
+      $("clearOutputBtn").addEventListener("click", () => {
+        currentGeneratedMessages = [];
+        renderGeneratedMessages([]);
+      });
+      });
+
+      $("outputList").addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const index = Number(button.dataset.index);
+        const message = currentGeneratedMessages[index];
+        if (!message) return;
+
+        if (button.dataset.action === "copy") {
+          copyText(message.scrMessage);
+        }
+
+        if (button.dataset.action === "email") {
+          sendEmail(message);
+        }
+      });
+
+      $("historySearch").addEventListener("input", renderHistory);
+
+      $("historyFilterBtn").addEventListener("click", () => {
+        $("historyFilterPanel").classList.toggle("show");
+      });
+
+      document.querySelectorAll(".history-filter-option").forEach(button => {
+        button.addEventListener("click", () => {
+          historyModeFilter = normaliseCode(button.dataset.filter || "ALL");
+
+          document.querySelectorAll(".history-filter-option").forEach(item => {
+            item.classList.toggle("active", item === button);
+          });
+
+          $("historyFilterStatus").textContent = `Showing: ${historyModeFilter}`;
+          renderHistory();
+        });
+      });
+
+      $("historyList").addEventListener("click", event => {
+        const button = event.target.closest("button[data-history-action]");
+        if (!button) return;
+
+        const visibleItems = [...$("historyList").querySelectorAll(".history-item")];
+        const parent = button.closest(".history-item");
+        const firebaseKey = parent ? parent.dataset.firebaseKey : "";
+        const entry = sharedHistoryCache.find(item => item.firebaseKey === firebaseKey);
+
+        if (!entry) return;
+
+        if (button.dataset.historyAction === "view") {
+          openViewScr(entry.scrMessage || "");
+        }
+
+        if (button.dataset.historyAction === "copy") {
+          copyText(entry.scrMessage || "");
+        }
+
+        if (button.dataset.historyAction === "delete") {
+          deleteHistoryEntry(entry);
+        }
+      });
+
+      $("clearHistoryBtn").addEventListener("click", clearAllHistory);
+
+      $("saveAircraftBtn").addEventListener("click", saveAircraftFromModal);
+      $("cancelAircraftBtn").addEventListener("click", () => closeAircraftModal(null));
+
+      $("saveAirportBtn").addEventListener("click", saveAirportFromModal);
+      $("cancelAirportBtn").addEventListener("click", () => closeAirportModal(null));
+
+      $("viewScrCloseBtn").addEventListener("click", closeViewScr);
+      $("viewScrCopyBtn").addEventListener("click", () => copyText(viewedScrText));
+
+      $("userInput").addEventListener("input", () => {
+        const { parsed } = parseInput($("userInput").value);
+        $("detectedReg").value = parsed.length ? parsed[0].registration : "";
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateUtcClock();
+      setInterval(updateUtcClock, 1000);
+
+      const username = getUserName();
+      $("currentUserText").textContent = username ? `User: ${username}` : "";
+
+      bindEvents();
+      initFirebase();
+    });
+  </script>
+</body>
+</html>
