@@ -1,0 +1,313 @@
+/* =========================================================
+   CONNECTED USERS + UPDATE STATUS
+   ========================================================= */
+
+.infobar-global-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+
+  box-sizing: border-box;
+}
+
+
+/* Connected users */
+
+.connected-users-status {
+  padding: 2px 7px;
+}
+
+.connected-users-icon {
+  color: #2e7d32;
+  font-size: 9px;
+}
+
+#connectedUsersCount {
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   WEBSITE UPDATE INFOBAR STATUS
+   ========================================================= */
+
+.website-update-status {
+  padding: 3px 8px;
+
+  background: #c0c0c0;
+  color: #000000;
+
+  border-top: 1px solid #ffffff;
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+
+  font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+
+  cursor: default;
+}
+
+
+.website-update-status.update-available {
+  background: #ffff00;
+
+  color: #000000;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  animation: runway-update-flash 1.2s infinite;
+}
+
+
+@keyframes runway-update-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+
+/* =========================================================
+   WEBSITE UPDATE WINDOW
+   ========================================================= */
+
+.runway-update-notification {
+  position: fixed;
+
+  right: 20px;
+  bottom: 20px;
+
+  width: 430px;
+
+  max-width: calc(100vw - 40px);
+
+  box-sizing: border-box;
+
+  display: none;
+
+  background: #c0c0c0;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #000000;
+  border-bottom: 2px solid #000000;
+
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+
+  font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+
+  z-index: 9999999;
+}
+
+
+.runway-update-notification.show {
+  display: block;
+
+  animation: runway-update-appear 0.2s ease-out;
+}
+
+
+@keyframes runway-update-appear {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   UPDATE TITLE BAR
+   ========================================================= */
+
+.runway-update-titlebar {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  height: 26px;
+
+  padding: 3px 4px 3px 7px;
+
+  box-sizing: border-box;
+
+  background: #000080;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: bold;
+}
+
+
+.runway-update-titlebar button {
+  width: 20px;
+  height: 18px;
+
+  padding: 0;
+
+  background: #c0c0c0;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #000000;
+  border-bottom: 2px solid #000000;
+
+  color: #000000;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  line-height: 12px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   UPDATE BODY
+   ========================================================= */
+
+.runway-update-body {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 17px;
+}
+
+
+.runway-update-icon {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  min-width: 44px;
+
+  background: #008000;
+
+  color: #ffffff;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+
+  font-size: 30px;
+
+  font-weight: bold;
+}
+
+
+.runway-update-message {
+  display: flex;
+
+  flex: 1;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.runway-update-message strong {
+  font-size: 13px;
+}
+
+
+.runway-update-message span {
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+
+.runway-update-message small {
+  color: #404040;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   UPDATE BUTTONS
+   ========================================================= */
+
+.runway-update-buttons {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  padding: 0 12px 12px 12px;
+}
+
+
+.runway-update-buttons button {
+  min-width: 95px;
+
+  padding: 6px 12px;
+
+  background: #c0c0c0;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #000000;
+  border-bottom: 2px solid #000000;
+
+  font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+
+.runway-update-buttons button:active {
+  border-top: 2px solid #000000;
+  border-left: 2px solid #000000;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .runway-update-notification {
+    right: 10px;
+    bottom: 10px;
+
+    width: calc(100vw - 20px);
+
+    max-width: none;
+  }
+}
