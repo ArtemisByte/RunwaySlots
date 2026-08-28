@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles/welco.css" />
-  <link rel="stylesheet" href="styles/infobar.css" />
+  <link rel="stylesheet" href="styles/infobar.css">
 </head>
 
 <body>
@@ -102,44 +102,65 @@
       </section>
 
       <!-- Information bar -->
-      <div class="info-bar">
+        <div class="info-bar" id="globalInfoBar">
 
-        <div class="left-tools">
-          <div
-            id="utcTopClock"
-            class="utc-clock"
-            aria-live="polite"
-          >
-            UTC: --:--:-- • --MON----
-          </div>
-        </div>
+    <div class="left-tools">
 
-        <div class="right-tools">
-
-          <label
-            class="auto-refresh"
-            title="Automatically reload this page every 15 minutes"
-          >
-            <input
-              type="checkbox"
-              id="autoRefreshToggle"
-              checked
-            />
-
-            <span>Auto-refresh (15 min)</span>
-          </label>
-
-          <div
-            id="fbStatus"
-            class="status-indicator"
-            title="Firebase Realtime Database status"
-          >
-            <span class="dot" aria-hidden="true"></span>
-            <span class="text">DB Not Connected</span>
-          </div>
-
-        </div>
+      <div
+        id="utcTopClock"
+        class="utc-clock"
+        aria-live="polite"
+      >
+        UTC: --:--:-- • --MON----
       </div>
+
+      <div
+        id="fbStatus"
+        class="status-indicator"
+        title="Firebase Realtime Database status"
+      >
+        <span class="dot"></span>
+        <span class="text">Database Connecting</span>
+      </div>
+
+      <div
+        id="connectedUsersStatus"
+        class="connected-users-status connecting"
+        title="Number of users currently connected to Runway Slots"
+      >
+        <span class="connected-users-dot"></span>
+        <span>Connected Users:</span>
+        <strong id="connectedUsersCount">--</strong>
+      </div>
+
+      <button
+        id="websiteUpdateStatus"
+        class="website-update-status"
+        type="button"
+        title="Runway Slots website version"
+      >
+        ✓ WEBSITE UP TO DATE
+      </button>
+
+    </div>
+
+    <div class="right-tools">
+
+      <label
+        class="auto-refresh"
+        title="Automatically reload this page every 15 minutes"
+      >
+        <input
+          type="checkbox"
+          id="autoRefreshToggle"
+          checked
+        >
+        <span>Auto-refresh (15 min)</span>
+      </label>
+
+    </div>
+  </div>
+
 
       <!-- Navigation -->
       <section class="group" aria-labelledby="navigationTitle">
@@ -222,8 +243,6 @@
 
     </div>
   </main>
-
-  <!-- Page footer -->
   <footer class="page-footer">
     <div>Created By: ArtemisByte/KunchackoBoben 2026</div>
 
@@ -237,9 +256,8 @@
   
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="scripts/firebase.js"></script>
-  <script src="scripts/welco.js"></script>
+<script src="scripts/welco.js"></script>
+<script src="scripts/firebase.js"></script>
   <script src="scripts/infobar.js"></script>
-
 </body>
 </html>
