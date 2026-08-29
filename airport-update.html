@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airport Database Monthly Update</title>
+  <title>Airport Database Yearly Update</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -108,8 +108,35 @@
           </div>
         </section>
 
+        <section class="panel" id="firebaseConnectionSection">
+          <div class="panel-title">3. Firebase Airport Database Connection</div>
+          <div class="panel-body">
+            <div class="firebase-status-grid">
+              <div class="firebase-status-card">
+                <span class="firebase-status-label">Database Status</span>
+                <span class="firebase-status-value connecting" id="firebaseStatus">Connecting...</span>
+              </div>
+
+              <div class="firebase-status-card">
+                <span class="firebase-status-label">Existing Airports</span>
+                <span class="firebase-status-value" id="firebaseAirportCount">--</span>
+              </div>
+
+              <div class="firebase-status-card">
+                <span class="firebase-status-label">Firebase Path</span>
+                <span class="firebase-status-value path">/airports</span>
+              </div>
+            </div>
+
+            <div class="firebase-readonly-note">
+              <strong>READ-ONLY STAGE:</strong> This version only reads the existing airport database for comparison.
+              It cannot add, edit or delete Firebase airport records.
+            </div>
+          </div>
+        </section>
+
         <section class="panel hidden" id="analysisSection">
-          <div class="panel-title">3. File Analysis</div>
+          <div class="panel-title">4. File Analysis</div>
           <div class="panel-body">
             <div class="summary-grid">
               <div class="summary-card"><span class="summary-value" id="totalRows">0</span><span class="summary-label">Rows Detected</span></div>
@@ -128,7 +155,7 @@
         </section>
 
         <section class="panel hidden" id="validationSection">
-          <div class="panel-title">4. Validation Report</div>
+          <div class="panel-title">5. Validation Report</div>
           <div class="panel-body">
             <div class="validation-toolbar">
               <button type="button" id="showAllBtn">All</button>
@@ -140,11 +167,10 @@
         </section>
 
         <section class="panel hidden" id="previewSection">
-          <div class="panel-title">5. Airport Import Preview</div>
+          <div class="panel-title">6. Airport Import Preview</div>
           <div class="panel-body">
             <div class="preview-note">
-              This preview shows the cleaned values that will be compared against Firebase in Step 2.
-              No database comparison is being performed yet.
+              This preview shows the cleaned values detected in the uploaded IATA file. The Firebase comparison appears in the next section.
             </div>
 
             <div class="table-wrapper">
@@ -166,16 +192,49 @@
           </div>
         </section>
 
+        <section class="panel hidden" id="comparisonSection">
+          <div class="panel-title">7. Firebase Comparison</div>
+          <div class="panel-body">
+            <div class="summary-grid comparison-summary-grid">
+              <div class="summary-card new-summary"><span class="summary-value" id="newAirportCount">0</span><span class="summary-label">New Airports</span></div>
+              <div class="summary-card changed-summary"><span class="summary-value" id="changedAirportCount">0</span><span class="summary-label">Changed Airports</span></div>
+              <div class="summary-card unchanged-summary"><span class="summary-value" id="unchangedAirportCount">0</span><span class="summary-label">Unchanged</span></div>
+              <div class="summary-card skipped-summary"><span class="summary-value" id="skippedAirportCount">0</span><span class="summary-label">Skipped / Errors</span></div>
+            </div>
+
+            <div class="preview-note">
+              Only IATA, ICAO, airport name, country, Summer Level and Winter Level are compared.
+              <strong>GCR, PPR, email addresses, contact numbers and additional information are ignored and protected.</strong>
+              Blank optional values in the uploaded file are also ignored so they cannot clear existing Firebase information.
+            </div>
+
+            <div class="table-wrapper comparison-table-wrapper">
+              <table id="comparisonTable">
+                <thead>
+                  <tr>
+                    <th>Result</th>
+                    <th>IATA</th>
+                    <th>ICAO</th>
+                    <th>Airport Name</th>
+                    <th>Changes Detected</th>
+                  </tr>
+                </thead>
+                <tbody id="comparisonTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <section class="panel hidden" id="readySection">
-          <div class="panel-title">6. Ready for Firebase Integration</div>
+          <div class="panel-title">8. Ready for Firebase Write Stage</div>
           <div class="panel-body">
             <div class="ready-box">
               <div class="ready-icon">✓</div>
               <div>
                 <strong>File processing complete.</strong>
                 <p>
-                  The next step will connect this page to Firebase so it can compare the validated airport records against
-                  <code>/airports</code>, show NEW / CHANGED / UNCHANGED records, create a backup, and apply approved updates.
+                  The read-only comparison is complete. The next stage will add a controlled <strong>Apply Update</strong> process,
+                  automatic backup, and import history. No write capability is enabled in this version.
                 </p>
               </div>
             </div>
@@ -188,6 +247,9 @@
   <footer>Created By: ArtemisByte/KunchackoBoben 2026</footer>
   <footer>Disclaimer: Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use.</footer>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="scripts/testfirebase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="scripts/airport-update.js"></script>
 </body>
