@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles/multiflight.css">
   <link rel="stylesheet" href="styles/navi-ui.css">
-  <link rel="stylesheet" href="styles/infobar.css"> 
+  <link rel="stylesheet" href="styles/infobar.css">
 </head>
 <body>
 
@@ -33,21 +33,65 @@
       <div style="display:flex; align-items:center; gap:6px;"></div>
     </nav>
 
-    <div class="info-bar">
+      <div class="info-bar" id="globalInfoBar">
+
     <div class="left-tools">
-      <div id="utcTopClock" class="utc-clock" aria-live="polite">UTC: --:--:-- • --MON----</div>
+
+      <div
+        id="utcTopClock"
+        class="utc-clock"
+        aria-live="polite"
+      >
+        UTC: --:--:-- • --MON----
+      </div>
+
+      <div
+        id="fbStatus"
+        class="status-indicator"
+        title="Firebase Realtime Database status"
+      >
+        <span class="dot"></span>
+        <span class="text">Database Connecting</span>
+      </div>
+
+      <div
+        id="connectedUsersStatus"
+        class="connected-users-status connecting"
+        title="Number of users currently connected to Runway Slots"
+      >
+        <span class="connected-users-dot"></span>
+        <span>Connected Users:</span>
+        <strong id="connectedUsersCount">--</strong>
+      </div>
+
+      <button
+        id="websiteUpdateStatus"
+        class="website-update-status"
+        type="button"
+        title="Runway Slots website version"
+      >
+        ✓ WEBSITE UP TO DATE
+      </button>
+
     </div>
+
     <div class="right-tools">
-      <label class="auto-refresh" title="Automatically reload this page every 15 minutes">
-        <input type="checkbox" id="autoRefreshToggle" checked>
+
+      <label
+        class="auto-refresh"
+        title="Automatically reload this page every 15 minutes"
+      >
+        <input
+          type="checkbox"
+          id="autoRefreshToggle"
+          checked
+        >
         <span>Auto-refresh (15 min)</span>
       </label>
-      <div id="fbStatus" class="status-indicator" title="Firebase Realtime Database status">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="text">Database Not Connected</span>
-      </div>
+
     </div>
   </div>
+
 
     <div class="app-shell">
       <div class="main-panel">
@@ -144,9 +188,8 @@ Use of this Service is at your own risk. The creator provides this Service "as i
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="scripts/firebase.js"></script>
   <script src="scripts/multiflight.js"></script>
+  <script src="scripts/firebase.js"></script>
   <script src="scripts/infobar.js"></script>
-
 </body>
 </html>
