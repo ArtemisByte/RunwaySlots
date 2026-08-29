@@ -14,6 +14,9 @@
   let analysedRows = [];
   let validationItems = [];
   let currentValidationFilter = "all";
+  let firebaseAirports = {};
+  let firebaseLoaded = false;
+  let comparisonRows = [];
   const els = {};
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -22,7 +25,10 @@
       "analysisSection","validationSection","previewSection","readySection",
       "totalRows","validRows","warningRows","errorRows","columnMapping",
       "analysisMessage","validationList","previewTableBody","showAllBtn",
-      "showWarningsBtn","showErrorsBtn"
+      "showWarningsBtn","showErrorsBtn",
+      "firebaseStatus","firebaseAirportCount","comparisonSection",
+      "newAirportCount","changedAirportCount","unchangedAirportCount",
+      "skippedAirportCount","comparisonTableBody"
     ].forEach(id => els[id] = document.getElementById(id));
 
     els.airportFile.addEventListener("change", handleFileSelection);
@@ -33,7 +39,54 @@
     els.showErrorsBtn.addEventListener("click", () => { currentValidationFilter = "error"; renderValidationList(); });
 
     resetPage();
+    loadFirebaseAirports();
   });
+
+  async function loadFirebaseAirports() {
+    setFirebaseStatus("Connecting...", "connecting");
+
+    try {
+      if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
+        throw new Error("Firebase app is not initialised. Check scripts/testfirebase.js.");
+      }
+
+      if (typeof firebase.database !== "function") {
+        throw new Error("Firebase Realtime Database SDK is not available.");
+      }
+
+      const snapshot = await firebase.database().ref("airports").once("value");
+      const rawAirports = snapshot.val() || {};
+
+      firebaseAirports = {};
+
+      Object.keys(rawAirports).forEach(key => {
+        const record = rawAirports[key] || {};
+        const iata = cleanCode(record.airportCode || key);
+        if (!iata) return;
+        firebaseAirports[iata] = record;
+      });
+
+      firebaseLoaded = true;
+      els.firebaseAirportCount.textContent = Object.keys(firebaseAirports).length;
+      setFirebaseStatus("Connected - Read Only", "connected");
+
+      if (analysedRows.length) {
+        compareWithFirebase();
+      }
+    } catch (error) {
+      firebaseLoaded = false;
+      firebaseAirports = {};
+      els.firebaseAirportCount.textContent = "--";
+      setFirebaseStatus("Connection Failed", "error");
+      console.error("Firebase airport read failed:", error);
+    }
+  }
+
+  function setFirebaseStatus(text, state) {
+    if (!els.firebaseStatus) return;
+    els.firebaseStatus.textContent = text;
+    els.firebaseStatus.className = `firebase-status-value ${state || ""}`.trim();
+  }
 
   function handleFileSelection(event) {
     selectedFile = event.target.files && event.target.files[0] ? event.target.files[0] : null;
@@ -157,6 +210,13 @@
 
     renderValidationList();
     renderPreviewTable();
+
+    if (firebaseLoaded) {
+      compareWithFirebase();
+    } else {
+      comparisonRows = [];
+      els.comparisonSection.classList.add("hidden");
+    }
   }
 
   function detectColumnMapping(headers) {
@@ -305,6 +365,129 @@
     });
   }
 
+  function compareWithFirebase() {
+    comparisonRows = analysedRows.map(row => {
+      if (row.status === "error") {
+        return {
+          status: "skipped",
+          airportCode: row.airportCode || "-",
+          airportIcao: row.airportIcao || "",
+          airportName: row.airportName || "",
+          changes: ["Row contains validation errors and was not compared."]
+        };
+      }
+
+      const existing = firebaseAirports[row.airportCode] || null;
+
+      if (!existing) {
+        return {
+          status: "new",
+          airportCode: row.airportCode,
+          airportIcao: row.airportIcao,
+          airportName: row.airportName,
+          changes: ["Airport does not currently exist in Firebase."]
+        };
+      }
+
+      const changes = [];
+      compareField(changes, "ICAO", existing.airportIcao, row.airportIcao, true);
+      compareField(changes, "Airport Name", existing.airportName, row.airportName, false);
+      compareField(changes, "Country", existing.country, row.country, true);
+      compareField(changes, "Summer Level", existing.summerLevel, row.summerLevel, true);
+      compareField(changes, "Winter Level", existing.winterLevel, row.winterLevel, true);
+
+      return {
+        status: changes.length ? "changed" : "unchanged",
+        airportCode: row.airportCode,
+        airportIcao: row.airportIcao || cleanCode(existing.airportIcao || ""),
+        airportName: row.airportName || cleanText(existing.airportName || ""),
+        changes
+      };
+    });
+
+    renderFirebaseComparison();
+  }
+
+  function compareField(changes, label, oldValue, importedValue, ignoreBlankImported) {
+    const imported = normalizeCompareValue(importedValue);
+
+    if (ignoreBlankImported && !imported) {
+      return;
+    }
+
+    const existing = normalizeCompareValue(oldValue);
+
+    if (existing !== imported) {
+      changes.push({
+        label,
+        oldValue: cleanDisplayValue(oldValue),
+        newValue: cleanDisplayValue(importedValue)
+      });
+    }
+  }
+
+  function normalizeCompareValue(value) {
+    return String(value == null ? "" : value)
+      .trim()
+      .replace(/\s+/g, " ")
+      .toUpperCase();
+  }
+
+  function cleanDisplayValue(value) {
+    const cleaned = String(value == null ? "" : value).trim();
+    return cleaned || "(blank)";
+  }
+
+  function renderFirebaseComparison() {
+    const counts = {
+      new: comparisonRows.filter(row => row.status === "new").length,
+      changed: comparisonRows.filter(row => row.status === "changed").length,
+      unchanged: comparisonRows.filter(row => row.status === "unchanged").length,
+      skipped: comparisonRows.filter(row => row.status === "skipped").length
+    };
+
+    els.newAirportCount.textContent = counts.new;
+    els.changedAirportCount.textContent = counts.changed;
+    els.unchangedAirportCount.textContent = counts.unchanged;
+    els.skippedAirportCount.textContent = counts.skipped;
+
+    els.comparisonTableBody.innerHTML = "";
+
+    comparisonRows.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.className = `comparison-row-${row.status}`;
+
+      let changeHtml = "No differences in protected import fields.";
+
+      if (row.status === "new") {
+        changeHtml = "New airport - no existing Firebase record.";
+      } else if (row.status === "skipped") {
+        changeHtml = escapeHtml(String(row.changes[0] || "Skipped"));
+      } else if (row.changes.length) {
+        changeHtml = row.changes.map(change => `
+          <div class="comparison-change-item">
+            <strong>${escapeHtml(change.label)}:</strong>
+            <span class="comparison-old">${escapeHtml(change.oldValue)}</span>
+            &rarr;
+            <span class="comparison-new">${escapeHtml(change.newValue)}</span>
+          </div>
+        `).join("");
+      }
+
+      tr.innerHTML = `
+        <td><span class="comparison-result ${row.status}">${escapeHtml(row.status.toUpperCase())}</span></td>
+        <td>${escapeHtml(row.airportCode || "-")}</td>
+        <td>${escapeHtml(row.airportIcao || "-")}</td>
+        <td>${escapeHtml(row.airportName || "-")}</td>
+        <td class="comparison-change-list">${changeHtml}</td>
+      `;
+
+      els.comparisonTableBody.appendChild(tr);
+    });
+
+    els.comparisonSection.classList.remove("hidden");
+  }
+
   function getMappedValue(row, headerName) {
     if (!headerName) return "";
     const value = row[headerName];
@@ -347,7 +530,7 @@
   }
 
   function hideResults() {
-    ["analysisSection","validationSection","previewSection","readySection"].forEach(key => {
+    ["analysisSection","validationSection","previewSection","comparisonSection","readySection"].forEach(key => {
       if (els[key]) els[key].classList.add("hidden");
     });
 
@@ -363,9 +546,13 @@
     if (els.validationList) els.validationList.innerHTML = "";
     if (els.columnMapping) els.columnMapping.innerHTML = "";
 
-    ["totalRows","validRows","warningRows","errorRows"].forEach(key => {
+    ["totalRows","validRows","warningRows","errorRows",
+      "newAirportCount","changedAirportCount","unchangedAirportCount","skippedAirportCount"].forEach(key => {
       if (els[key]) els[key].textContent = "0";
     });
+
+    comparisonRows = [];
+    if (els.comparisonTableBody) els.comparisonTableBody.innerHTML = "";
   }
 
   function resetPage() {
