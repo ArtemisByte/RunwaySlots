@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airport Database Monthly Update</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles/navi-ui.css">
+  <link rel="stylesheet" href="styles/infobar.css">
+  <link rel="stylesheet" href="styles/airport-update.css">
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="sir.html">SIR Request</a></li>
+      <li><a href="multiflight.html">Multi Flight</a></li>
+      <li><a href="airport-search.html">Airport Database</a></li>
+      <li><a href="aircrafttype.html">Aircraft Database</a></li>
+      <li><a href="gcrformat.html">GCR Format</a></li>
+      <li><a href="turnaround.html">Turnaround Format</a></li>
+      <li><a href="quicklinks.html">Quick Links</a></li>
+      <li><a href="analytics.html">Analytics</a></li>
+      <li><a href="experimental.html">EXPERIMENTAL</a></li>
+      <li><a href="updates.html">SYSTEM UPDATES</a></li>
+      <li><a href="https://forms.gle/Q4T4TbhEU9Sa7jbg7" target="_blank" rel="noopener noreferrer">Log Issues</a></li>
+    </ul>
+  </nav>
+
+  <main class="page-shell">
+    <section class="window">
+      <div class="title-bar"><span>Airport Database Monthly Update</span></div>
+
+      <div class="window-content">
+        <div class="step-banner">
+          <strong>STEP 1 OF 2:</strong>
+          Upload, analyse and validate the monthly airport file.
+          No Firebase data will be changed on this page yet.
+        </div>
+
+        <div class="warning-panel">
+          <div class="warning-title">Important</div>
+          <div class="warning-text">
+            This import is designed to update airport coordination information only.
+            <strong>GCR, PPR, email addresses, contact numbers and additional information are not read from the monthly Excel file and will not be changed.</strong>
+            These details should be checked directly with the airport and updated manually in the Airport Database.
+          </div>
+        </div>
+
+
+        <section class="panel iata-download-panel">
+          <div class="panel-title">0. Download Latest IATA Airport Slots File</div>
+          <div class="panel-body">
+            <div class="iata-download-box">
+              <div class="iata-download-copy">
+                <strong>IATA WASG Annex 12.7</strong>
+                <p>Download the latest airport coordination information directly from IATA, then upload the Excel file below for analysis.</p>
+                <div class="help-text">Source: International Air Transport Association (IATA)</div>
+              </div>
+              <a class="download-link-button" href="https://www.iata.org/contentassets/4ede2aabfcc14a55919e468054d714fe/wasg-annex-12.7.xlsx" target="_blank" rel="noopener noreferrer">Download Latest IATA File</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">1. Select Monthly Airport File</div>
+          <div class="panel-body">
+            <div class="upload-grid">
+              <div>
+                <label for="airportFile">Excel / CSV File</label>
+                <input type="file" id="airportFile" accept=".xlsx,.xls,.csv">
+                <div class="help-text">Supported file types: .xlsx, .xls and .csv</div>
+              </div>
+
+              <div class="file-status-box">
+                <div class="file-status-label">Selected File</div>
+                <div id="selectedFileName">No file selected</div>
+                <div id="selectedFileSize">-</div>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button id="analyseBtn" type="button" disabled>Analyse File</button>
+              <button id="clearBtn" type="button">Clear</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">2. Expected Airport Information</div>
+          <div class="panel-body">
+            <div class="field-grid">
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>IATA Code</strong></div>
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>ICAO Code</strong></div>
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>Airport Name</strong></div>
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>Country</strong></div>
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>Summer Level</strong></div>
+              <div class="field-card included"><span class="field-status">AUTO UPDATE</span><strong>Winter Level</strong></div>
+              <div class="field-card protected"><span class="field-status">PROTECTED</span><strong>GCR</strong></div>
+              <div class="field-card protected"><span class="field-status">PROTECTED</span><strong>PPR</strong></div>
+              <div class="field-card protected"><span class="field-status">PROTECTED</span><strong>Email / GA Email</strong></div>
+              <div class="field-card protected"><span class="field-status">PROTECTED</span><strong>Contact Number</strong></div>
+              <div class="field-card protected"><span class="field-status">PROTECTED</span><strong>Additional Information</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="analysisSection">
+          <div class="panel-title">3. File Analysis</div>
+          <div class="panel-body">
+            <div class="summary-grid">
+              <div class="summary-card"><span class="summary-value" id="totalRows">0</span><span class="summary-label">Rows Detected</span></div>
+              <div class="summary-card"><span class="summary-value" id="validRows">0</span><span class="summary-label">Valid Airports</span></div>
+              <div class="summary-card"><span class="summary-value" id="warningRows">0</span><span class="summary-label">Warnings</span></div>
+              <div class="summary-card"><span class="summary-value" id="errorRows">0</span><span class="summary-label">Errors</span></div>
+            </div>
+
+            <div class="detected-columns-box">
+              <div class="subheading">Detected Column Mapping</div>
+              <div id="columnMapping" class="column-mapping"></div>
+            </div>
+
+            <div id="analysisMessage" class="analysis-message"></div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="validationSection">
+          <div class="panel-title">4. Validation Report</div>
+          <div class="panel-body">
+            <div class="validation-toolbar">
+              <button type="button" id="showAllBtn">All</button>
+              <button type="button" id="showWarningsBtn">Warnings</button>
+              <button type="button" id="showErrorsBtn">Errors</button>
+            </div>
+            <div id="validationList" class="validation-list"></div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="previewSection">
+          <div class="panel-title">5. Airport Import Preview</div>
+          <div class="panel-body">
+            <div class="preview-note">
+              This preview shows the cleaned values that will be compared against Firebase in Step 2.
+              No database comparison is being performed yet.
+            </div>
+
+            <div class="table-wrapper">
+              <table id="previewTable">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>IATA</th>
+                    <th>ICAO</th>
+                    <th>Airport Name</th>
+                    <th>Country</th>
+                    <th>Summer Level</th>
+                    <th>Winter Level</th>
+                  </tr>
+                </thead>
+                <tbody id="previewTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="readySection">
+          <div class="panel-title">6. Ready for Firebase Integration</div>
+          <div class="panel-body">
+            <div class="ready-box">
+              <div class="ready-icon">✓</div>
+              <div>
+                <strong>File processing complete.</strong>
+                <p>
+                  The next step will connect this page to Firebase so it can compare the validated airport records against
+                  <code>/airports</code>, show NEW / CHANGED / UNCHANGED records, create a backup, and apply approved updates.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>Created By: ArtemisByte/KunchackoBoben 2026</footer>
+  <footer>Disclaimer: Use of this Service is at your own risk. The creator provides this Service "as is" without any warranties and is not liable for any damages or losses resulting from its use.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="scripts/airport-update.js"></script>
+</body>
+</html>
